@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <JobDef>
+    <defName>RPS_EnterPowerSuit</defName>
+    <driverClass>RimoutPowerSuit.JobDriver_EnterPowerSuit</driverClass>
+    <reportString>climbing into TargetA.</reportString>
+    <casualInterruptible>false</casualInterruptible>
+    <allowOpportunisticPrefix>true</allowOpportunisticPrefix>
+  </JobDef>
+  <JobDef>
+    <defName>RPS_ExitPowerSuit</defName>
+    <driverClass>RimoutPowerSuit.JobDriver_ExitPowerSuit</driverClass>
+    <reportString>climbing out of a power suit.</reportString>
+    <casualInterruptible>false</casualInterruptible>
+  </JobDef>
+</Defs>

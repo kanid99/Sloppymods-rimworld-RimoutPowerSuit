@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <RPS.EnterSuit>Climb into {0}</RPS.EnterSuit>
+  <RPS.ExitSuit>Climb out</RPS.ExitSuit>
+  <RPS.ExitSuitDesc>Climb out of the {0} and leave it standing here. Warcasket weapons can only be held inside a suit, so they are left with it.</RPS.ExitSuitDesc>
+  <RPS.PilotDowned>{0} is down.</RPS.PilotDowned>
+  <RPS.CannotEnterNotHumanlike>{0} cannot pilot a power suit</RPS.CannotEnterNotHumanlike>
+  <RPS.CannotEnterNotAdult>{0} is too small for a power suit</RPS.CannotEnterNotAdult>
+  <RPS.CannotEnterAlreadyPiloting>{0} is already in a power suit</RPS.CannotEnterAlreadyPiloting>
+</LanguageData>

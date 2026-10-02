@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <!-- The suit sits on its own layer, drawn over everything else. Conflicts with outer armour
+       and headgear are decided in code (ApparelUtility.CanWearTogether), not by sharing a layer. -->
+  <ApparelLayerDef>
+    <defName>RPS_PowerSuit</defName>
+    <label>power suit</label>
+    <drawOrder>350</drawOrder>
+  </ApparelLayerDef>
+</Defs>

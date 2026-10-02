@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ResearchProjectDef>
+    <defName>RPS_PowerSuits</defName>
+    <label>power suits</label>
+    <description>Build walking armoured frames that a colonist climbs into to work and fight - and, unlike a warcasket, climbs back out of.</description>
+    <baseCost>3000</baseCost>
+    <techLevel>Spacer</techLevel>
+    <prerequisites>
+      <li>PoweredArmor</li>
+      <li>VFEP_Warcaskets</li>
+    </prerequisites>
+    <!-- Beside the warcasket research, in Vanilla Expanded's research tab. -->
+    <tab>VanillaExpanded</tab>
+    <researchViewX>10.00</researchViewX>
+    <researchViewY>4.25</researchViewY>
+  </ResearchProjectDef>
+</Defs>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <ThingDef ParentName="ArmorMachineableBase">
+    <defName>RPS_PowerSuitFrame</defName>
+    <label>power suit frame</label>
+    <description>A hulking powered exoskeleton, wrapped in armour plate, that stands on its own until a colonist climbs inside. The servos let its pilot carry far more and hit far harder, at the cost of speed.\n\nThe frame encloses its pilot completely: outer armour and headgear are left behind when they climb in. A pilot can wield the heavy weapons built for warcaskets, and can climb back out at any time.</description>
+    <thingClass>RimoutPowerSuit.Apparel_PowerSuit</thingClass>
+    <techLevel>Spacer</techLevel>
+    <!-- The standing suit, as it looks when nobody is inside. -->
+    <graphicData>
+      <texPath>Things/Item/PowerSuit/PowerSuitFrame</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(1.6,1.6)</drawSize>
+    </graphicData>
+    <thingCategories>
+      <li>ApparelArmor</li>
+    </thingCategories>
+    <stackLimit>1</stackLimit>
+    <pathCost>30</pathCost>
+    <statBases>
+      <MaxHitPoints>450</MaxHitPoints>
+      <WorkToMake>60000</WorkToMake>
+      <Mass>85</Mass>
+      <Flammability>0.2</Flammability>
+      <ArmorRating_Sharp>1.0</ArmorRating_Sharp>
+      <ArmorRating_Blunt>0.5</ArmorRating_Blunt>
+      <ArmorRating_Heat>0.6</ArmorRating_Heat>
+      <Insulation_Cold>25</Insulation_Cold>
+      <Insulation_Heat>10</Insulation_Heat>
+      <!-- Seconds to climb in or out. -->
+      <EquipDelay>5</EquipDelay>
+      <Beauty>-3</Beauty>
+    </statBases>
+    <equippedStatOffsets>
+      <MoveSpeed>-0.6</MoveSpeed>
+      <CarryingCapacity>75</CarryingCapacity>
+      <VEF_MassCarryCapacity>100</VEF_MassCarryCapacity>
+      <MeleeDamageFactor>0.3</MeleeDamageFactor>
+    </equippedStatOffsets>
+    <costList>
+      <Plasteel>120</Plasteel>
+      <Steel>200</Steel>
+      <ComponentIndustrial>8</ComponentIndustrial>
+      <ComponentSpacer>2</ComponentSpacer>
+    </costList>
+    <recipeMaker>
+      <unfinishedThingDef>UnfinishedTechArmor</unfinishedThingDef>
+      <researchPrerequisite>RPS_PowerSuits</researchPrerequisite>
+      <skillRequirements>
+        <Crafting>7</Crafting>
+      </skillRequirements>
+      <recipeUsers Inherit="False">
+        <li>FabricationBench</li>
+      </recipeUsers>
+      <displayPriority>200</displayPriority>
+    </recipeMaker>
+    <apparel>
+      <bodyPartGroups>
+        <li>Torso</li>
+        <li>Neck</li>
+        <li>Shoulders</li>
+        <li>Arms</li>
+        <li>Legs</li>
+        <li>FullHead</li>
+      </bodyPartGroups>
+      <layers Inherit="False">
+        <li>RPS_PowerSuit</li>
+      </layers>
+      <wornGraphicPath>Things/Pawn/PowerSuit/PowerSuitFrame</wornGraphicPath>
+      <parentTagDef>ApparelBody</parentTagDef>
+      <!-- The helmet is part of the suit: the pilot's head is not drawn. -->
+      <renderSkipFlags Inherit="False">
+        <li>Head</li>
+        <li>Hair</li>
+        <li>Beard</li>
+        <li>Eyes</li>
+        <li>Tattoos</li>
+      </renderSkipFlags>
+      <drawData>
+        <scale>1.2</scale>
+      </drawData>
+      <tags Inherit="False" />
+      <defaultOutfitTags Inherit="False" />
+      <developmentalStageFilter>Adult</developmentalStageFilter>
+      <wearPerDay>0</wearPerDay>
+      <careIfWornByCorpse>false</careIfWornByCorpse>
+      <canBeGeneratedToSatisfyWarmth>false</canBeGeneratedToSatisfyWarmth>
+      <canBeGeneratedToSatisfyToxicEnvironmentResistance>false</canBeGeneratedToSatisfyToxicEnvironmentResistance>
+      <canBeGeneratedToSatisfyVacuumResistance>false</canBeGeneratedToSatisfyVacuumResistance>
+      <canBeDesiredForIdeo>false</canBeDesiredForIdeo>
+      <useDeflectMetalEffect>true</useDeflectMetalEffect>
+    </apparel>
+    <!-- "Warcasket" is what lets warcasket weapons accept the pilot: Vanilla Expanded Framework's
+         heavy-weapon check allows anyone wearing torso armour with this trade tag. -->
+    <tradeTags Inherit="False">
+      <li>Warcasket</li>
+    </tradeTags>
+    <thingSetMakerTags Inherit="False" />
+    <generateAllowChance>0</generateAllowChance>
+  </ThingDef>
+
+</Defs>
