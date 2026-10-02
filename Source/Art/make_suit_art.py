@@ -2,14 +2,21 @@
 
     python3 Source/Art/make_suit_art.py
 
-Writes the worn suit for every adult body type in three directions
-(Textures/Things/Pawn/PowerSuit; the game mirrors east for west), the standing suit
-(Textures/Things/Item/PowerSuit), the "Climb out" command icon and About/Preview.png.
+Writes the worn suit in three directions (Textures/Things/Pawn/PowerSuit; the game mirrors
+east for west), the standing suit (Textures/Things/Item/PowerSuit), the "Climb out" command
+icon and About/Preview.png.
 
-Every part is a flat shape drawn at 4x size: filled with a top-left lit gradient, given a
-rim light and a shadowed edge, outlined in near-black like vanilla art, then the whole
-sheet is scaled down to 256px, which antialiases it. Shape coordinates below are in
-256px units; (128, 128) is the centre of the pawn's body.
+Style follows the warcaskets of Vanilla Factions Expanded - Pirates, so the suits sit
+beside them: chunky plates with heavy black outlines, a few flat grey tones with a soft
+top-down gradient, dark vent slots and round ports rather than fine detail. The textures
+are greyscale - the game tints them with the suit's colour (CompColorable), so one drawing
+serves every paint job. One drawing also serves every body type (VEF's isUnifiedApparel),
+as the warcaskets' do.
+
+Each view is built from named pieces (shell, chest, helmet, ...) so later work - the suit
+opening around its pilot - can draw them separately. Shape coordinates are in 256px units
+on the body's 1.5-tile mesh; (128, 128) is the centre of the pawn's body and the head sits
+about 58px above it.
 """
 import os
 
@@ -22,21 +29,22 @@ S = 256               # output size
 N = S * K
 CX = 128
 
-# Palette: olive drab plate over a gunmetal frame, Fallout T-51 style.
-OLIVE = (126, 124, 84)
-OLIVE_DARK = (98, 96, 64)
-GUN = (82, 88, 86)
-GUN_DARK = (58, 62, 62)
-RUBBER = (46, 48, 48)
-EDGE = (24, 24, 22)
-STRIPE = (190, 140, 48)
-VISOR_ON = (255, 196, 84)
-VISOR_OFF = (70, 64, 52)
-CORE = (120, 226, 255)
-LINE = (40, 42, 38)
+# Greyscale tones, matched to the warcasket textures (their plates sit at ~205-255, mid
+# panels ~150, recesses ~50). The game multiplies these by the suit's colour.
+WHITE = (240, 240, 240)
+LIGHT = (208, 208, 208)
+MID = (164, 164, 164)
+DARK = (104, 104, 104)
+RECESS = (54, 54, 54)
+EDGE = (12, 12, 12)
 
-OUTLINE = 4.0         # outline thickness, output pixels
-BODY_WIDTH = {"Male": 1.0, "Female": 0.94, "Thin": 0.9, "Fat": 1.12, "Hulk": 1.16}
+OUTLINE = 4.5         # outline thickness, output pixels
+
+# Paint jobs for previews; the same colours seed the def's colorGenerator.
+OLIVE = (0.58, 0.60, 0.42)
+DESERT = (0.78, 0.68, 0.50)
+GUNMETAL = (0.56, 0.58, 0.60)
+RUST = (0.66, 0.40, 0.32)
 
 
 # --------------------------------------------------------------------- drawing core
@@ -75,43 +83,33 @@ class Sheet:
         draw_fn(ImageDraw.Draw(img))
         return np.array(img) > 127
 
-    def part(self, draw_fn, color, light=0.32, outline=True, rim=True):
-        """A plate: gradient-filled, rim-lit, outlined."""
+    def part(self, draw_fn, tone, light=0.16, outline=True, rim=True, weight=OUTLINE):
+        """A plate: soft top-down gradient, rim-lit top edge, shaded lower edge, outlined."""
         m = self.mask(draw_fn)
         if not m.any():
             return m
         if outline:
-            o = _dilate(m, OUTLINE * K / 2) & ~m
+            o = _dilate(m, weight * K / 2) & ~m
             self.rgb[o] = EDGE
             self.alpha |= o
         ys, xs = np.nonzero(m)
-        y0, y1, x0, x1 = ys.min(), ys.max(), xs.min(), xs.max()
+        y0, y1 = ys.min(), ys.max()
         ny = (self.yy - y0) / max(1, y1 - y0)
-        nx = (self.xx - x0) / max(1, x1 - x0)
-        f = 1 + light * (0.5 - ny) + light * 0.45 * (0.5 - nx)
+        f = 1 + light * (0.5 - ny)
         if rim:
-            off = 3 * K
-            f = f + 0.22 * (m & ~_shift(m, off, off))     # lit top-left edge
-            f = f - 0.22 * (m & ~_shift(m, -off, -off))   # shaded bottom-right edge
-        col = np.clip(np.array(color, np.float32)[None, None, :] * f[..., None], 0, 255)
+            off = 4 * K
+            f = f + 0.08 * (m & ~_shift(m, off // 2, off))      # lit upper edge
+            f = f - 0.14 * (m & ~_shift(m, 0, -off))            # shaded lower edge
+        col = np.clip(np.array(tone, np.float32)[None, None, :] * f[..., None], 0, 255)
         self.rgb[m] = col[m]
         self.alpha |= m
         return m
 
-    def flat(self, draw_fn, color):
-        """Unshaded detail painted only onto what is already drawn (panel lines, decals)."""
+    def flat(self, draw_fn, tone):
+        """Unshaded detail painted only onto what is already drawn (slots, seams)."""
         m = self.mask(draw_fn) & self.alpha
-        self.rgb[m] = color
+        self.rgb[m] = tone
         return m
-
-    def glow(self, draw_fn, color, radius=3):
-        m = self.mask(draw_fn)
-        halo = Image.fromarray((m * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(radius * K))
-        h = (np.array(halo, np.float32) / 255)[..., None] * self.alpha[..., None]
-        self.rgb = self.rgb * (1 - 0.6 * h) + np.array(color, np.float32) * 0.6 * h
-        core = np.clip(np.array(color, np.float32) + 40, 0, 255)
-        self.rgb[m] = core
-        self.alpha |= m
 
     def image(self):
         a = (self.alpha * 255).astype(np.uint8)
@@ -131,8 +129,19 @@ def poly(points):
     return lambda d: d.polygon([(k(x), k(y)) for x, y in points], fill=255)
 
 
-def line(points, width):
-    return lambda d: d.line([(k(x), k(y)) for x, y in points], fill=255, width=int(k(width)), joint="curve")
+def chord(box, start, end):
+    return lambda d: d.chord([k(v) for v in box], start, end, fill=255)
+
+
+def slot(sh, x0, y0, x1, y1):
+    """A dark vent slot, as on the warcaskets."""
+    sh.flat(rrect((x0, y0, x1, y1), (y1 - y0) / 2), RECESS)
+
+
+def port(sh, cx, cy, r, tone=MID):
+    """A round port: a ring around a dark centre."""
+    sh.part(ellipse((cx - r, cy - r, cx + r, cy + r)), tone, rim=False)
+    sh.flat(ellipse((cx - r * 0.55, cy - r * 0.55, cx + r * 0.55, cy + r * 0.55)), RECESS)
 
 
 def both(*fns):
@@ -142,172 +151,152 @@ def both(*fns):
     return draw
 
 
-def rivets(sh, points, r=1.6):
-    for x, y in points:
-        sh.flat(ellipse((x - r, y - r, x + r, y + r)), LINE)
-        sh.flat(ellipse((x - r * 0.5 - 0.4, y - r * 0.5 - 0.4, x - 0.2, y - 0.2)), (176, 172, 140))
+def dome(x0, x1, top, bottom, chin):
+    """A helmet: round crown, sides tapering in to the chin."""
+    w = x1 - x0
+    return both(ellipse((x0, top, x1, top + w)),
+                poly([(x0, top + w * 0.5), (x1, top + w * 0.5), (x1 - chin, bottom), (x0 + chin, bottom)]),
+                rrect((x0 + chin - 4, bottom - 24, x1 - chin + 4, bottom), 12))
+
+
+def torso(x0, x1, top, waist_in):
+    """A chest shell: broad shoulders, tapering to the waist."""
+    return both(rrect((x0, top, x1, top + 64), 40),
+                poly([(x0, top + 30), (x1, top + 30), (x1 - waist_in, 206), (x0 + waist_in, 206)]),
+                rrect((x0 + waist_in - 6, 180, x1 - waist_in + 6, 210), 14))
+
+
+HELMET_WEIGHT = 6.0   # the helmet's outline is heavier, as on the warcaskets
 
 
 # ----------------------------------------------------------------------- the suit
 
-def front(sh, w, visor):
-    """South: the suit facing the viewer."""
-    def X(off):
-        return CX + off * w
-
-    # legs
+def skirt(sh, x_of, back=False):
+    """Hip plates hanging from the waist - the bottom of the silhouette."""
+    sh.part(rrect((x_of(-44), 196, x_of(44), 222), 8), RECESS, light=0)        # thigh gap
     for s in (-1, 1):
-        lx = X(s * 25)
-        sh.part(rrect((lx - 18, 148, lx + 18, 196), 8), GUN)                       # thigh
-        sh.part(rrect((lx - 19, 186, lx + 19, 224), 8), OLIVE)                     # shin plate
-        sh.part(ellipse((lx - 13, 178, lx + 13, 200)), OLIVE_DARK)                 # knee cap
-        sh.part(rrect((lx - 22, 214, lx + 22, 238), 7), RUBBER)                    # boot
-        sh.flat(line([(lx - 20, 231), (lx + 20, 231)], 1.4), EDGE)                 # sole
-        sh.flat(line([(lx - 12, 206), (lx + 12, 206)], 1.2), LINE)
-    # hips and belt
-    sh.part(rrect((X(-46), 136, X(46), 162), 9), GUN_DARK)
-    sh.part(rrect((CX - 13, 140, CX + 13, 160), 4), OLIVE_DARK)                   # buckle plate
-    for s in (-1, 1):
-        sh.part(poly([(X(s * 30), 146), (X(s * 50), 146), (X(s * 48), 176), (X(s * 30), 172)]), OLIVE)  # tassets
-    # upper arms
-    for s in (-1, 1):
-        sh.part(rrect((X(s * 78) - 15, 96, X(s * 78) + 15, 150), 9), GUN)
-    # torso: gunmetal frame behind an olive chest plate
-    sh.part(poly([(X(-58), 86), (X(58), 86), (X(48), 146), (X(-48), 146)]), GUN_DARK)
-    sh.part(poly([(X(-52), 84), (X(52), 84), (X(44), 128), (X(14), 136), (X(-14), 136), (X(-44), 128)]), OLIVE)
-    sh.flat(line([(CX, 88), (CX, 134)], 1.6), LINE)                                # chest ridge
-    sh.flat(line([(X(-44), 108), (X(-14), 116)], 1.2), LINE)
-    sh.flat(line([(X(44), 108), (X(14), 116)], 1.2), LINE)
-    for i, y in enumerate((134, 141)):                                             # abdomen bands
-        sh.flat(line([(X(-40 + i * 3), y), (X(40 - i * 3), y)], 1.2), LINE)
-    rivets(sh, [(X(-40), 94), (X(40), 94), (X(-36), 122), (X(36), 122)])
-    # forearm gauntlets and fists
-    for s in (-1, 1):
-        ax = X(s * 80)
-        sh.part(ellipse((ax - 11, 140, ax + 11, 160)), GUN_DARK)                  # elbow
-        sh.part(rrect((ax - 17, 150, ax + 17, 188), 9), OLIVE)
-        sh.flat(line([(ax - 13, 168), (ax + 13, 168)], 1.2), LINE)
-        sh.part(rrect((ax - 15, 184, ax + 15, 206), 8), RUBBER)                    # fist
-        sh.flat(line([(ax - 9, 195), (ax + 9, 195)], 1.0), EDGE)
-    # pauldrons, with a painted stripe
-    for s in (-1, 1):
-        px = X(s * 80)
-        sh.part(rrect((px - 30, 68, px + 30, 112), 18), OLIVE)
-        sh.flat(rrect((px - 30, 92, px + 30, 98), 0), STRIPE)
-        sh.flat(line([(px - 26, 105), (px + 26, 105)], 1.2), LINE)
-        rivets(sh, [(px - 18, 80), (px + 18, 80)])
-    # gorget and helmet
-    sh.part(rrect((CX - 30, 80, CX + 30, 100), 8), GUN_DARK)
-    sh.part(rrect((CX - 34, 26, CX + 34, 94), 26), OLIVE)                          # dome
-    sh.flat(line([(CX, 28), (CX, 46)], 2.0), OLIVE_DARK)                            # crest
-    sh.part(rrect((CX - 27, 46, CX + 27, 66), 8), RUBBER, light=0.1)               # visor housing
-    if visor:
-        sh.glow(rrect((CX - 22, 52, CX + 22, 60), 3), VISOR_ON)
-    else:
-        sh.flat(rrect((CX - 22, 52, CX + 22, 60), 3), VISOR_OFF)
-    sh.part(poly([(CX - 22, 68), (CX + 22, 68), (CX + 15, 92), (CX - 15, 92)]), GUN)  # jaw / breather
-    for gx in (-8, -3, 2, 7):
-        sh.flat(line([(CX + gx + 0.5, 72), (CX + gx * 0.8 + 0.5, 88)], 1.5), EDGE)
-    for s in (-1, 1):
-        sh.part(ellipse((CX + s * 31 - 7, 60, CX + s * 31 + 7, 76)), GUN_DARK)    # cheek vents
+        sh.part(poly([(x_of(s * 30), 198), (x_of(s * 74), 192), (x_of(s * 70), 244), (x_of(s * 34), 250)]),
+                MID if back else LIGHT)
+    sh.part(poly([(x_of(-24), 202), (x_of(24), 202), (x_of(20), 246), (x_of(-20), 246)]), MID if back else WHITE)
 
 
-def back(sh, w):
-    """North: the suit from behind, power cell housing in view."""
-    def X(off):
-        return CX + off * w
+def pauldron(sh, cx, back=False):
+    """A big rounded shoulder plate with a trim band round its lower edge and a bolt."""
+    sh.part(rrect((cx - 37, 64, cx + 37, 152), 30), WHITE)
+    sh.part(chord((cx - 37, 92, cx + 37, 160), 0, 180), MID, rim=False)         # lower trim band
+    sh.flat(rrect((cx - 37, 124, cx + 37, 129), 2), DARK)
+    if not back:
+        port(sh, cx, 100, 10, LIGHT)
 
+
+def helmet_front(sh):
+    """The T-51 style helmet: dome, two round eye lenses, a breather snout, cheek filters."""
+    sh.part(dome(CX - 52, CX + 52, 8, 128, 14), WHITE, weight=HELMET_WEIGHT)     # dome
+    sh.part(rrect((CX - 8, 6, CX + 8, 40), 6), LIGHT)                             # crest
+    sh.part(poly([(CX - 42, 48), (CX + 42, 48), (CX + 38, 76), (CX - 38, 76)]), DARK, light=0)  # brow
+    for s in (-1, 1):                                                             # eye lenses
+        ex = CX + s * 21
+        sh.part(ellipse((ex - 15, 50, ex + 15, 80)), RECESS, light=0, rim=False)
+        sh.flat(ellipse((ex - 8, 56, ex - 1, 63)), (120, 120, 120))              # glint
+    for s in (-1, 1):                                                             # cheek filters
+        port(sh, CX + s * 44, 98, 15, MID)
+    sh.part(poly([(CX - 26, 82), (CX + 26, 82), (CX + 20, 124), (CX - 20, 124)]), MID)  # snout
+    for gx in (-12, -4, 4, 12):
+        slot(sh, CX + gx - 2, 90, CX + gx + 2, 116)
+
+
+def helmet_back(sh):
+    sh.part(dome(CX - 52, CX + 52, 8, 128, 14), WHITE, weight=HELMET_WEIGHT)
+    sh.part(rrect((CX - 8, 6, CX + 8, 100), 6), LIGHT)                            # crest runs back
+    sh.part(poly([(CX - 50, 96), (CX + 50, 96), (CX + 38, 126), (CX - 38, 126)]), MID)  # neck guard
+    for y in (104, 114):
+        slot(sh, CX - 26, y, CX + 26, y + 5)
+
+
+def south(sh, pieces=("shell", "chest", "pauldrons", "helmet")):
+    x = lambda off: CX + off
+    if "shell" in pieces:
+        skirt(sh, x)
+        sh.part(rrect((CX - 34, 98, CX + 34, 132), 10), RECESS, light=0)            # collar
+        sh.part(torso(CX - 78, CX + 78, 92, 22), LIGHT)                             # torso shell
+        sh.part(rrect((CX - 50, 180, CX + 50, 200), 9), MID)                        # abdomen band
+    if "chest" in pieces:
+        sh.part(poly([(CX - 70, 110), (CX + 70, 110), (CX + 56, 162), (CX, 176), (CX - 56, 162)]), WHITE)
+        sh.flat(rrect((CX - 3, 114, CX + 3, 170), 2), LIGHT)                        # centre ridge
+        for s in (-1, 1):
+            for i in range(2):
+                slot(sh, CX + s * 30 - 14, 132 + i * 12, CX + s * 30 + 14, 137 + i * 12)
+    if "pauldrons" in pieces:
+        for cx in (CX - 82, CX + 82):
+            pauldron(sh, cx)
+    if "helmet" in pieces:
+        helmet_front(sh)
+
+
+def north(sh):
+    x = lambda off: CX + off
+    skirt(sh, x, back=True)
+    sh.part(torso(CX - 78, CX + 78, 92, 22), LIGHT)
+    sh.part(rrect((CX - 50, 184, CX + 50, 202), 8), MID)
+    # power cell housing: a backpack with the cell's end cap and two exhaust stacks
+    sh.part(rrect((CX - 48, 110, CX + 48, 192), 18), MID)
     for s in (-1, 1):
-        lx = X(s * 25)
-        sh.part(rrect((lx - 18, 148, lx + 18, 196), 8), GUN)
-        sh.part(rrect((lx - 18, 188, lx + 18, 222), 8), OLIVE_DARK)              # calf
-        sh.part(rrect((lx - 22, 214, lx + 22, 238), 7), RUBBER)
-        sh.flat(line([(lx - 20, 231), (lx + 20, 231)], 1.4), EDGE)
-    sh.part(rrect((X(-46), 136, X(46), 162), 9), GUN_DARK)
-    for s in (-1, 1):
-        sh.part(rrect((X(s * 78) - 15, 96, X(s * 78) + 15, 150), 9), GUN)
-    sh.part(poly([(X(-58), 86), (X(58), 86), (X(48), 146), (X(-48), 146)]), OLIVE)
-    sh.flat(line([(CX, 90), (CX, 144)], 1.4), LINE)
-    for s in (-1, 1):
-        ax = X(s * 80)
-        sh.part(ellipse((ax - 11, 140, ax + 11, 160)), GUN_DARK)
-        sh.part(rrect((ax - 17, 150, ax + 17, 188), 9), OLIVE)
-        sh.part(rrect((ax - 15, 184, ax + 15, 206), 8), RUBBER)
-    # power cell housing: a backpack with the cell port and two exhausts
-    sh.part(rrect((X(-40), 84, X(40), 150), 12), GUN)
-    sh.part(rrect((CX - 15, 96, CX + 15, 140), 7), RUBBER, light=0.1)
-    sh.glow(rrect((CX - 8, 104, CX + 8, 132), 4), CORE, radius=4)
-    sh.flat(line([(CX - 8, 113), (CX + 8, 113)], 1.0), (60, 120, 140))
-    sh.flat(line([(CX - 8, 123), (CX + 8, 123)], 1.0), (60, 120, 140))
-    for s in (-1, 1):
-        sh.part(rrect((X(s * 28) - 7, 74, X(s * 28) + 7, 98), 5), GUN_DARK)     # exhaust stacks
-        sh.part(ellipse((X(s * 28) - 6, 72, X(s * 28) + 6, 80)), RUBBER, outline=False)
-    rivets(sh, [(X(-32), 140), (X(32), 140), (X(-32), 94), (X(32), 94)])
-    for s in (-1, 1):
-        px = X(s * 80)
-        sh.part(rrect((px - 30, 68, px + 30, 112), 18), OLIVE)
-        sh.flat(rrect((px - 30, 92, px + 30, 98), 0), STRIPE)
-    sh.part(rrect((CX - 34, 26, CX + 34, 92), 26), OLIVE)
-    sh.flat(line([(CX, 28), (CX, 84)], 2.0), OLIVE_DARK)
-    for y in (66, 72, 78):                                                          # rear vents
-        sh.flat(line([(CX - 16, y), (CX + 16, y)], 1.4), LINE)
+        sh.part(rrect((CX + s * 34 - 9, 92, CX + s * 34 + 9, 132), 6), DARK)
+        sh.flat(ellipse((CX + s * 34 - 6, 94, CX + s * 34 + 6, 102)), RECESS)
+    sh.part(ellipse((CX - 26, 126, CX + 26, 178)), LIGHT)
+    sh.part(ellipse((CX - 17, 135, CX + 17, 169)), RECESS, light=0, rim=False)
+    sh.flat(ellipse((CX - 7, 145, CX + 7, 159)), DARK)
+    for cx in (CX - 82, CX + 82):
+        pauldron(sh, cx, back=True)
+    helmet_back(sh)
 
 
-def side(sh, w, visor):
-    """East: the suit in profile, facing right."""
-    d = 0.75 + 0.25 * w      # body types change depth less than width
-
-    def X(off):
-        return CX + off * d
-
-    sh.part(rrect((X(-24), 150, X(8), 222), 8), GUN_DARK)                           # far leg
-    sh.part(rrect((X(-26), 214, X(16), 238), 7), RUBBER)
-    sh.part(rrect((X(-66), 82, X(-26), 152), 12), GUN)                              # backpack
-    sh.part(rrect((X(-62), 96, X(-44), 140), 6), RUBBER, light=0.1)
-    sh.glow(rrect((X(-58), 104, X(-48), 132), 3), CORE, radius=3)
-    sh.part(rrect((X(-58), 70, X(-46), 96), 5), GUN_DARK)                          # exhaust stack
-    sh.part(rrect((X(-34), 136, X(30), 162), 9), GUN_DARK)                          # hips
-    sh.part(poly([(X(-36), 84), (X(34), 84), (X(40), 128), (X(28), 146), (X(-30), 146)]), OLIVE)  # torso
-    sh.flat(line([(X(-24), 132), (X(30), 132)], 1.2), LINE)
-    sh.flat(line([(X(-24), 140), (X(28), 140)], 1.2), LINE)
-    sh.part(rrect((X(-6), 150, X(26), 196), 8), GUN)                                # near thigh
-    sh.part(rrect((X(-6), 186, X(28), 224), 8), OLIVE)                              # near shin
-    sh.part(ellipse((X(10), 176, X(32), 200)), OLIVE_DARK)                         # knee cap
-    sh.part(rrect((X(-8), 214, X(40), 238), 7), RUBBER)                             # near boot
-    sh.flat(line([(X(-6), 231), (X(38), 231)], 1.4), EDGE)
-    # helmet in profile, the breather jutting forward
-    sh.part(rrect((X(-22), 80, X(26), 100), 8), GUN_DARK)                           # gorget
-    sh.part(rrect((X(-26), 26, X(34), 94), 26), OLIVE)
-    sh.part(poly([(X(18), 66), (X(44), 70), (X(40), 90), (X(14), 92)]), GUN)       # breather
-    for gx in (24, 30, 36):
-        sh.flat(line([(X(gx), 72), (X(gx - 1), 88)], 1.5), EDGE)
-    sh.part(rrect((X(16), 46, X(40), 64), 7), RUBBER, light=0.1)
-    if visor:
-        sh.glow(rrect((X(22), 51, X(40), 59), 3), VISOR_ON)
-    else:
-        sh.flat(rrect((X(22), 51, X(40), 59), 3), VISOR_OFF)
-    sh.part(ellipse((X(-14), 56, X(4), 74)), GUN_DARK)                             # ear vent
-    sh.flat(line([(X(-20), 32), (X(10), 28)], 2.0), OLIVE_DARK)
-    # arm hangs in front of the torso
-    sh.part(rrect((X(-12), 96, X(18), 150), 9), GUN)
-    sh.part(ellipse((X(-8), 140, X(14), 160)), GUN_DARK)
-    sh.part(rrect((X(-12), 150, X(22), 188), 9), OLIVE)
-    sh.flat(line([(X(-8), 168), (X(18), 168)], 1.2), LINE)
-    sh.part(rrect((X(-10), 184, X(24), 206), 8), RUBBER)
-    sh.part(rrect((X(-28), 68, X(30), 112), 18), OLIVE)                             # pauldron
-    sh.flat(rrect((X(-28), 92, X(30), 98), 0), STRIPE)
-    rivets(sh, [(X(-16), 80), (X(18), 80)])
+def east(sh):
+    """Facing right. The pilot's back - and the power cell housing - is to the left."""
+    # backpack, behind everything
+    sh.part(rrect((CX - 84, 104, CX - 30, 196), 16), MID)
+    sh.part(rrect((CX - 72, 88, CX - 52, 128), 6), DARK)                           # exhaust stack
+    sh.part(ellipse((CX - 94, 128, CX - 62, 172)), LIGHT)                         # cell end cap
+    sh.part(ellipse((CX - 88, 136, CX - 68, 164)), RECESS, light=0, rim=False)
+    # hips and torso in profile
+    sh.part(rrect((CX - 44, 196, CX + 40, 222), 8), RECESS, light=0)
+    sh.part(poly([(CX - 46, 198), (CX + 6, 196), (CX + 4, 248), (CX - 40, 250)]), MID)
+    sh.part(poly([(CX - 6, 198), (CX + 50, 194), (CX + 48, 244), (CX - 2, 248)]), LIGHT)
+    sh.part(both(rrect((CX - 58, 92, CX + 66, 156), 40),
+                 poly([(CX - 58, 122), (CX + 66, 122), (CX + 50, 206), (CX - 44, 206)]),
+                 rrect((CX - 50, 178, CX + 56, 210), 14)), LIGHT)
+    sh.part(poly([(CX + 8, 108), (CX + 70, 112), (CX + 64, 170), (CX + 14, 178)]), WHITE)  # chest plate
+    for i in range(3):
+        slot(sh, CX + 30, 126 + i * 11, CX + 58, 131 + i * 11)
+    sh.part(rrect((CX - 36, 182, CX + 50, 200), 8), MID)
+    # helmet in profile: the snout juts forward
+    sh.part(dome(CX - 46, CX + 54, 8, 128, 10), WHITE, weight=HELMET_WEIGHT)
+    sh.part(rrect((CX - 40, 6, CX + 20, 22), 8), LIGHT)                          # crest
+    sh.part(poly([(CX + 20, 48), (CX + 56, 52), (CX + 54, 78), (CX + 18, 76)]), DARK, light=0)  # brow
+    sh.part(ellipse((CX + 30, 52, CX + 56, 80)), RECESS, light=0, rim=False)      # eye lens
+    sh.flat(ellipse((CX + 36, 57, CX + 43, 64)), (120, 120, 120))
+    sh.part(poly([(CX + 24, 84), (CX + 70, 92), (CX + 64, 124), (CX + 20, 124)]), MID)  # snout
+    for gx in (34, 44, 54):
+        slot(sh, gx + CX - 2, 96, gx + CX + 2, 118)
+    port(sh, CX - 6, 92, 17, MID)                                                 # cheek filter
+    # near pauldron over the shoulder
+    pauldron(sh, CX - 3)
 
 
-def suit(direction, w=1.0, visor=True):
+def suit(direction):
     sh = Sheet()
-    {"south": lambda: front(sh, w, visor),
-     "north": lambda: back(sh, w),
-     "east": lambda: side(sh, w, visor)}[direction]()
+    {"south": lambda: south(sh), "north": lambda: north(sh), "east": lambda: east(sh)}[direction]()
     return sh.image()
 
 
 # ----------------------------------------------------------------------- outputs
+
+def tint(img, color):
+    """What the game does with the greyscale texture: multiply by the suit's colour."""
+    arr = np.array(img, np.float32)
+    arr[..., :3] *= np.array(color, np.float32)
+    return Image.fromarray(arr.astype(np.uint8), "RGBA")
+
 
 def save(img, *parts):
     path = os.path.join(ROOT, *parts)
@@ -317,20 +306,20 @@ def save(img, *parts):
 
 
 def standing():
-    """The empty suit as it stands on the map: visor dark, a shadow on the floor."""
+    """The empty suit as it stands on the map, with a shadow on the floor."""
     img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
     shadow = Image.new("RGBA", (S, S), (0, 0, 0, 0))
-    ImageDraw.Draw(shadow).ellipse((44, 220, 212, 248), fill=(0, 0, 0, 120))
+    ImageDraw.Draw(shadow).ellipse((36, 222, 220, 254), fill=(0, 0, 0, 120))
     img = Image.alpha_composite(img, shadow.filter(ImageFilter.GaussianBlur(5)))
-    return Image.alpha_composite(img, suit("south", visor=False))
+    return Image.alpha_composite(img, suit("south"))
 
 
 def icon():
     img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
-    img.alpha_composite(suit("south", visor=False).resize((212, 212), Image.LANCZOS), (-14, 30))
+    img.alpha_composite(tint(suit("south"), OLIVE).resize((220, 220), Image.LANCZOS), (-16, 24))
     arrow = Sheet()
     arrow.part(poly([(150, 112), (206, 112), (206, 88), (248, 128), (206, 168), (206, 144), (150, 144)]),
-               (236, 236, 228), light=0.2)
+               (236, 236, 228), light=0.1)
     img.alpha_composite(arrow.image())
     return img.resize((128, 128), Image.LANCZOS)
 
@@ -342,16 +331,15 @@ def preview():
         d.line((i, 0, i, 360), fill=(48, 52, 50, 255))
     for i in range(0, 360, 40):
         d.line((0, i, 640, i), fill=(48, 52, 50, 255))
-    img.alpha_composite(standing().resize((300, 300), Image.LANCZOS), (40, 40))
-    img.alpha_composite(suit("east").resize((300, 300), Image.LANCZOS), (300, 40))
+    img.alpha_composite(tint(standing(), DESERT).resize((230, 230), Image.LANCZOS), (-10, 110))
+    img.alpha_composite(tint(standing(), OLIVE).resize((300, 300), Image.LANCZOS), (170, 40))
+    img.alpha_composite(tint(suit("east"), GUNMETAL).resize((230, 230), Image.LANCZOS), (420, 110))
     return img.convert("RGB")
 
 
 def main():
-    for body, w in BODY_WIDTH.items():
-        for direction in ("south", "north", "east"):
-            save(suit(direction, w), "Textures", "Things", "Pawn", "PowerSuit",
-                 "PowerSuitFrame_%s_%s.png" % (body, direction))
+    for direction in ("south", "north", "east"):
+        save(suit(direction), "Textures", "Things", "Pawn", "PowerSuit", "PowerSuitFrame_%s.png" % direction)
     save(standing(), "Textures", "Things", "Item", "PowerSuit", "PowerSuitFrame.png")
     save(icon(), "Textures", "UI", "Commands", "RPS_ExitPowerSuit.png")
     save(preview(), "About", "Preview.png")

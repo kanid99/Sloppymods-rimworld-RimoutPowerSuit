@@ -11,7 +11,7 @@
     <graphicData>
       <texPath>Things/Item/PowerSuit/PowerSuitFrame</texPath>
       <graphicClass>Graphic_Single</graphicClass>
-      <drawSize>(1.6,1.6)</drawSize>
+      <drawSize>(1.5,1.5)</drawSize>
     </graphicData>
     <thingCategories>
       <li>ApparelArmor</li>
@@ -77,9 +77,6 @@
         <li>Eyes</li>
         <li>Tattoos</li>
       </renderSkipFlags>
-      <drawData>
-        <scale>1.2</scale>
-      </drawData>
       <tags Inherit="False" />
       <defaultOutfitTags Inherit="False" />
       <developmentalStageFilter>Adult</developmentalStageFilter>
@@ -97,6 +94,42 @@
       <li>Warcasket</li>
     </tradeTags>
     <thingSetMakerTags Inherit="False" />
+    <!-- The textures are greyscale, tinted with the suit's colour, like the warcaskets'. -->
+    <comps Inherit="False">
+      <li Class="CompProperties_Forbiddable" />
+      <li>
+        <compClass>CompColorable</compClass>
+      </li>
+      <li>
+        <compClass>CompQuality</compClass>
+      </li>
+    </comps>
+    <colorGenerator Class="ColorGenerator_Options">
+      <options>
+        <li>
+          <weight>10</weight>
+          <only>(0.58,0.60,0.42)</only> <!-- olive drab -->
+        </li>
+        <li>
+          <weight>6</weight>
+          <only>(0.56,0.58,0.60)</only> <!-- gunmetal -->
+        </li>
+        <li>
+          <weight>4</weight>
+          <only>(0.78,0.68,0.50)</only> <!-- desert -->
+        </li>
+        <li>
+          <weight>2</weight>
+          <only>(0.66,0.40,0.32)</only> <!-- rust red -->
+        </li>
+      </options>
+    </colorGenerator>
+    <modExtensions>
+      <!-- One texture for every body type, as the warcaskets do (Vanilla Expanded Framework). -->
+      <li Class="VEF.Apparels.ApparelExtension">
+        <isUnifiedApparel>true</isUnifiedApparel>
+      </li>
+    </modExtensions>
     <generateAllowChance>0</generateAllowChance>
   </ThingDef>
 
