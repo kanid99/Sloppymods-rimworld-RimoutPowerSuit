@@ -3,12 +3,12 @@
   <name>SloppyMods Rimout Power Suit</name>
   <author>SloppyMod</author>
   <packageId>sloppymod.rimoutpowersuit</packageId>
-  <modVersion>0.9.4</modVersion>
+  <modVersion>0.9.5</modVersion>
   <!-- 1.6 only: the assembly is built against 1.6 signatures. -->
   <supportedVersions>
     <li>1.6</li>
   </supportedVersions>
-  <description>Build 0.9.4
+  <description>Build 0.9.5
 
 Walking tanks for your colonists. A power suit is a hulking armoured frame that stands on its own until a colonist climbs inside to work and fight in it, and climbs back out when the job is done.
 

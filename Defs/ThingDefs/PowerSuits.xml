@@ -11,6 +11,9 @@
     <graphicData>
       <texPath>Things/Item/PowerSuit/PowerSuitFrame</texPath>
       <graphicClass>Graphic_Single</graphicClass>
+      <!-- CutoutComplex reads the _m mask beside the texture: red marks the armour plates,
+           which take the suit's colour; the frame, hoses and lamp keep their own. -->
+      <shaderType>CutoutComplex</shaderType>
       <drawSize>(1.5,1.5)</drawSize>
     </graphicData>
     <thingCategories>
@@ -68,6 +71,8 @@
         <li>RPS_PowerSuit</li>
       </layers>
       <wornGraphicPath>Things/Pawn/PowerSuit/PowerSuitFrame</wornGraphicPath>
+      <!-- Worn masks are _southm / _eastm / _northm (no underscore before the m). -->
+      <useWornGraphicMask>true</useWornGraphicMask>
       <parentTagDef>ApparelBody</parentTagDef>
       <!-- The helmet is part of the suit: the pilot's head is not drawn. -->
       <renderSkipFlags Inherit="False">
@@ -94,7 +99,7 @@
       <li>Warcasket</li>
     </tradeTags>
     <thingSetMakerTags Inherit="False" />
-    <!-- The textures are greyscale, tinted with the suit's colour, like the warcaskets'. -->
+    <!-- Only the armour plates are painted with the suit's colour (see the masks). -->
     <comps Inherit="False">
       <li Class="CompProperties_Forbiddable" />
       <li>
