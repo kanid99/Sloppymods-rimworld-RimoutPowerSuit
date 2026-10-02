@@ -65,8 +65,9 @@ def plate_mask(rgb):
     return ndimage.median_filter(m, size=7)
 
 
-def fit(name):
-    rgb = np.array(Image.open(os.path.join(SRC, name + ".png")).convert("RGB")).astype(np.float32)
+def fit(name, path=None):
+    path = path or os.path.join(SRC, name + ".png")
+    rgb = np.array(Image.open(path).convert("RGB")).astype(np.float32)
     fig = cut_out(rgb)
     mask = plate_mask(rgb) * fig
     ys, xs = np.nonzero(fig)
