@@ -71,9 +71,14 @@ commit pushed to `main` is what the game loads next**.
 - Do not reuse VFE Pirates' `Apparel_Warcasket` / `WarcasketDef` types: their
   patches block unlocking, stripping and spawning them on the ground, which
   is the opposite of a suit you climb in and out of.
+- The suit design is ORIGINAL (a diving-helmet industrial suit: wraparound amber
+  visor, side lamp, layered pauldrons, hazard-striped chest, twin cells and a release
+  wheel on the back). Never give an image generator another game's armour - Fallout's
+  power armour included - as a reference: copies are a copyright risk. Only "inspired
+  by" ideas (a walking suit, a release wheel) are fine.
 - Suit art is painted with Nano Banana Pro (`Source/Art/nano.py`, which reads the
-  key from `GEMINI_API_KEY` - never commit a key) from a T-60 reference, in the
-  format and style of VFE Pirates' warcaskets: no arms, no legs, helmet + torso +
+  key from `GEMINI_API_KEY` - never commit a key), in the format and style of VFE
+  Pirates' warcaskets: no arms, no legs, helmet + torso +
   pauldrons + hip plates. The paintings live in `Source/Art/nano/`;
   `python3 Source/Art/process_nano.py` turns them into the textures: cut-out, scaled
   to the 256px body canvas, one texture per direction for every body type (VEF

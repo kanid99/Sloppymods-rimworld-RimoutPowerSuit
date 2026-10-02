@@ -3,8 +3,8 @@
     python3 Source/Art/process_nano.py
 
 Source/Art/nano/{south,east,north}.png are the paintings (made with Source/Art/nano.py:
-Nano Banana Pro, from a T-60 reference and the VFE Pirates warcasket sprites for style),
-on white. This script:
+Nano Banana Pro, an original design - a diving-helmet industrial suit - with the VFE
+Pirates warcasket sprites given only for format and style), on white. This script:
 
 - cuts each one out of its white background,
 - scales each so the figure is the same height, feet - well, hip plates - on the same
@@ -54,12 +54,15 @@ def cut_out(rgb):
 
 
 def plate_mask(rgb):
-    """1 on the light neutral-grey armour plates, 0 on the frame, hoses, lamp, lenses, lines."""
+    """1 on the light grey armour plates, 0 on the dark frame, the coloured parts (visor,
+    lamp, hazard stripes, cells) and the black lines. Thresholds are soft and the result is
+    median-filtered, so compression noise in the painting doesn't speckle the paint job."""
     lum = rgb.mean(2)
     spread = rgb.max(2) - rgb.min(2)
-    neutral = np.clip((26 - spread) / 10, 0, 1)
-    light = np.clip((lum - 132) / 22, 0, 1)
-    return neutral * light
+    neutral = np.clip((48 - spread) / 14, 0, 1)
+    light = np.clip((lum - 118) / 20, 0, 1)
+    m = neutral * light
+    return ndimage.median_filter(m, size=7)
 
 
 def fit(name):
