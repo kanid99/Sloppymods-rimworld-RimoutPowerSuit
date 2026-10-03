@@ -111,31 +111,47 @@ def arm_layer(path, inner_x, top, height, side, flip_v=False):
         pair = tuple(i.transpose(Image.FLIP_LEFT_RIGHT) for i in pair)
     return pair
 
-def flatten_collar(layer_pair, ring_h_ratio=0.32, sink=6):
-    """Replace a chassis's tall round neck tube with a low, flat collar ring: erase the
-    tube above its middle, then draw a wide, shallow oval rim with a dark opening, in the
-    suit's own style (gunmetal rim, thick black outline). The rim is unpainted (mask 0)."""
+COLLAR_RINGS = []   # masks of every collar ring drawn, in pre-rescale canvas pixels
+
+
+CANON_RING = (127.0, 96.0, 96.0)   # centre x, centre y, width of the standard collar ring (pre-rescale)
+RING_H_RATIO = 0.32
+
+
+def ring_ellipse(pad=0.0):
+    """Outer ellipse of the standard collar ring, as a mask in pre-rescale canvas pixels."""
+    cx, cy, w = CANON_RING
+    rw = w / 2 + 10 + 3 + pad
+    rh = (w / 2 + 10) * RING_H_RATIO + 3 + pad
+    yy, xx = np.mgrid[0:S, 0:S]
+    return ((xx - cx) / rw) ** 2 + ((yy - cy) / rh) ** 2 <= 1
+
+
+def flatten_collar(layer_pair):
+    """Replace a chassis's neck - a tall round tube or the model's own collar - with the
+    standard flat collar ring, identical on every chassis so any arm piece can tuck behind
+    it: erase the old neck above the ring, then draw the ring (gunmetal rim, dark opening,
+    thick black outline; unpainted)."""
     tex, mask = (np.array(i).copy() for i in layer_pair)
+    cx, cy, w = CANON_RING
     c = collar(layer_pair[0])
-    if c is None:
-        return layer_pair
-    cx, cy, w, h, bottom = c
     rim = 10
-    x0, x1 = int(cx - w / 2 - rim), int(cx + w / 2 + rim)
-    top_cut = int(bottom) - sink           # the whole tube goes, down to where it meets the shoulders
+    half = max(w / 2, (c[2] / 2) if c else 0) + rim
+    x0, x1 = int(cx - half), int(cx + half)
+    top_cut = int(cy)
     tex[:top_cut, x0:x1] = 0
     mask[:top_cut, x0:x1] = 0
     K = 4
     big = Image.new('RGBA', (S * K, S * K), (0, 0, 0, 0))
     d = ImageDraw.Draw(big)
-    rw, rh = (w / 2 + rim) * K, (w / 2 + rim) * ring_h_ratio * K
-    ccx, ccy = cx * K, top_cut * K
-    d.ellipse((ccx - rw - 3 * K, ccy - rh - 3 * K, ccx + rw + 3 * K, ccy + rh + 3 * K), fill=(10, 10, 10, 255))   # outline
-    d.ellipse((ccx - rw, ccy - rh, ccx + rw, ccy + rh), fill=(96, 100, 104, 255))                             # gunmetal rim
-    d.ellipse((ccx - rw + 4 * K, ccy - rh + 3 * K, ccx + rw - 4 * K, ccy + rh - 1 * K), fill=(150, 154, 158, 255))  # rim highlight
+    rw, rh = (w / 2 + rim) * K, (w / 2 + rim) * RING_H_RATIO * K
+    ccx, ccy = cx * K, cy * K
+    d.ellipse((ccx - rw - 3 * K, ccy - rh - 3 * K, ccx + rw + 3 * K, ccy + rh + 3 * K), fill=(10, 10, 10, 255))
+    d.ellipse((ccx - rw, ccy - rh, ccx + rw, ccy + rh), fill=(96, 100, 104, 255))
+    d.ellipse((ccx - rw + 4 * K, ccy - rh + 3 * K, ccx + rw - 4 * K, ccy + rh - 1 * K), fill=(150, 154, 158, 255))
     ow, oh = rw - 9 * K, rh - 6 * K
-    d.ellipse((ccx - ow - 2 * K, ccy - oh - 2 * K + K, ccx + ow + 2 * K, ccy + oh + 2 * K + K), fill=(10, 10, 10, 255))
-    d.ellipse((ccx - ow, ccy - oh + K, ccx + ow, ccy + oh + K), fill=(38, 40, 42, 255))                         # opening
+    d.ellipse((ccx - ow - 2 * K, ccy - oh - 1 * K, ccx + ow + 2 * K, ccy + oh + 3 * K), fill=(10, 10, 10, 255))
+    d.ellipse((ccx - ow, ccy - oh + K, ccx + ow, ccy + oh + K), fill=(38, 40, 42, 255))
     ring = np.array(big.resize((S, S), Image.LANCZOS)).astype(np.float32)
     a = ring[..., 3:4] / 255
     out = tex.astype(np.float32)
@@ -145,3 +161,13 @@ def flatten_collar(layer_pair, ring_h_ratio=0.32, sink=6):
     m[..., 0:1] *= (1 - a)
     m[..., 3:4] = np.maximum(m[..., 3:4], ring[..., 3:4])
     return Image.fromarray(out.astype(np.uint8), 'RGBA'), Image.fromarray(m.astype(np.uint8), 'RGBA')
+
+
+def clip_behind(layer_pair, mask):
+    """Erase a layer wherever `mask` is set: used to tuck arm pieces behind the collar ring."""
+    out = []
+    for img in layer_pair:
+        a = np.array(img).copy()
+        a[mask] = 0
+        out.append(Image.fromarray(a, img.mode))
+    return tuple(out)

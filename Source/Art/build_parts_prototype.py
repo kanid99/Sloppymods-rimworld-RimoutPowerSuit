@@ -12,15 +12,20 @@ for k in V:
     src = f'{SP}/mod5/chassis_harvester.png' if k == 'harvester' else f'{SP}/mod4/chassis_{k}.png'
     lay=layer(src,T); c=collar(lay[0])
     lay=shift(lay,0,CANON_CY-c[1])
-    C[k]=rescale(lay if k == 'harvester' else flatten_collar(lay),GS)
+    C[k]=rescale(flatten_collar(lay),GS)
     H[k]=rescale(helmet_layer(f'{SP}/mod2/helmet_{k}.png',127,CANON_BOTTOM+DROP,HW*{'harvester':1.25,'miner':1.1}.get(k,1)),GS)
 # arm placement: (inner edge x on the left side, top y, height) in final canvas pixels
 AX=float(sys.argv[2]) if len(sys.argv)>2 else 70
 ARMS={'standard':(AX,96,66,False),'medic':(AX,98,62,False),'builder':(AX,86,74,False),'miner':(AX+2,94,70,False),
       'bulwark':(98,58,110,False),'bughunter':(AX+4,70,104,False)}
+# the collar ring sits in front of the arm pieces: it is the same ring on every chassis, so
+# one cut-out of its outline tucks every arm piece behind it
+ringimg = Image.fromarray((ring_ellipse() * 255).astype(np.uint8), 'L')
+ring_final = np.array(rescale((ringimg,), GS)[0]) > 0
 A={}
 for a,(ix,top,h,fv) in ARMS.items():
-    A[a]={'left':arm_layer(f'{SP}/arms/arm_{a}.png',ix,top,h,'left',fv),'right':arm_layer(f'{SP}/arms/arm_{a}.png',ix,top,h,'right',fv)}
+    A[a]={'left':clip_behind(arm_layer(f'{SP}/arms/arm_{a}.png',ix,top,h,'left',fv),ring_final),
+          'right':clip_behind(arm_layer(f'{SP}/arms/arm_{a}.png',ix,top,h,'right',fv),ring_final)}
 def suit(ch,he,al,ar,col):
     return stack([C[ch],A[al]['left'],A[ar]['right'],H[he]],col)   # pauldrons over the shoulder joints, under the helmet
 floor=(92,84,70,255)
