@@ -37,8 +37,11 @@ Decisions agreed with the owner, to build from. Numbers are starting points for 
     arm, each with its own cooldown.
 - **Net launcher** (chassis ability): a targeted button that fires a net over an area; insects
   caught in it are pinned (or heavily slowed) for a few seconds - other creatures are only
-  slowed briefly. Sets up the hammer and flamer.
-- Helmet: lamps instead of horns; no side fire port. Chassis: only a subtle hint of teeth.
+  slowed briefly. Sets up the hammer and flamer. Holds **3 nets max**; does not use suit
+  power. The pilot reloads it from **cloth or other common textiles** (any fabric: cloth,
+  hemp, synthread, devilstrand...; around 20 per net), like vanilla reloadable gear.
+- Helmet: twin lamps on top (no horns, no side fire port). Chassis: a faint chevron along
+  the lower chest edge - the only hint of teeth.
 - Drawbacks: **slow** (large move-speed penalty) and **power hungry** (high drain).
 - Compensation: holds **two power cells** instead of one.
 
