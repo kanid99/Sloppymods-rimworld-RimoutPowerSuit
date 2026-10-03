@@ -83,6 +83,7 @@ Decisions agreed with the owner, to build from. Numbers are starting points for 
 
 ### More Bulwark arm ideas
 
+- Art for the four below is drawn in code (`Source/Art/draw_weapons.py`), not generated.
 - **Autocannon** - single heavy barrel, slow powerful shots; good against mechs and doors.
 - **Grenade launcher** - ability arm: lobs over cover and walls (indirect fire).
 - **Arc projector** - ability arm: chains EMP lightning between enemies; stuns and wrecks mechanoids and
