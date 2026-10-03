@@ -28,11 +28,17 @@ Decisions agreed with the owner, to build from. Numbers are starting points for 
   weapon) and to **fire** (+25% flame damage dealt, any flamethrower or fire source).
 - Built-in arm weapons (art: `arm_flamer`, `arm_hammer`):
   - **Hydraulic hammer arm**: a built-in heavy blunt melee attack, always available, even while
-    the pilot holds a gun. Two hammer arms = more frequent hammer strikes.
+    the pilot holds a gun. Two hammer arms = more frequent hammer strikes. Drawn big and swung
+    outward from its shoulder plate (which stays bolted to the chassis) so it reads at a glance.
   - **Flamethrower arm**: NOT a regular weapon - a **targeted ability button** on the pilot's
     command bar: pick a spot in range (~7 tiles), sprays a cone of fire there (reusing VFE
     Pirates' flame projectile). Cooldown; **draws its charge from the suit's power cells**
-    and can't fire when they're too low. Two flamer arms = shorter cooldown or wider cone.
+    and can't fire when they're too low. Two flamer arms = **two independent buttons**, one per
+    arm, each with its own cooldown.
+- **Net launcher** (chassis ability): a targeted button that fires a net over an area; insects
+  caught in it are pinned (or heavily slowed) for a few seconds - other creatures are only
+  slowed briefly. Sets up the hammer and flamer.
+- Helmet: lamps instead of horns; no side fire port. Chassis: only a subtle hint of teeth.
 - Drawbacks: **slow** (large move-speed penalty) and **power hungry** (high drain).
 - Compensation: holds **two power cells** instead of one.
 

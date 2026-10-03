@@ -85,7 +85,7 @@ def rescale(layer_pair, s, cx=S / 2, by=BOTTOM):
         out.append(c)
     return tuple(out)
 
-def arm_layer(path, inner_x, top, height, side, flip_v=False):
+def arm_layer(path, inner_x, top, height, side, flip_v=False, rotate=0.0):
     """A shoulder piece painted for the suit's LEFT side, scaled to `height`, with its inner
     (right-hand) edge at `inner_x` and its top at `top`. side='right' mirrors it onto the
     other shoulder: one drawing serves both sides."""
@@ -102,6 +102,11 @@ def arm_layer(path, inner_x, top, height, side, flip_v=False):
     m = Image.fromarray(crop((mask * 255).astype(np.uint8)), 'L').resize((w, h), Image.LANCZOS)
     if flip_v:
         body, m = body.transpose(Image.FLIP_TOP_BOTTOM), m.transpose(Image.FLIP_TOP_BOTTOM)
+    if rotate:
+        # positive = swing the lower end outward (away from the body), pivoting near the top
+        body = body.rotate(-rotate, resample=Image.BICUBIC, expand=True, center=(w * 0.75, h * 0.15))
+        m = m.rotate(-rotate, resample=Image.BICUBIC, expand=True, center=(w * 0.75, h * 0.15))
+        w, h = body.size
     left = int(round(inner_x - w))
     tex = Image.new('RGBA', (S, S)); tex.paste(body, (left, int(top)), body)
     red = Image.new('L', (S, S), 0); red.paste(m, (left, int(top)))
@@ -170,4 +175,47 @@ def clip_behind(layer_pair, mask):
         a = np.array(img).copy()
         a[mask] = 0
         out.append(Image.fromarray(a, img.mode))
+    return tuple(out)
+
+def swung_arm_layer(path, pivot_xy, pivot_frac, height, angle, side, canvas_w=S):
+    """An arm piece (painted for the LEFT shoulder) scaled to `height` and swung outward by
+    `angle` degrees about a pivot in its shoulder plate, so the plate stays bolted on while the
+    rest swings out. pivot_frac: the pivot as a fraction of the piece's (width, height);
+    pivot_xy: where the pivot sits on the suit's canvas. Returns (tex, mask) on a canvas
+    `canvas_w` wide; side='right' mirrors it."""
+    rgb = load(path); fig = cut_out(rgb)
+    ys, xs = np.nonzero(fig); y0, y1, x0, x1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
+    scale = height / (y1 - y0)
+    ring = ndimage.binary_dilation(fig, iterations=max(1, round(OUTER / scale))) & ~fig
+    rgb[ring] = 8; fig = fig | ring
+    mask = plate_mask(rgb) * fig
+    rgb[~fig] = 0
+    crop = lambda arr: arr[y0:y1, x0:x1]
+    w, h = round((x1 - x0) * scale), round((y1 - y0) * scale)
+    body = Image.fromarray(np.dstack([crop(rgb).astype(np.uint8), crop((fig * 255).astype(np.uint8))]), 'RGBA').resize((w, h), Image.LANCZOS)
+    m = Image.fromarray(crop((mask * 255).astype(np.uint8)), 'L').resize((w, h), Image.LANCZOS)
+    px, py = pivot_frac[0] * w, pivot_frac[1] * h
+    R = int(2 * max(w, h)) + 4
+    def around(img):
+        big = Image.new(img.mode, (R, R))
+        big.paste(img, (int(R / 2 - px), int(R / 2 - py)))
+        # positive angle swings the lower end outward, i.e. to the LEFT for a left-side piece
+        return big.rotate(-angle, resample=Image.BICUBIC, center=(R / 2, R / 2))
+    body, m = around(body), around(m)
+    ox, oy = int(round(pivot_xy[0] - R / 2)), int(round(pivot_xy[1] - R / 2))
+    tex = Image.new('RGBA', (canvas_w, S)); tex.paste(body, (ox, oy), body)
+    red = Image.new('L', (canvas_w, S), 0); red.paste(m, (ox, oy))
+    z = Image.new('L', (canvas_w, S), 0)
+    pair = (tex, Image.merge('RGBA', (red, z, z, tex.split()[3])))
+    if side == 'right':
+        pair = tuple(i.transpose(Image.FLIP_LEFT_RIGHT) for i in pair)
+    return pair
+
+def widen(layer_pair, canvas_w):
+    """Centre a 256-wide layer on a wider canvas (for previews of pieces that stick out)."""
+    out = []
+    for img in layer_pair:
+        c = Image.new(img.mode, (canvas_w, img.size[1]))
+        c.paste(img, ((canvas_w - img.size[0]) // 2, 0))
+        out.append(c)
     return tuple(out)
