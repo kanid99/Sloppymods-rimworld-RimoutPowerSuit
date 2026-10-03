@@ -60,3 +60,32 @@ Decisions agreed with the owner, to build from. Numbers are starting points for 
   South view: weapons hang straight down, muzzle to the ground (warcasket style), so nothing sticks out sideways.
   Options: minigun, rocket pod, chainsaw, laser, flamer, hammer. Weapon art is separate
   (`Source/Art/nano/modular/weapons/`), composited under the shared plate (`Source/Art/bulwark_hang.py`).
+
+### Bulwark mechanics
+
+- **Siege shield.** After the pilot has stood still for ~1 second, the suit diverts power into a shield
+  bubble. It absorbs incoming damage of every kind (bullets, blades, blunt, fire, explosions) up to its
+  energy, drawn from the suit's power cells while it is up and while it recharges. The pilot can still fire
+  out of it (unlike a vanilla shield belt). Taking a step drops it instantly; it starts back up after
+  standing still again. No power left in the cells = no shield. A gizmo toggles it off to save power.
+- **Ranged arms** (minigun, autocannon, laser): the arm *is* the suit's weapon. One gun arm = that gun;
+  two gun arms fire together as one heavier burst. Works with VFE Pirates' warcasket weapons in place of
+  a gun arm.
+- **Ability arms** (rocket pod, flamer, grenade launcher, arc projector): each arm adds its own targeted
+  button, powered from the suit (two such arms = two independent buttons, as for the Bughunter).
+  Each button has an **Auto** toggle: when on, the arm fires by itself at hostiles in range when
+  ready - rockets and grenades pick the biggest group, the flamer only fires when no friendly is in the
+  cone. Off by default.
+- **Melee arms** (chainsaw, hammer): built-in melee attacks that replace fists; chainsaw = cut + bleeding,
+  hammer = blunt + stun.
+- **Rocket ammo:** a few rockets loaded at a time, reloaded from steel and chemfuel (like the net launcher
+  reloads from textiles).
+
+### More Bulwark arm ideas
+
+- **Autocannon** - single heavy barrel, slow powerful shots; good against mechs and doors.
+- **Grenade launcher** - ability arm: lobs over cover and walls (indirect fire).
+- **Arc projector** - ability arm: chains EMP lightning between enemies; stuns and wrecks mechanoids and
+  shields, harmless-ish to flesh.
+- **Tower shield** - a non-weapon arm: a slab shield that adds armour from the front and doubles the
+  siege shield's strength while standing still; pairs with any weapon on the other arm.
