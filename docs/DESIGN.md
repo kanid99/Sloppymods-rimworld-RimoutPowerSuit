@@ -50,3 +50,13 @@ Decisions agreed with the owner, to build from. Numbers are starting points for 
 - Removable battery items carrying their own charge, charged on a powered charging rack.
 - The suit drains them over time (more when drafted, moving, attacking); abilities such as the
   flamer spend charge directly. Most chassis take one cell; the Bughunter takes two.
+
+## Bulwark (reviewed)
+
+- Role: heavy tank. Takes a lot of varied damage, best when standing still; deals heavy damage of several kinds.
+- Chassis: heavy bolted slab plates over the chest (no vents).
+- Helmet: brow plate, two slanted eye plates, centre ridge, breather snout; two lamps on top of the crown.
+- Arms: every arm keeps the shielded Bulwark shoulder plate; the weapon hangs beneath it.
+  South view: weapons hang straight down, muzzle to the ground (warcasket style), so nothing sticks out sideways.
+  Options: minigun, rocket pod, chainsaw, laser, flamer, hammer. Weapon art is separate
+  (`Source/Art/nano/modular/weapons/`), composited under the shared plate (`Source/Art/bulwark_hang.py`).
