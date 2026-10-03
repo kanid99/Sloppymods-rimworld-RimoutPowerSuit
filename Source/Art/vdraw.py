@@ -59,3 +59,16 @@ class Canvas:
         im=Image.fromarray(s.rgb.astype(np.uint8))
         bg=Image.new('RGB',im.size,'white'); bg.paste(im,mask=Image.fromarray((s.a*255).astype(np.uint8)))
         bg.save(path)
+
+def fill_cyl(c,mask,col,edge=4,hi=0.32):
+    "vertical cylinder shading: light stripe at `hi` across the width, darker towards both edges"
+    col=np.array(col,float); xs=np.nonzero(mask.any(0))[0]
+    if not len(xs): return
+    x0,x1=xs.min(),xs.max(); t=(np.arange(c.n)-x0)/max(1,x1-x0)
+    f=0.62+0.55*np.exp(-((t-hi)/0.16)**2)+0.25*np.clip(1-np.abs(t-0.5)*2,0,1)
+    f=np.clip(f,0,1.5)[None,:]*np.ones((c.n,1))
+    cc=np.clip(col[None,None,:]*f[...,None],0,255)
+    c.rgb[mask]=cc[mask]
+    ring=mask&~ndimage.binary_erosion(mask,iterations=edge)
+    c.rgb[ring]=c.rgb[ring]*0.25+INK*0.75
+    c.a|=mask

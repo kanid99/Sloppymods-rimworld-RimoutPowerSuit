@@ -63,27 +63,35 @@ def half_ell(c,box,lower=True):
     yy=np.arange(c.n)[:,None]
     return m&((yy>=cy) if lower else (yy<cy))
 
-# ---- autocannon: fat barrel, real slotted muzzle brake, belt-fed ammo box
+# ---- autocannon (after the vanilla turret / warcasket heavy guns): compact receiver, long barrel, brake, U-belt
+from vdraw import fill_cyl
 b=Board()
-def ammo(c):
-    c.fill(c.rrect((X+170,330,X+470,900),30),STEEL,bevel=30)
-    c.fill(c.rrect((X+200,380,X+440,460),14),DK,bevel=10)             # lid
-    for k in range(5):                                               # belt of brass rounds into the gun
-        yy=560+k*62
-        c.fill(c.rrect((X+120,yy,X+260,yy+50),18),BRASS,bevel=14)
-        c.fill(c.rrect((X+100,yy+6,X+140,yy+44),10),(150,110,40),bevel=8)
-b.vd(ammo)
-y=b.put(P('minigun',(830,100,1240,720),(470,700)),X,60)
-y=b.put(P('hammer',(900,440,1100,1310),(330,820)),X,y-40)
-def brake(c):
-    t=y-330
-    c.fill(c.rrect((X-210,t,X+210,t+300),36),STEEL,bevel=34)
-    for k in range(3):
-        yy=t+50+k*80
-        for sx in (-1,1): c.fill(c.rrect((X+sx*120-70,yy,X+sx*120+70,yy+44),16),BLK,bevel=8,spec=False)
-    c.fill(c.rrect((X-120,t+270,X+120,t+330),20),DK,bevel=14)
-    c.fill(c.ell((X-80,t+280,X+80,t+330)),BLK,bevel=6,spec=False)
-b.vd(brake); b.save(W('autocannon'))
+b.put(MOUNT((300,240)),X,30)
+def ac(c):
+    # ammo box low on the outer side + U-shaped brass belt looping up into the receiver
+    c.fill(c.rrect((X+190,560,X+460,860),28),(96,100,92),bevel=26)            # olive ammo can
+    c.fill(c.rrect((X+220,590,X+430,640),12),(70,74,68),bevel=8)
+    for k in range(9):
+        ang=np.pi*(k/8)                                                       # U loop from the can to the receiver
+        bx=X+280-150*np.cos(ang)*0.9; by=860+150*np.sin(ang)-40
+        c.fill(c.rrect((bx-40,by-26,bx+40,by+26),12),BRASS,bevel=12)
+    # receiver
+    c.fill(c.rrect((X-230,240,X+230,620),34),STEEL,bevel=34)
+    c.fill(c.rrect((X-230,330,X+230,380),10),DK,bevel=8)                      # top-cover seam
+    c.fill(c.rrect((X-260,420,X-180,600),18),DK,bevel=12)                     # side plate
+    c.fill(c.rrect((X+180,420,X+260,600),18),DK,bevel=12)
+    for bx in (X-150,X+150): c.bolt(bx,290,18)
+    # long barrel with a recoil sleeve and reinforcing rings
+    fill_cyl(c,c.rrect((X-120,600,X+120,820),20),STEEL)                       # recoil sleeve
+    fill_cyl(c,c.rrect((X-80,800,X+80,1720),14),STEEL)                        # barrel
+    for yy in (860,1180):
+        fill_cyl(c,c.rrect((X-110,yy,X+110,yy+60),14),DK)
+    # muzzle brake: stepped block with side baffles, dark bore at the tip
+    fill_cyl(c,c.rrect((X-150,1680,X+150,1900),26),STEEL)
+    for yy in (1715,1790):
+        for x0,x1 in ((X-215,X-140),(X+140,X+215)): c.fill(c.rrect((x0,yy,x1,yy+50),12),DK,bevel=10)
+    c.fill(c.ell((X-95,1850,X+95,1950)),(26,26,32),bevel=10,spec=False)
+b.vd(ac); b.save(W('autocannon'))
 
 # ---- grenade launcher: drum magazine on the side showing six rounds, fat tube, sight
 b=Board()

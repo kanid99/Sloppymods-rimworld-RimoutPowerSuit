@@ -6,7 +6,7 @@ _arm=arm
 def arm(name,side):
     w=clip_behind(place(f'{SP}/weap/{name}.png',PCX-OUT-OUTX.get(name,0),58+int(os.environ.get('TOP','80')),H[name],side),ringw)
     return [w,plate(side)]
-H.update({'autocannon':120,'grenade':104,'arc':134,'towershield':136})
+H.update({'autocannon':150,'grenade':104,'arc':134,'towershield':136})
 loadouts=[('autocannon / grenade','autocannon','grenade'),('arc / minigun','arc','minigun'),('tower shield / autocannon','towershield','autocannon'),('grenade / chainsaw','grenade','chainsaw'),('tower shield / hammer','towershield','hammer'),('arc / arc','arc','arc')]
 img=Image.new('RGBA',(3*345,2*330),floor); d=ImageDraw.Draw(img)
 for i,(lab,a,b) in enumerate(loadouts):
