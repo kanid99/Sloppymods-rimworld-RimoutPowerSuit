@@ -57,47 +57,88 @@ X=1024
 P=lambda n,box,size=None: piece(W(n),box,size)
 MOUNT=lambda size=(300,250): P('hammer',(840,90,1210,400),size)
 
-# ---- autocannon
-b=Board()
-b.put(P('rockets',(700,240,1340,1520),(270,560)),X+250,340)                # side ammo box
-y=b.put(P('minigun',(830,100,1240,720)),X,60)                               # mount + receiver
-y=b.put(P('hammer',(900,440,1100,1310),(250,860)),X,y-30)                   # single fat barrel
-clamp=P('minigun',(830,1040,1240,1210),(400,170))
-b.put(clamp,X,y-330); b.put(clamp,X,y-150)                                  # muzzle brake
-b.save(W('autocannon'))
+BRASS=(214,168,70); STEEL=(128,130,140); DK=(70,72,82); BLK=(26,26,32)
+def half_ell(c,box,lower=True):
+    m=c.ell(box); cy=(box[1]+box[3])//2
+    yy=np.arange(c.n)[:,None]
+    return m&((yy>=cy) if lower else (yy<cy))
 
-# ---- grenade launcher
+# ---- autocannon: fat barrel, real slotted muzzle brake, belt-fed ammo box
 b=Board()
-y=b.put(MOUNT(),X,40)
-y=b.put(P('minigun',(830,250,1240,720),(600,700)),X,y-30)                   # revolver drum
-y=b.put(P('flamer',(860,480,1190,1560),(440,900)),X,y-40)                   # tube
-def mouth(c):
-    c.fill(c.ell((X-230,y-110,X+230,y+110)),(104,106,116),bevel=28)
-    c.fill(c.ell((X-150,y-62,X+150,y+70)),(26,26,32),bevel=10,spec=False)
-b.vd(mouth); b.save(W('grenade'))
+def ammo(c):
+    c.fill(c.rrect((X+170,330,X+470,900),30),STEEL,bevel=30)
+    c.fill(c.rrect((X+200,380,X+440,460),14),DK,bevel=10)             # lid
+    for k in range(5):                                               # belt of brass rounds into the gun
+        yy=560+k*62
+        c.fill(c.rrect((X+120,yy,X+260,yy+50),18),BRASS,bevel=14)
+        c.fill(c.rrect((X+100,yy+6,X+140,yy+44),10),(150,110,40),bevel=8)
+b.vd(ammo)
+y=b.put(P('minigun',(830,100,1240,720),(470,700)),X,60)
+y=b.put(P('hammer',(900,440,1100,1310),(330,820)),X,y-40)
+def brake(c):
+    t=y-330
+    c.fill(c.rrect((X-210,t,X+210,t+300),36),STEEL,bevel=34)
+    for k in range(3):
+        yy=t+50+k*80
+        for sx in (-1,1): c.fill(c.rrect((X+sx*120-70,yy,X+sx*120+70,yy+44),16),BLK,bevel=8,spec=False)
+    c.fill(c.rrect((X-120,t+270,X+120,t+330),20),DK,bevel=14)
+    c.fill(c.ell((X-80,t+280,X+80,t+330)),BLK,bevel=6,spec=False)
+b.vd(brake); b.save(W('autocannon'))
 
-# ---- arc projector
+# ---- grenade launcher: drum magazine on the side showing six rounds, fat tube, sight
 b=Board()
-y=b.put(P('laser',(700,90,1500,1740)),X+int(__import__('os').environ.get('LX','100')),40)
-def coils(c):
-    for yy in (1000,1190,1380):
-        c.fill(c.ell((X-260,yy,X+260,yy+130)),(198,112,56),bevel=30,strength=0.7)
-        c.fill(c.ell((X-160,yy+32,X+160,yy+98)),(110,58,28),bevel=10,spec=False)
-    c.fill(c.rrect((X-170,1660,X+170,1750),24),(124,126,134),bevel=18)
-    for sx in (-1,1): c.fill(c.rrect((X+sx*120-50,1720,X+sx*120+50,1940),20),(124,126,134),bevel=18)
-    sp=c.poly([(X,1740),(X-60,1840),(X+10,1850),(X-40,1980),(X+80,1820),(X+20,1815),(X+60,1740)])
-    c.fill(sp,(110,235,255),bevel=10,strength=0.3); c.glow(sp,(140,240,255),30,0.6)
-    for sx in (-1,1): c.bolt(X+sx*120,1700,18)
-b.vd(coils); b.save(W('arc'))
+y=b.put(MOUNT((340,260)),X,40)
+y=b.put(P('minigun',(830,250,1240,720),(560,620)),X,y-30)
+yt=y
+y=b.put(P('flamer',(860,480,1190,1560),(470,880)),X,y-40)
+def gl(c):
+    cx,cy,r=X+330,yt+120,250
+    c.fill(c.ell((cx-r,cy-r,cx+r,cy+r)),STEEL,bevel=36)
+    c.fill(c.ell((cx-r+50,cy-r+50,cx+r-50,cy+r-50)),DK,bevel=14,spec=False)
+    for k in range(6):
+        ang=k*np.pi/3; gx,gy=cx+120*np.cos(ang),cy+120*np.sin(ang)
+        c.fill(c.ell((gx-52,gy-52,gx+52,gy+52)),BRASS,bevel=20)
+        c.fill(c.ell((gx-24,gy-24,gx+24,gy+24)),(240,120,40),bevel=10)
+    c.fill(c.ell((cx-44,cy-44,cx+44,cy+44)),STEEL,bevel=16)
+    c.fill(c.ell((X-250,y-120,X+250,y+120)),STEEL,bevel=32)          # mouth
+    c.fill(c.ell((X-165,y-70,X+165,y+76)),BLK,bevel=10,spec=False)
+    c.fill(c.rrect((X-260,yt+420,X+260,yt+500),24),DK,bevel=16)       # barrel band
+b.vd(gl); b.save(W('grenade'))
 
-# ---- tower shield: the chest's bolted slab plate, stretched tall
+# ---- arc projector: coils wrap the body (back half behind, front half in front)
 b=Board()
-b.put(MOUNT(),X,40)
-slab=plate(CH,(640,1000)).resize((520,1500),Image.LANCZOS)
-g=np.array(slab).astype(float); lum=g[...,:3].mean(2,keepdims=True)
-g[...,:3]=lum*np.array([0.96,0.98,1.04])                      # grey steel
-half=Image.fromarray(g.clip(0,255).astype(np.uint8),'RGBA').crop((0,240,300,1500))
-sym=Image.new('RGBA',(600,1260)); sym.paste(half,(0,0)); sym.paste(half.transpose(Image.FLIP_LEFT_RIGHT),(300,0))
-b.put(sym,X,250)
-def slit(c): c.fill(c.rrect((X-200,420,X+200,480),20),(26,26,32),bevel=8,spec=False)
-b.vd(slit); b.save(W('towershield'))
+COP=(186,110,62); COPD=(108,60,32)
+CY=(1000,1190,1380)
+def back(c):
+    for yy in CY: c.fill(half_ell(c,(X-280,yy-30,X+280,yy+190),False),COPD,bevel=24,strength=0.4)
+b.vd(back)
+b.put(P('laser',(700,90,1500,1740)),X+100,40)
+def front(c):
+    for yy in CY:
+        ring=half_ell(c,(X-280,yy-30,X+280,yy+190),True)&~c.ell((X-200,yy+10,X+200,yy+110))
+        c.fill(ring,COP,bevel=26,strength=0.75)
+    c.fill(c.rrect((X-180,1660,X+180,1760),26),STEEL,bevel=22)
+    for sx in (-1,1):
+        c.fill(c.poly([(X+sx*90,1740),(X+sx*190,1740),(X+sx*170,1960),(X+sx*110,1960)]),STEEL,bevel=22)
+        c.bolt(X+sx*130,1700,20)
+    sp=c.poly([(X,1760),(X-70,1860),(X+10,1870),(X-50,2010),(X+90,1840),(X+24,1832),(X+64,1760)])
+    c.glow(sp,(120,230,255),40,0.55); c.fill(sp,(150,240,255),bevel=10,strength=0.3)
+b.vd(front); b.save(W('arc'))
+
+# ---- tower shield: drawn big, bevelled rim, ridge, bolts cut from the chest plate
+b=Board()
+b.put(MOUNT((340,280)),X,30)
+chest=Image.open(CH).convert('RGB')
+def shield(c):
+    outer=[(X-380,260),(X+380,260),(X+400,1150),(X,1960),(X-400,1150)]
+    inner=[(X-300,330),(X+300,330),(X+318,1120),(X,1820),(X-318,1120)]
+    c.fill(c.poly(outer),(150,152,160),bevel=60,strength=0.7)        # thick bevelled rim
+    c.fill(c.poly(inner),(118,120,130),bevel=40,strength=0.55)       # inset face
+    c.fill(c.poly([(X-34,340),(X+34,340),(X+40,1700),(X,1800),(X-40,1700)]),(150,152,160),bevel=26,strength=0.8)  # ridge
+    c.fill(c.rrect((X-250,520,X+250,600),30),BLK,bevel=10,spec=False)  # vision slit
+    c.fill(c.rrect((X-262,600,X+262,640),16),(150,152,160),bevel=10)   # slit lip
+b.vd(shield)
+def bolts(c):
+    for bx,by in [(X-322,320),(X+322,320),(X-338,1120),(X+338,1120),(X-170,1540),(X+170,1540)]: c.bolt(bx,by,34,(158,160,168))
+b.vd(bolts)
+b.save(W('towershield'))
