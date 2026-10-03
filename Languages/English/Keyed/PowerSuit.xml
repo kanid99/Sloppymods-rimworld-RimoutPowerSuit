@@ -7,4 +7,9 @@
   <RPS.CannotEnterNotHumanlike>{0} cannot pilot a power suit</RPS.CannotEnterNotHumanlike>
   <RPS.CannotEnterNotAdult>{0} is too small for a power suit</RPS.CannotEnterNotAdult>
   <RPS.CannotEnterAlreadyPiloting>{0} is already in a power suit</RPS.CannotEnterAlreadyPiloting>
+  <!-- Exosuit Framework mode -->
+  <RPS.ClimbOutHere>Climb out here</RPS.ClimbOutHere>
+  <RPS.ClimbOutHereDesc>Climb out and leave the suit standing here, ready for anyone to climb back in. No maintenance bay needed.</RPS.ClimbOutHereDesc>
+  <RPS.DeploySuit>Set up {0} here</RPS.DeploySuit>
+  <RPS.NoRoomForSuit>No room to leave a suit standing here</RPS.NoRoomForSuit>
 </LanguageData>

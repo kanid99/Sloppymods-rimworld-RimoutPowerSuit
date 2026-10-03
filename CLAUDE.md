@@ -35,6 +35,7 @@ commit pushed to `main` is what the game loads next**.
 - **Commit the compiled assemblies.** RimWorld loads the DLL, not the source,
   and a clone gets only what is in git. This mod needs:
   - `Assemblies/RimoutPowerSuit.dll`
+  - `Mods/Exosuit/Assemblies/RimoutPowerSuit.Exosuit.dll`
   `.gitignore` must not exclude them (a bare `Assemblies/` rule does, at any
   depth - un-ignore those paths). Rebuild and commit the DLLs in the same
   commit as any C# change; a stale DLL is what players get.
@@ -91,6 +92,24 @@ commit pushed to `main` is what the game loads next**.
   for the standing suit) whose red marks the plates that take the suit's colour.
 - The suit is apparel locked onto its pilot; only the exit job unlocks it
   (`PowerSuitUtility.AllowUnlock`).
+
+## Two modes
+
+- **Lite mode** (no Exosuit Framework): everything in the root - the suit is our own
+  `Apparel_PowerSuit`, climbed into where it stands. Keep it light: no modules, no bays.
+- **Exosuit mode** (Exosuit Framework, `Aoba.Exosuit.Framework`, active):
+  `LoadFolders.xml` adds `Mods/Exosuit` - the suit as a framework core
+  (`RPS_PowerSuitCoreItem` / `RPS_PowerSuitCore`), a patch that stops the lite suit
+  being craftable, and `RimoutPowerSuit.Exosuit.dll` (`Source/RimoutPowerSuit.Exosuit`).
+  That assembly is the only code that references the framework; the root assembly must
+  never reference `Exosuit` types, or lite mode breaks.
+- We depend on the framework, we do not copy it: it has no licence. Extend it by
+  subclassing its virtual members (bays, `Exosuit_Core`, `ExosuitExt.wreckageOverride`),
+  and patch its internals only as a last resort. It is compiled against a pinned
+  commit (`EXOSUIT_COMMIT` in `.github/release.sh`); bump it deliberately and re-test.
+- Free-standing suits in Exosuit mode: `Building_SuitStand` is a one-tile bay that
+  appears when a pilot uses "Climb out here" or a suit is "Set up here", and destroys
+  itself once it holds no core.
 
 ## Standing preferences
 

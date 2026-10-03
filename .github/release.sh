@@ -25,10 +25,16 @@ cd "$ROOT"
 # ---------------------------------------------------------------- this mod
 FOLDER=SloppyModRimoutPowerSuit
 
+# Exosuit Framework, pinned: the Exosuit-mode assembly is compiled against this build of it.
+EXOSUIT_COMMIT=2012b6f6650f366448d247e726b8f21d50533d73
+
 build() {
   # Harmony is only compiled against: the Harmony mod supplies it at run time.
-  compile Assemblies/RimoutPowerSuit.dll Source/RimoutPowerSuit \
-    "$(nuget Lib.Harmony 2.3.3 lib/net472/0Harmony.dll)"
+  local harmony; harmony="$(nuget Lib.Harmony 2.3.3 lib/net472/0Harmony.dll)"
+  compile Assemblies/RimoutPowerSuit.dll Source/RimoutPowerSuit "$harmony"
+  # Loaded only when Exosuit Framework is active (LoadFolders.xml); never ship Exosuit.dll.
+  compile Mods/Exosuit/Assemblies/RimoutPowerSuit.Exosuit.dll Source/RimoutPowerSuit.Exosuit "$harmony" \
+    "$(download "https://raw.githubusercontent.com/AobaKuma/MechsuitFramework/$EXOSUIT_COMMIT/1.6/Assemblies/Exosuit.dll" "Exosuit-$EXOSUIT_COMMIT.dll")"
 }
 # -------------------------------------------------------------------------
 

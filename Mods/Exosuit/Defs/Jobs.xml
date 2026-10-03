@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <JobDef>
+    <defName>RPS_DeploySuit</defName>
+    <driverClass>RimoutPowerSuit.ExosuitBridge.JobDriver_DeploySuit</driverClass>
+    <reportString>setting up TargetA.</reportString>
+    <casualInterruptible>false</casualInterruptible>
+  </JobDef>
+  <JobDef>
+    <defName>RPS_ClimbOutToStand</defName>
+    <driverClass>RimoutPowerSuit.ExosuitBridge.JobDriver_ClimbOutToStand</driverClass>
+    <reportString>climbing out of a power suit.</reportString>
+    <casualInterruptible>false</casualInterruptible>
+  </JobDef>
+</Defs>

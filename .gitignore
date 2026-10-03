@@ -5,5 +5,8 @@ bin/
 # straight into the Mods folder, so a clone must carry the DLL (see CLAUDE.md).
 Assemblies/*
 !Assemblies/RimoutPowerSuit.dll
+!Mods/Exosuit/Assemblies/
+Mods/Exosuit/Assemblies/*
+!Mods/Exosuit/Assemblies/RimoutPowerSuit.Exosuit.dll
 *.user
 __pycache__/

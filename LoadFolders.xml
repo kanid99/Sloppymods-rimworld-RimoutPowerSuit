@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Two modes. Without Exosuit Framework the suit runs on this mod's own lightweight system
+     (everything in the root). With it, Mods/Exosuit adds the suit as an Exosuit Framework
+     core - modules, bays, repair - with its own small assembly compiled against the
+     framework, so the root never touches the framework's code. -->
+<loadFolders>
+  <v1.6>
+    <li>/</li>
+    <li IfModActive="Aoba.Exosuit.Framework">Mods/Exosuit</li>
+  </v1.6>
+</loadFolders>
