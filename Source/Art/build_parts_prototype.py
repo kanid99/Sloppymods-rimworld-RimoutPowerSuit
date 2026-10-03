@@ -17,7 +17,7 @@ for k in V:
 # arm placement: (inner edge x on the left side, top y, height) in final canvas pixels
 AX=float(sys.argv[2]) if len(sys.argv)>2 else 70
 ARMS={'standard':(AX,96,66,False),'medic':(AX,98,62,False),'builder':(AX,86,74,False),'miner':(AX+2,94,70,False),
-      'bulwark':(AX-6,84,140,False),'bughunter':(AX+4,70,104,False)}
+      'bulwark':(98,58,176,False),'bughunter':(AX+4,70,104,False)}
 A={}
 for a,(ix,top,h,fv) in ARMS.items():
     A[a]={'left':arm_layer(f'{SP}/arms/arm_{a}.png',ix,top,h,'left',fv),'right':arm_layer(f'{SP}/arms/arm_{a}.png',ix,top,h,'right',fv)}
