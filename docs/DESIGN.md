@@ -137,3 +137,9 @@ spreadsheet" round:
   (clear dome visor, green crosses), Bughunter helmet (twin filter gas mask, four eye lenses), and the
   Miner / Medic / Bughunter bodies as references - they have legs and harness detail, so only the torso
   ideas are used (vest with pouches, medic chest cross and belt, bughunter canisters at the hips).
+
+### Bughunter helmet (soft VFE style)
+
+Redrawn from the kept Gemini idea: egg-shaped skull, cheek plates, a brow ridge with two small upper lenses,
+two big teardrop lenses slanting up and out (insect-like), a narrow snout with a hexagonal port, twin filter
+canisters hanging low, two crown lamps. `Source/Art/vfe_bughunter_helmet.py`.
