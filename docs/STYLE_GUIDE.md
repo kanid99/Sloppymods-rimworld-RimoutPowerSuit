@@ -70,3 +70,11 @@ later be its own apparel / module and be damaged and lost on its own.
   leg stubs are shared between suits.
 Bulwark sources: `Source/Art/kit/bulwark_src/`; output: `Source/Art/kit/out_bulwark/`
 (choose weapons with WEAPON_L / WEAPON_R).
+
+## Bulwark view consistency (owner notes)
+
+- Weapons point FORWARD in every view, as they do when firing: front view = end-on art pointing at the viewer
+  (`weap_fwd/<w>_south.png`), back view = end-on rear (`weap_fwd/<w>_north.png`), side view = level, muzzle forward.
+  Done for minigun and rocket pod; the other eight weapons still need their two end-on paintings.
+- Back-view shoulder plates = the front plates mirrored, with the hook interior painted over as solid back
+  armour, at the same height as the front and side views.

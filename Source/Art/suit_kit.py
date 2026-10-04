@@ -233,8 +233,32 @@ def build(spec, out):
         mx = lambda x: C - x                                       # mirror across the canvas centre
         N = Layer(); fx = mx((wx.min() + wx.max()) / 2)
         x0, y0, x1, y1 = bbox(P.tex); box = (x0, y0, x1 + 1, y1 + 1)
-        N.put(part(spec['weapons_north'][wname]), fx, bottom=wy.max(), h=int(spec['weapon_h'][wname] * K), flip=True)   # ends where the front view's weapon ends
-        N.put((P.tex.crop(box), P.mask.crop(box)), mx((x0 + x1) / 2), top=y0, h=y1 - y0, flip=True)
+        pw = x1 - x0
+        # weapon rear view: same bottom as the front view's weapon, no wider than 70% of the plate
+        wt, wm = part(spec['weapons_north'][wname]); wh = int(spec['weapon_h'][wname] * K)
+        kk = min(wh / wt.height, pw * 0.70 / wt.width)
+        N.put((wt, wm), fx, bottom=wy.max(), h=int(wt.height * kk), flip=True)
+        # shoulder plate from behind: the front plate's exact outline (mirrored), filled with the plate's back face
+        sil = P.tex.crop(box).transpose(Image.FLIP_LEFT_RIGHT); sa = np.array(sil)[..., 3] > 100
+        # back of the plate = the front plate mirrored, its dark hook interior painted over as solid back armour
+        pt = np.array(P.tex.crop(box)).astype(float); pmk = np.array(P.mask.crop(box))
+        pa_ = pt[..., 3] > 100; lum = pt[..., :3].mean(2)
+        inner = pa_ & ndimage.binary_erosion(pa_, iterations=6)
+        dark = inner & (lum < 95)
+        dark = ndimage.binary_closing(dark, iterations=3) & inner
+        lit = pa_ & (lum > 110)
+        col = np.median(pt[..., :3][lit], 0) if lit.any() else np.array([140, 140, 150.])
+        ys_ = np.nonzero(dark)[0]
+        if len(ys_):
+            yy = np.arange(pt.shape[0])[:, None] * np.ones((1, pt.shape[1]))
+            sh = 1.04 - 0.18 * np.clip((yy - ys_.min()) / max(1, ys_.max() - ys_.min()), 0, 1)
+            for c in range(3): pt[..., c] = np.where(dark, col[c] * sh, pt[..., c])
+            pmk = np.where(dark, 255, pmk)
+            seam = dark & ~ndimage.binary_erosion(dark, iterations=2)       # a soft seam where the hook was
+            pt[seam, :3] *= 0.75
+        tb = Image.fromarray(pt.astype(np.uint8), 'RGBA').transpose(Image.FLIP_LEFT_RIGHT)
+        mb = Image.fromarray(pmk.astype(np.uint8), 'L').transpose(Image.FLIP_LEFT_RIGHT)
+        N.put((tb, mb), mx((x0 + x1) / 2), top=y0, h=y1 - y0)
         N.joint(int(fx), y1 - 26)
         pieces[(p, 'north')] = N
     if spec.get('backpack_peek'):
@@ -243,6 +267,34 @@ def build(spec, out):
         a = np.array(bt).astype(float); a[..., :3] *= 0.72; bt = Image.fromarray(a.astype(np.uint8), 'RGBA')   # the far side: in shadow
         nbb = bbox(pieces[('Body', 'north')].tex)
         pieces[('Body', 'south')].put((bt, bm), cx, top=side_top, w=int((nbb[2] - nbb[0]) * 0.55), behind=True)
+    # ---------------- weapons aimed forward in the front/back views too (end-on art), where it exists
+    fwd = spec.get('weapons_fwd', {})
+    for p_, plate, wname, side in (('ArmL', 'plateLfull', spec['weapon_l'], 'L'), ('ArmR', 'plateRfull', spec['weapon_r'], 'R')):
+        if wname not in fwd: continue
+        P = Layer(); P.put_assembly(f'{src}/south_{plate}.png', f'{src}/south_{plate}_m.png')
+        cutL = Layer(); cutL.put_assembly(f'{src}/south_arm{side}_{wname}.png', f'{src}/south_arm{side}_{wname}_m.png')
+        fullL = Layer(); fullL.put_assembly(f'{src}/south_arm{side}full_{wname}.png', f'{src}/south_arm{side}full_{wname}_m.png')
+        hole = (np.array(fullL.tex)[..., 3] > 100) & ~(np.array(cutL.tex)[..., 3] > 100)   # where the chest nests in
+        x0, y0, x1, y1 = bbox(P.tex); pw = x1 - x0; pcx = (x0 + x1) / 2
+        for facing in ('south', 'north'):
+            N = Layer()
+            wt, wm = part(fwd[wname][facing]); kk = pw * 0.78 / wt.width
+            wcx = pcx if facing == 'south' else C - pcx
+            N.put((wt, wm), wcx, top=y1 - 34, h=int(wt.height * kk))
+            if facing == 'south':
+                pt = np.array(P.tex); pt[hole, 3] = 0; pm_ = np.array(P.mask); pm_[hole] = 0
+                N.tex.alpha_composite(Image.fromarray(pt)); N.mask = Image.fromarray(np.maximum(np.array(N.mask), np.where(pt[..., 3] > 100, pm_, 0)).astype(np.uint8))
+                N.joint(int(wcx), y1 - 30); pieces[(p_, 'south')] = N
+            else:
+                old = pieces[(p_, 'north')]
+                # keep the back plate already built for this arm, swap only the weapon underneath
+                oa = np.array(old.tex); keep = oa[..., 1] >= 0
+                ob = bbox(old.tex)
+                plate_only = np.zeros_like(oa); cut = int(y1 + 4)
+                plate_only[:cut] = oa[:cut]
+                N.tex.alpha_composite(Image.fromarray(plate_only))
+                om = np.array(old.mask); om[cut:] = 0; N.mask = Image.fromarray(np.maximum(np.array(N.mask), om).astype(np.uint8))
+                N.joint(int(wcx), y1 - 30); pieces[(p_, 'north')] = N
     # ---------------- save: helmet stored HEAD px lower (the game lifts it to the head)
     for (p, f), L in pieces.items():
         if p == 'Helmet': L.shift(HEAD)
@@ -281,11 +333,12 @@ def bulwark_spec(sp):
         assembly=f'{sp}/kit_src', weapon_l='minigun', weapon_r='rockets',
         body=dict(east=f'{sp}/views/chassis_east_caps.png', north=f'{sp}/views/chassis_north_tall.png'), backpack_peek=True,
         helmet=dict(east=f'{sp}/views/helmet_east.png', north=f'{sp}/views/helmet_north.png'),
-        plate=dict(east=f'{sp}/views/plate_east.png', north=f'{sp}/views/plate_north.png'),
+        plate=dict(east=f'{sp}/views/plate_east.png', north=f'{sp}/views/plate_north.png', back=f'{sp}/views/plate_back.png'),
         legs=dict(south=f'{sp}/views/legs_south.png', east=f'{sp}/views/legs_east2.png', north=f'{sp}/views/legs_north.png'),
         weapons_south={w: f'{sp}/weap/{w}.png' for w in ws},
         weapons_east={w: f'{sp}/weap_east/{w}.png' for w in ws},
         weapons_north={w: f'{sp}/weap_north/{w}.png' for w in ws},
+        weapons_fwd={w: dict(south=f'{sp}/weap_fwd/{w}_south.png', north=f'{sp}/weap_fwd/{w}_north.png') for w in ('minigun', 'rockets')},
         full_east=dict(image=f'{sp}/views/full_east.png', body_image=f'{sp}/views/full_east_noarm.png', pieces={            # outlines in the 1024 painting
             'Helmet': [(372, 175), (378, 95), (450, 55), (650, 55), (705, 120), (705, 372), (640, 388), (590, 372), (560, 330), (540, 188)],
             'ArmL': [(285, 330), (345, 185), (545, 182), (605, 318), (605, 488), (915, 488), (915, 685), (640, 685), (455, 640), (345, 605), (285, 480)],
