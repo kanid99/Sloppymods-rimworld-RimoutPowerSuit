@@ -28,3 +28,11 @@ The VFE-style redraws were tried and dropped by the owner (archived in
 - **Originality:** check generated parts side by side against VFE Pirates warcaskets and vanilla armour
   before keeping them; never give a generator VFE's or another game's art (Fallout included). Known no-gos:
   the T-shaped visor, twin back exhaust stacks, a round grille snout with hoses.
+
+## Bulwark assembly (current)
+
+`Source/Art/bulwark_assemble.py` (run with `SOFT=1 PR=88 PT=70 OUT=14 TOP=86`): shoulder plates nested into
+the chest's shoulder wedge, a thin (1 px) outline all round them, weapons hung at the outer edges, a ball
+joint where each weapon meets its plate, and the chest/helmet inner black lines replaced by shading
+(thin dark lines filled from the surrounding paint, leaving a soft crease; openings and the outer
+silhouette keep their black).
