@@ -161,6 +161,6 @@ as separate apparel with their own hit points.
 ### Entry: the back opens
 
 The suit is entered from behind: the whole back panel (power-cell caps and release wheel on it) is hinged on
-one side and swings open like a door, showing the padded cavity with a seat harness
+one side and swings open like a door, showing an upright padded cavity for a standing pilot (who faces away from the viewer: no seat), with loose harness straps
 (`chassis_bulwark_north_open.png`). Used for the empty/parked suit and as a frame of the climb-in animation
 (turn the release wheel, back swings open, pilot climbs in, back closes).
