@@ -64,10 +64,17 @@ Median tone of a VFE body is about 205 and of a helmet about 200: the art is **m
 comes from hard steps between flat planes (faceting) plus the one gentle vertical gradient - not from
 soft airbrushed shading, rim lights, highlights or cast shadows.
 
+## Form
+
+- Build from big rounded masses: a domed helmet, domed pauldrons, a barrel chest. Avoid flat boxes.
+- Rounded parts get a lit cap (a brighter, unstroked patch toward the top-left) and a shaded underside or side.
+- A face reads through a heavy brow over deep-set eye recesses, a centre ridge on the faceplate and a jaw
+  piece that stands out (lit top face, darker front).
+
 ## Detail
 
 - Large shapes only. Per layer, at most a handful of small marks: a pair of vent slots, a round
-  socket, one seam. No rivets, bolts, grilles, texture, scratches, text or decals.
+  socket, one seam, two to four round bolt bumps. No rivets, bolts, grilles, texture, scratches, text or decals.
 - The visor/eyes are dark-grey shapes (70 - 100), not glowing colour, drawn as recesses: a thin line
   (1.5 - 2 px, not the 4 px plate outline), a lighter strip (~130) along the inside bottom edge where the far
   wall catches light, and a soft bevel rim (~210) around the opening. That is what gives them depth.
@@ -81,6 +88,8 @@ soft airbrushed shading, rim lights, highlights or cast shadows.
 
 - Before a design is kept, put it next to every VFE warcasket (helmet and body) and the vanilla armours
   and reject anything that matches one. Never give an image generator VFE or another game's art.
+- Inspiration from Fallout-style power armour is limited to principles (rounded masses, deep-set eyes, faceplate
+  ridge, protruding jaw). Never its round grille snout with hoses, its eye shape or its decals.
 - Known no-gos: the T-shaped visor (VFE Marine, Fallout), twin vertical exhaust stacks on the back
   (VFE Cataphract/Siegebreaker), the round-faced helmet with a hex jaw (VFE Brute).
 

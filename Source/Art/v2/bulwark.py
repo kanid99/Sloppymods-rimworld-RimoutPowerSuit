@@ -36,25 +36,40 @@ S.plate(S.poly(arc(60,112,56,62,180,262)+[(56,58),(46,66),(26,82),(14,104),(10,1
 rim=S.poly(arc(60,112,56,62,196,320)+list(reversed(arc(60,120,46,54,196,320))))
 S.plate(rim,240,226,stroke=3,mirror=True)                                         # raised rim along the top
 S.plate(S.poly([(10,132),(26,146),(66,138),(104,122),(104,130),(66,148),(24,156),(8,142)]),188,stroke=3,mirror=True)  # lip under the flare
-S.plate(S.ell(46,84,82,118),246,212,stroke=3,mirror=True)                         # shield boss
-# ---------------- HELMET
+S.plate(S.ell(30,62,78,96),255,stroke=0,mirror=True)                              # lit cap of the dome
+S.plate(S.ell(52,86,84,118),246,212,stroke=3,mirror=True)                         # shield boss
+for bx,by in ((24,112),(92,100)): S.plate(S.ell(bx-5,by-5,bx+5,by+5),236,stroke=1.5,mirror=True)   # bolt bumps
+# ---------------- HELMET: domed, deep angled eyes under a heavy brow, faceplate ridge, protruding jaw
 H=Layer()
-H.plate(H.poly(sym([(128,66),(98,68),(76,84),(68,120),(72,160),(88,186),(110,196),(128,199)])),255,222,stroke=7)  # shell
-H.plate(H.poly([(71,112),(86,110),(93,168),(89,184),(75,160)]),200,stroke=3,mirror=True)                   # cheek planes
-H.plate(H.poly(sym([(128,164),(108,166),(104,188),(128,197)])),200,184,stroke=2)                            # simple chin plate, clear of the eyes
-H.mark(H.rrect(118,176,138,181,2))                                                                         # one slot
 def bez(p0,p1,p2,n=24):
     return [((1-t)**2*p0[0]+2*(1-t)*t*p1[0]+t*t*p2[0],(1-t)**2*p0[1]+2*(1-t)*t*p1[1]+t*t*p2[1]) for t in np.linspace(0,1,n)]
-brow=bez((74,118),(128,86),(182,118))+bez((178,132),(128,104),(78,132))
-H.plate(H.poly(brow),250,224,stroke=3)                                                                     # brow: one smooth arch across the face
-def lamp(sx):                                                                                              # lamp windows set into the shell
+def bump(x,y,r=4.5): H.plate(H.ell(x-r,y-r,x+r,y+r),236,stroke=1.5)
+# ear cylinders behind the shell
+H.plate(H.rrect(63,120,80,160,7),198,176,stroke=4,mirror=True)
+dome=bez((72,150),(64,66),(128,62))+bez((128,62),(192,66),(184,150))+bez((184,150),(176,196),(128,202))+bez((128,202),(80,196),(72,150))
+H.plate(H.poly(dome),255,214,stroke=7)                                                                    # domed shell
+H.plate(H.poly(bez((74,120),(70,170),(100,196))+[(104,184),(86,150),(86,118)]),206,stroke=0,mirror=True)  # shaded cheek side
+face=bez((88,112),(128,98),(168,112))+[(166,150)]+bez((166,150),(160,192),(128,196))+bez((128,196),(96,192),(90,150))
+H.plate(H.poly(face),246,222,stroke=3)                                                                    # faceplate
+H.plate(H.poly([(122,104),(134,104),(134,186),(128,192),(122,186)]),224,stroke=2)                          # centre ridge
+# heavy brow, one arch, overhanging the eyes
+# deep-set eye lenses angled down toward the centre (recess rules: thin line, lit lower wall, bevel rim)
+H.plate(H.poly([(82,124),(121,134),(122,158),(86,152)]),212,stroke=0,mirror=True)
+H.plate(H.poly([(86,127),(118,137),(119,154),(90,149)]),62,stroke=1.5,mirror=True)
+H.plate(H.poly([(90,144),(119,149),(119,154),(90,149)]),132,stroke=0,mirror=True)
+brow=bez((78,118),(128,90),(178,118))+bez((178,128),(128,106),(78,128))
+H.plate(H.poly(brow),252,226,stroke=3)
+# protruding jaw: a rounded block standing out from the faceplate, one slot
+H.plate(H.rrect(106,160,150,198,12),214,184,stroke=3)
+H.plate(H.rrect(110,163,146,172,4),236,stroke=0)                                                          # lit top face of the jaw
+H.mark(H.rrect(118,180,138,185,2))
+# lamp windows set into the crown
+def lamp(sx):
     q=lambda pts:[(128+sx*x,y) for x,y in pts]
-    H.plate(H.poly(q([(14,78),(42,76),(46,96),(16,100)])),214,stroke=0)                                    # bevel rim
-    H.plate(H.poly(q([(18,81),(39,79),(42,93),(19,96)])),104,stroke=1.5)                                   # recess
-    H.plate(H.poly(q([(20,83),(38,81),(40,90),(21,92)])),246,stroke=0)                                     # bright lens
+    H.plate(H.poly(q([(14,74),(42,72),(46,92),(16,96)])),214,stroke=0)
+    H.plate(H.poly(q([(18,77),(39,75),(42,89),(19,92)])),104,stroke=1.5)
+    H.plate(H.poly(q([(20,79),(38,77),(40,86),(21,88)])),246,stroke=0)
 for sx in (-1,1): lamp(sx)
-H.plate(H.poly([(82,132),(124,124),(124,146),(86,152)]),212,stroke=0,mirror=True)                          # bevel rim around the socket
-H.plate(H.poly([(86,135),(120,128),(120,142),(89,148)]),68,stroke=1.5,mirror=True)                         # eye recess (thin line)
-H.plate(H.poly([(89,144),(120,138),(120,142),(89,148)]),128,stroke=0,mirror=True)                          # lit inner bottom wall = depth
+for sx in (-1,1): bump(128+sx*52,174)                                                   # a few bolt bumps
 body,sh,hm=B.image(),S.image(),H.image()
 for n,im in (('body',body),('shoulders',sh),('helmet',hm)): im.save(f'{SP}/bw2/Bulwark_{n}_south.png')
