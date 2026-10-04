@@ -90,3 +90,11 @@ Decisions agreed with the owner, to build from. Numbers are starting points for 
   shields, harmless-ish to flesh.
 - **Tower shield** - a non-weapon arm: a slab shield that adds armour from the front and doubles the
   siege shield's strength while standing still; pairs with any weapon on the other arm.
+
+### Vanilla art for kitbashing
+
+Ludeon's official RimWorld art source (layered PSDs for the base game and every DLC) is the owner's
+"Game art source" Dropbox folder; it is not in the repo (1.3 GB). Read PSDs with `psd-tools` (+ `aggdraw` for
+vector layers), enlarge with `Source/Art/vanilla_kitbash.py` (premultiplied Lanczos, crisp alpha), rotate to
+the suit's facing. The Bulwark autocannon arm is the vanilla autocannon turret's gun (`TurretAutocannon_Top`),
+turned to point down; the earlier code-drawn one is kept as `autocannon_drawn_south.png`.
