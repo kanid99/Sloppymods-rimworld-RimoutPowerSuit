@@ -86,3 +86,7 @@ Bulwark sources: `Source/Art/kit/bulwark_src/`; output: `Source/Art/kit/out_bulw
   (`shield_part`), drawn the VEF way: in front of the body facing south, in
   front of the chest side-on facing east/west, and behind the body facing north (only the edge past the body
   shows). Listed in the spec's `shields`.
+- A shield arm draws above the head facing south (listed in `above_head.txt`; in game its render node goes
+  above the head for that facing). Facing north the shield's back (front shape mirrored, plain, in shadow) sits
+  behind the body. In the side view the far arm is drawn behind everything, a little higher and in shadow, so
+  only what sticks out past the body shows (a shield's edge, a barrel's end).

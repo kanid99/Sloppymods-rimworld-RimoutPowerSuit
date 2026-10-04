@@ -130,7 +130,11 @@ class Layer:
 
 def shield_part(path, top, bottom, widen=1.35):
     """a tower shield sized to stand from `top` to `bottom` (canvas px), made wider than the painting"""
-    wt, wm = part(path); h = bottom - top; w = int(wt.width * h / wt.height * widen)
+    wt, wm = part(path)
+    a = np.array(wt)[..., 3] > 100; widths = a.sum(1); full = widths.max()
+    start = int(np.argmax(widths > full * 0.6))            # drop the narrow mounting block on top
+    wt, wm = wt.crop((0, start, wt.width, wt.height)), wm.crop((0, start, wm.width, wm.height))
+    h = bottom - top; w = int(wt.width * h / wt.height * widen)
     return wt.resize((w, h), Image.LANCZOS), wm.resize((w, h), Image.LANCZOS)
 
 
@@ -216,7 +220,17 @@ def build(spec, out):
             A_.put((wt, wm), ab[0] + (ab[2] - ab[0]) * 0.80 + ln / 2, top=ey - h // 2, w=ln)
         before = np.array(A_.tex)[..., 3] > 100
         A_.shift(plL_bb[1] - bbox(A_.tex)[1]); after = np.array(A_.tex)[..., 3] > 100
-        pieces[('ArmR', 'east')] = Layer()
+        # the far arm: drawn behind everything, a little higher; only what sticks out past the body shows
+        F_ = Layer(); far = spec['weapon_r']; feet = bbox(pieces[('Legs', 'south')].tex)[3]
+        if far in spec.get('shields', ()):
+            F_.put(shield_part(spec['weapons_east'][far], ab[1] + 20, feet - 14, widen=1.6), ab[2] + 26, top=ab[1] + 20)
+        else:
+            wt, wm = part(spec['weapons_east'][far]); wt, wm = wt.rotate(90, expand=True), wm.rotate(90, expand=True)
+            ln = int(spec['weapon_h'][far] * K * 0.98); h = max(1, round(wt.height * ln / wt.width))
+            fa = np.array(F_.tex)
+            F_.put((wt, wm), ab[0] + (ab[2] - ab[0]) * 0.95 + ln / 2, top=ey - 22 - h // 2, w=ln)
+            t_ = np.array(F_.tex).astype(float); t_[..., :3] *= 0.82; F_.tex = Image.fromarray(t_.astype(np.uint8))   # far side, in shadow
+        pieces[('ArmR', 'east')] = F_
     else:
         # ---------------- east (side view, the owner's pick over the three-quarter view): one near arm, gun aimed forward
         L = Layer(); L.put(part(spec['body']['east']), cx, bottom=body_bb[3], h=body_h); pieces[('Body', 'east')] = L
@@ -285,7 +299,7 @@ def build(spec, out):
         nbb = bbox(pieces[('Body', 'north')].tex)
         pieces[('Body', 'south')].put((bt, bm), cx, top=side_top, w=int((nbb[2] - nbb[0]) * 0.55), behind=True)
     # ---------------- weapons aimed forward in the front/back views too (end-on art), where it exists
-    fwd = spec.get('weapons_fwd', {})
+    fwd = spec.get('weapons_fwd', {}); front_over = set()
     for p_, plate, wname, side in (('ArmL', 'plateLfull', spec['weapon_l'], 'L'), ('ArmR', 'plateRfull', spec['weapon_r'], 'R')):
         if wname not in fwd: continue
         P = Layer(); P.put_assembly(f'{src}/south_{plate}.png', f'{src}/south_{plate}_m.png')
@@ -305,9 +319,17 @@ def build(spec, out):
                 if facing == 'south':
                     pm2 = shield_part(spec['weapons_south'][wname], y0 + 40, feet + 6)
                     N.put(pm2, pcx + inward, top=y0 + 40)
+                    front_over.add(p_)
                 else:
-                    pm2 = shield_part(spec['weapons_back'][wname], y0 + 40, feet + 6)
-                    N.put(pm2, C - pcx - inward * 0.15, top=y0 + 40, flip=True, behind=True)
+                    # back of the same shield: the front shape mirrored, plain and in shadow, at the mirrored spot
+                    bt_, bm_ = shield_part(spec['weapons_south'][wname], y0 + 40, feet + 6)
+                    ba_ = np.array(bt_).astype(float); al = ba_[..., 3] > 100
+                    inner = al & ndimage.binary_erosion(al, iterations=10)
+                    col = np.median(ba_[..., :3][inner], 0) * 0.78
+                    for c_ in range(3): ba_[..., c_] = np.where(inner, col[c_], ba_[..., c_])
+                    rim = inner & ~ndimage.binary_erosion(inner, iterations=3); ba_[rim, :3] *= 0.6
+                    N.put((Image.fromarray(ba_.astype(np.uint8)), bm_), C - (pcx + inward), top=y0 + 40, flip=True)
+                    front_over.add(p_)
             elif facing == 'north' and spec.get('weapons_back'):
                 wt, wm = part(spec['weapons_back'][wname])
                 kk = min(int(spec['weapon_h'][wname] * K * 0.85) / wt.height, cw * 1.9 / wt.width)
@@ -338,6 +360,7 @@ def build(spec, out):
     for (p, f), L in pieces.items():
         if p == 'Helmet': L.shift(HEAD)
         L.save(out, f'{p}_{f}')
+    open(f'{out}/above_head.txt', 'w').write('\n'.join(sorted(front_over)))
     preview(out, spec.get('colors', [(0.56, 0.58, 0.60), (0.58, 0.60, 0.42)]))
 
 
@@ -347,7 +370,12 @@ ORDER = {'south': ['Legs', 'Body', 'ArmL', 'ArmR', 'Helmet'], 'east': ['ArmR', '
 
 def stack(out, facing, color=None):
     c = Image.new('RGBA', (C, C))
-    for p in ORDER[facing]:
+    order = list(ORDER[facing])
+    try: over = [l for l in open(f'{out}/above_head.txt').read().split() if l]
+    except OSError: over = []
+    if facing == 'south':                      # a shield arm draws above the head facing south
+        for p in over: order.remove(p); order.append(p)
+    for p in order:
         t = Image.open(f'{out}/{p}_{facing}.png').convert('RGBA'); m = Image.open(f'{out}/{p}_{facing}m.png').convert('RGBA')
         if color: t = tint(t, Image.merge('RGBA', (m.split()[0],) * 3 + (m.split()[3],)), color)
         c.alpha_composite(t, (0, -HEAD if p == 'Helmet' else 0))
