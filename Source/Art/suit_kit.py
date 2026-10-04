@@ -155,19 +155,20 @@ def build(spec, out):
         N.put(pm, cx_to, top=top_to, h=int((y1 - y0) * k), flip=flip); return N
     armR_bb = bbox(pieces[('ArmR', 'south')].tex)
     bw = body_bb[2] - body_bb[0]
+    _P = Layer(); _P.put_assembly(f'{src}/south_plateLfull.png', f'{src}/south_plateLfull_m.png'); plL_bb = bbox(_P.tex)
     # ---------------- east (side view, the owner's pick over the three-quarter view): one near arm, gun aimed forward
     L = Layer(); L.put(part(spec['body']['east']), cx, bottom=body_bb[3], h=body_h); pieces[('Body', 'east')] = L
     eb = bbox(L.tex)
     L = Layer(); L.put(legs_stub(spec['legs']['east']), cx, top=eb[3] - int(body_h * 0.12), h=int(body_h * 0.42)); pieces[('Legs', 'east')] = L
     L = Layer(); L.put(part(spec['helmet']['east']), cx + 4, bottom=helm_bb[3] - int(helm_h * 0.06), h=int(helm_h * 0.92)); pieces[('Helmet', 'east')] = L
-    L = Layer()
-    pb = L.put(part(spec['plate']['east']), cx - 4, top=eb[1] + int(body_h * 0.16), h=int(plate_h * 0.85))
+    L = moved('plateLfull', cx - int(bw * 0.16), plL_bb[1] + int((plL_bb[3] - plL_bb[1]) * 0.22), 0.80)
+    pb = bbox(L.tex)
     wname = spec['weapon_l']
     wt, wm = part(spec['weapons_east'][wname]); wt, wm = wt.rotate(90, expand=True), wm.rotate(90, expand=True)
     ln = int(spec['weapon_h'][wname] * K); h = max(1, round(wt.height * ln / wt.width))
-    elbow_y = pb[3] - 8
-    L.put((wt, wm), pb[0] + (pb[2] - pb[0]) * 0.3 + ln / 2, top=elbow_y - h // 2, w=ln)
-    L.joint(int((pb[0] + pb[2]) / 2), elbow_y - 18)
+    elbow_y = pb[3] - 6
+    L.put((wt, wm), (pb[0] + pb[2]) / 2 + ln * 0.42, top=elbow_y - h // 2, w=ln, behind=True)
+    L.joint(int((pb[0] + pb[2]) / 2), elbow_y - 20)
     pieces[('ArmL', 'east')] = L; pieces[('ArmR', 'east')] = Layer()
     # ---------------- north (back view): the arms swap sides and are mirrored; shoulders cover the body
     L = Layer(); L.put(part(spec['body']['north']), cx, bottom=body_bb[3], h=body_h); pieces[('Body', 'north')] = L
@@ -177,8 +178,18 @@ def build(spec, out):
     # the back rim of the collar is nearer than the head from behind: a shaded armour band over the helmet's base
     L.collar((hb[0] + hb[2]) / 2, hb[3] - int(helm_h * 0.22), int((hb[2] - hb[0]) * 1.04), int(helm_h * 0.42), t=int(helm_h * 0.13))
     pieces[('Helmet', 'north')] = L
-    pieces[('ArmL', 'north')] = moved(f"armLfull_{spec['weapon_l']}", (armR_bb[0] + armR_bb[2]) / 2, armL_bb[1], 1.0, flip=True)
-    pieces[('ArmR', 'north')] = moved(f"armRfull_{spec['weapon_r']}", (armL_bb[0] + armL_bb[2]) / 2, armR_bb[1], 1.0, flip=True)
+    for p, plate, full, wname in (('ArmL', 'plateLfull', 'armLfull', spec['weapon_l']), ('ArmR', 'plateRfull', 'armRfull', spec['weapon_r'])):
+        P = Layer(); P.put_assembly(f'{src}/south_{plate}.png', f'{src}/south_{plate}_m.png')
+        F = Layer(); F.put_assembly(f'{src}/south_{full}_{wname}.png', f'{src}/south_{full}_{wname}_m.png')
+        pa = np.array(P.tex)[..., 3] > 100; fa = np.array(F.tex)[..., 3] > 100
+        wy, wx = np.nonzero(fa & ~ndimage.binary_dilation(pa, iterations=3))
+        mx = lambda x: C - x                                       # mirror across the canvas centre
+        N = Layer(); fx = mx((wx.min() + wx.max()) / 2)
+        x0, y0, x1, y1 = bbox(P.tex); box = (x0, y0, x1 + 1, y1 + 1)
+        N.put(part(spec['weapons_north'][wname]), fx, top=y1 - 30, h=int(spec['weapon_h'][wname] * K), flip=True)
+        N.put((P.tex.crop(box), P.mask.crop(box)), mx((x0 + x1) / 2), top=y0, h=y1 - y0, flip=True)
+        N.joint(int(fx), y1 - 26)
+        pieces[(p, 'north')] = N
     # ---------------- save: helmet stored HEAD px lower (the game lifts it to the head)
     for (p, f), L in pieces.items():
         if p == 'Helmet': L.shift(HEAD)
@@ -186,7 +197,7 @@ def build(spec, out):
     preview(out, spec.get('colors', [(0.56, 0.58, 0.60), (0.58, 0.60, 0.42)]))
 
 
-ORDER = {'south': ['Legs', 'Body', 'ArmL', 'ArmR', 'Helmet'], 'east': ['ArmR', 'Legs', 'Body', 'ArmL', 'Helmet'],
+ORDER = {'south': ['Legs', 'Body', 'ArmL', 'ArmR', 'Helmet'], 'east': ['ArmR', 'Legs', 'Body', 'Helmet', 'ArmL'],
          'north': ['Legs', 'Body', 'ArmL', 'ArmR', 'Helmet']}
 
 
@@ -221,6 +232,7 @@ def bulwark_spec(sp):
         legs=dict(south=f'{sp}/views/legs_south.png', east=f'{sp}/views/legs_east2.png', north=f'{sp}/views/legs_north.png'),
         weapons_south={w: f'{sp}/weap/{w}.png' for w in ws},
         weapons_east={w: f'{sp}/weap_east/{w}.png' for w in ws},
+        weapons_north={w: f'{sp}/weap_north/{w}.png' for w in ws},
         weapon_h={'minigun': 118, 'rockets': 104, 'chainsaw': 124, 'laser': 118, 'flamer': 112, 'hammer': 112,
                   'autocannon': 150, 'grenade': 104, 'arc': 134, 'towershield': 136})
 

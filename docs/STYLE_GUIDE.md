@@ -55,8 +55,11 @@ later be its own apparel / module and be damaged and lost on its own.
   `kit_src/south_*.png` incl. an arm layer per weapon, with the hole where the chest nests into the plate).
 - East = side view (owner preferred it to a three-quarter view; the three-quarter paintings are kept in
   `kit/bulwark_src/q/`), guns aimed forward from the elbow so the firing animation matches.
-- North = back painting; the arms are the front-view arm layers mirrored and swapped, drawn over the body so
-  the shoulders are covered; a collar band is drawn over the helmet base.
+- North = back painting; the shoulder plates are the front-view plates mirrored and swapped at the same
+  height (so they cover the shoulders), each weapon is its own rear view (no muzzles), with the ribbed joint;
+  a collar band is drawn over the helmet base.
+- East: the near shoulder plate is drawn OVER the helmet (in game the arm's render node goes above the head
+  when facing east/west).
 - A new suit = a new spec function (like `bulwark_spec`) pointing at its parts. Weapon side views and the
   leg stubs are shared between suits.
 Bulwark sources: `Source/Art/kit/bulwark_src/`; output: `Source/Art/kit/out_bulwark/`
