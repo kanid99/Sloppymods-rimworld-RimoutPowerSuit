@@ -85,7 +85,18 @@ def soften(pair,keep=4,depth=0.72,erode=0):
     if line.any():                                   # paint the filled lines like their neighbours
         r=mm[...,0].astype(float); rf=cv2.inpaint(np.ascontiguousarray(mm[...,0]),(line*255).astype(np.uint8),5,cv2.INPAINT_TELEA); mm[...,0]=np.where(line,rf,r)
     return Image.fromarray(t,'RGBA'),Image.fromarray(mm,'RGBA')
-ch=chas(SP+'/mod4/chassis_bulwark_plated2.png'); cb=np.nonzero((np.array(ch[0].split()[3])>0).any(0))[0]; print('chassis x',cb.min(),cb.max(),'plate cx',PCX); HL=helm(SP+'/mod2/'+os.environ.get('HELM','helmet_bulwark_lamps2.png'))
+ch=chas(SP+'/mod4/chassis_bulwark_plated2.png'); cb=np.nonzero((np.array(ch[0].split()[3])>0).any(0))[0]; print('chassis x',cb.min(),cb.max(),'plate cx',PCX); HL=helm(SP+'/mod2/'+os.environ.get('HELM','helmet_bulwark_fwd2.png'))
+def _hbox(pair):
+    a=np.array(pair[0].split()[3])>100; ys,xs=np.nonzero(a); return xs.min(),ys.min(),xs.max(),ys.max()
+def match_height(pair,ref):
+    "temple lamps make the helmet wider, so the width fit shrinks it: rescale to the reference helmet's height"
+    x0,y0,x1,y1=_hbox(pair); r0,s0,r1,s1=_hbox(ref); k=(s1-s0)/(y1-y0)
+    cx,by=(x0+x1)/2,y1; out=[]
+    for im in pair:
+        big=im.resize((int(im.width*k),int(im.height*k)),Image.LANCZOS); c=Image.new('RGBA',im.size)
+        c.alpha_composite(big,(int(cx-cx*k),int(s1-by*k))) if True else None; out.append(c)
+    return tuple(out)
+if 'fwd2' in os.environ.get('HELM','helmet_bulwark_fwd2.png'): HL=match_height(HL,helm(SP+'/mod2/helmet_bulwark_fwd1.png'))
 if os.environ.get('SOFT'): ch=soften(ch); HL=soften(HL,keep=4)
 loadouts=[('minigun / rockets','minigun','rockets'),('laser / chainsaw','laser','chainsaw'),('flamer / minigun','flamer','minigun'),('hammer / rockets','hammer','rockets'),('laser / laser','laser','laser'),('chainsaw / flamer','chainsaw','flamer')]
 img=Image.new('RGBA',(3*345,2*330),floor); d=ImageDraw.Draw(img)
