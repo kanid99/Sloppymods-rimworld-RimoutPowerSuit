@@ -15,6 +15,14 @@ B.plate(B.poly([(46,62),(122,72),(122,150),(78,156),(42,128)]),255,226,mirror=Tr
 B.plate(B.poly([(118,66),(138,66),(136,150),(128,158),(120,150)]),212)        # centre ridge (ends under the helmet)
 # ---------------- SHOULDERS: one stylised pauldron per side, no arm plates below
 S=Layer()
+SX,SY=0.82,-16                     # pauldron placement: narrower toward the helmet, raised
+_poly,_ell=S.poly,S.ell
+TILT=np.radians(14); PX,PY=96,110        # tilt: outer edge rises, pivoting near the inner corner
+def _tf(x,y):
+    x,y=x-PX,y-PY; x,y=x*np.cos(TILT)-y*np.sin(TILT),x*np.sin(TILT)+y*np.cos(TILT); x,y=x+PX,y+PY
+    return 2+(x-2)*SX, y+SY
+S.poly=lambda pts:_poly([_tf(x,y) for x,y in pts])
+S.ell=lambda x0,y0,x1,y1:(lambda c0,c1:_ell(c0[0]-(x1-x0)*SX/2,c0[1]-(y1-y0)/2,c0[0]+(x1-x0)*SX/2,c0[1]+(y1-y0)/2))(_tf((x0+x1)/2,(y0+y1)/2),None)
 def arc(cx,cy,rx,ry,a0,a1,n=40):
     return [(cx+rx*np.cos(t),cy+ry*np.sin(t)) for t in np.linspace(np.radians(a0),np.radians(a1),n)]
 shell=arc(60,112,56,62,180,330)+[(108,98),(104,122),(66,138),(26,146),(6,132)]   # domed top, flared angled lower edge
