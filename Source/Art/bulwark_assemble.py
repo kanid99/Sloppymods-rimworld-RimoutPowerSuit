@@ -39,18 +39,40 @@ def arm(name,side):
     w=clip_behind(place(f'{SP}/weap/{name}.png',PCX-OUT,58+int(os.environ.get('TOP','80')),H[name],side),ringw)
     return [w,plate(side),joint(side)]
 import cv2
-def joint(side,r=10):
-    "a ball elbow between the shoulder plate and the weapon"
+def joint(side,w=22,h=18):
+    "a ribbed square swivel between the shoulder plate and the weapon"
     pa=np.array(plate('left')[0].split()[3])>100; ys,xs=np.nonzero(pa)
-    cx=PCX-OUT; cy=ys.max()+2
+    cx=PCX-OUT; top=ys.max()-4
     if side=='right': cx=WC-cx
-    K=4; n=WC*K; img=Image.new('RGBA',(WC*K,S*K)); d=ImageDraw.Draw(img)
-    d.ellipse(((cx-r-1.5)*K,(cy-r-1.5)*K,(cx+r+1.5)*K,(cy+r+1.5)*K),fill=(14,14,18,255))
-    for i in range(r*K,0,-1):                       # radial shading, light from the upper left
-        t=i/(r*K); v=int(140-62*t)
-        d.ellipse(((cx-r*0.18*(1-t))*K-i,(cy-r*0.22*(1-t))*K-i,(cx-r*0.18*(1-t))*K+i,(cy-r*0.22*(1-t))*K+i),fill=(v,v+2,v+8,255))
-    img=img.resize((WC,S),Image.LANCZOS); z=Image.new('RGBA',(WC,S))
-    return img,z
+    K=4; img=Image.new('RGBA',(WC*K,S*K)); d=ImageDraw.Draw(img)
+    x0,y0,x1,y1=(cx-w/2)*K,top*K,(cx+w/2)*K,(top+h)*K
+    d.rounded_rectangle((x0-1.5*K,y0-1.5*K,x1+1.5*K,y1+1.5*K),radius=3*K,fill=(14,14,18,255))
+    for i in range(int(y1-y0)):                       # vertical shading: lit top, darker bottom
+        v=int(150-50*i/(y1-y0)); d.line((x0,y0+i,x1,y0+i),fill=(v,v+2,v+8,255))
+    for k in (1,2,3):                                  # three horizontal ribs
+        yy=y0+(y1-y0)*k/4; d.line((x0,yy,x1,yy),fill=(30,30,36,255),width=int(1.4*K))
+    d.line((x0+2*K,y0+1.5*K,x1-2*K,y0+1.5*K),fill=(190,192,200,255),width=int(K))   # top highlight
+    img=img.resize((WC,S),Image.LANCZOS); return img,Image.new('RGBA',(WC,S))
+def chest_front():
+    "the chest armour shows inside the curl of each shoulder plate: wherever the plate's dark inner wall is"
+    ct,cm=ch; ca=np.array(ct.split()[3])>100
+    T=np.array(ct); Mk=np.array(cm); band=np.zeros((S,WC),bool)
+    for side in ('left','right'):
+        pt=np.array(plate(side)[0]).astype(float); pa=pt[...,3]>100; L=pt[...,:3].mean(2)
+        xs=np.nonzero(pa.any(0))[0]; cx=(xs.min()+xs.max())/2
+        X=np.arange(WC)[None,:]*np.ones((S,1))
+        inner_half=(X>cx-4) if side=='left' else (X<cx+4)
+        wall=pa&(L>45)&(L<int(os.environ.get('WALL','120')))&inner_half
+        wall=ndimage.binary_opening(wall,iterations=1)
+        lab,n=ndimage.label(wall)
+        if n: sz=ndimage.sum(wall,lab,range(1,n+1)); wall=lab==(np.argmax(sz)+1)
+        band|=ndimage.binary_dilation(wall,iterations=2)&pa
+    band&=ca
+    border=band&~ndimage.binary_erosion(band,iterations=1)&ndimage.binary_erosion(ca,iterations=2)
+    out_t=np.zeros((S,WC,4),np.uint8); out_m=np.zeros((S,WC,4),np.uint8)
+    out_t[band]=T[band]; out_m[band]=Mk[band]
+    out_t[border]=(18,18,22,255); out_m[border,0]=0
+    return Image.fromarray(out_t,'RGBA'),Image.fromarray(out_m,'RGBA')
 def soften(pair,keep=4,depth=0.72,erode=0):
     "remove inner black lines: fill them from the surrounding paint, leave a soft crease"
     tex,m=pair; t=np.array(tex).copy(); A=t[...,3]>100; L=t[...,:3].mean(2)
@@ -72,7 +94,7 @@ loadouts=[('minigun / rockets','minigun','rockets'),('laser / chainsaw','laser',
 img=Image.new('RGBA',(3*345,2*330),floor); d=ImageDraw.Draw(img)
 for i,(lab,a,b) in enumerate(loadouts):
     out=Image.new('RGBA',(WC,S))
-    for t,m in [ch,*arm(a,'left'),*arm(b,'right'),HL]: out.alpha_composite(tint(t,m,COL['bulwark']))
+    for t,m in [ch,*arm(a,'left'),*arm(b,'right'),chest_front(),HL]: out.alpha_composite(tint(t,m,COL['bulwark']))
     x,y=(i%3)*345,(i//3)*330
     d.text((x+6,y+4),lab,fill=(255,255,255,255))
     img.alpha_composite(out,(x+8,y+20)); img.alpha_composite(out.resize((82,64),Image.LANCZOS),(x+130,y+262))

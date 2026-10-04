@@ -31,8 +31,8 @@ The VFE-style redraws were tried and dropped by the owner (archived in
 
 ## Bulwark assembly (current)
 
-`Source/Art/bulwark_assemble.py` (run with `SOFT=1 PR=88 PT=70 OUT=14 TOP=86`): shoulder plates nested into
-the chest's shoulder wedge, a thin (1 px) outline all round them, weapons hung at the outer edges, a ball
-joint where each weapon meets its plate, and the chest/helmet inner black lines replaced by shading
-(thin dark lines filled from the surrounding paint, leaving a soft crease; openings and the outer
-silhouette keep their black).
+`Source/Art/bulwark_assemble.py` (run with `PR=88 PT=70 OUT=14 TOP=86`): shoulder plates nested into the
+chest's shoulder wedge with a thin (1 px) outline all round; the chest armour drawn in front of each plate's
+dark inner wall, so the chest sits inside the curl of the hook; weapons at the outer edges; a ribbed square
+swivel joint (three horizontal ribs) where each weapon meets its plate. Inner black detail lines stay
+(removing them by filling looked like a poor eraser job; `SOFT=1` keeps that experiment).
