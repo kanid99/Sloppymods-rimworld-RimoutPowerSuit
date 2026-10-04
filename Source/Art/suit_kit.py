@@ -172,6 +172,14 @@ def build(spec, out):
     pieces = {}
     # ---------------- south: straight from the front-view assembly (keeps the nesting into the shoulders)
     for p, f in (('Body', 'body'), ('Helmet', 'helmet'), ('ArmL', f"armL_{spec['weapon_l']}"), ('ArmR', f"armR_{spec['weapon_r']}")):
+        if f.endswith('_none'):
+            # a bare arm (no weapon fitted): the plate and its cuff, with the same hole the chest nests into
+            sd = f[3]; L = Layer(); L.put_assembly(f'{src}/south_plate{sd}full.png', f'{src}/south_plate{sd}full_m.png')
+            a_ = Layer(); a_.put_assembly(f'{src}/south_arm{sd}_minigun.png', f'{src}/south_arm{sd}_minigun_m.png')
+            b_ = Layer(); b_.put_assembly(f'{src}/south_arm{sd}full_minigun.png', f'{src}/south_arm{sd}full_minigun_m.png')
+            hole = (np.array(b_.tex)[..., 3] > 100) & ~(np.array(a_.tex)[..., 3] > 100)
+            t_ = np.array(L.tex); t_[hole, 3] = 0; m_ = np.array(L.mask); m_[hole] = 0
+            L.tex = Image.fromarray(t_); L.mask = Image.fromarray(m_); pieces[(p, 'south')] = L; continue
         L = Layer(); L.put_assembly(f'{src}/south_{f}.png', f'{src}/south_{f}_m.png'); pieces[(p, 'south')] = L
     body_bb = bbox(pieces[('Body', 'south')].tex); helm_bb = bbox(pieces[('Helmet', 'south')].tex)
     armL_bb = bbox(pieces[('ArmL', 'south')].tex)
@@ -266,7 +274,9 @@ def build(spec, out):
             ey = ab[1] + int((bx[3] - bx[1]) * k_) - 6
             A_.joint(int((ab[0] + ab[2]) / 2), ey - 12)
             ab = (ab[0], ab[1], ab[2], ey)
-        if wname in spec.get('shields', ()):
+        if wname == 'none':
+            pass                                                     # bare arm: plate and elbow only
+        elif wname in spec.get('shields', ()):
             feet = bbox(pieces[('Legs', 'south')].tex)[3]
             st0 = plL_bb[1] + 40                                     # same top as in the front and back views
             A_.put(shield_part(spec['weapons_east'][wname], st0, feet + 6, widen=1.6), ab[2] + 4, top=st0)
@@ -282,7 +292,9 @@ def build(spec, out):
             A_.tex = Image.alpha_composite(O_.tex, A_.tex)
         # the far arm: drawn behind everything, a little higher; only what sticks out past the body shows
         F_ = Layer(); far = spec['weapon_r']; feet = bbox(pieces[('Legs', 'south')].tex)[3]
-        if far in spec.get('shields', ()):
+        if far == 'none':
+            pass                                                     # a bare far arm is hidden behind the body
+        elif far in spec.get('shields', ()):
             st0 = plL_bb[1] + 40
             F_.put(shield_part(spec['weapons_east'][far], st0, feet + 6, widen=1.6), ab[2] + 26, top=st0)
         else:
@@ -361,9 +373,9 @@ def build(spec, out):
             for cxs in (fx0 + fw * 0.34, fx0 + fw * 0.66):              # shoulder straps
                 d_.rounded_rectangle((cxs - sw / 2, fy0 + fh * 0.08, cxs + sw / 2, fy1 - fh * 0.08), radius=sw // 3,
                                      fill=(60, 52, 64, 255), outline=(14, 14, 18, 255), width=2)
-                by = fy0 + fh * 0.45; bw = sw * 1.15
-                d_.rectangle((cxs - bw / 2, by - bw / 2, cxs + bw / 2, by + bw / 2), fill=(150, 150, 160, 255), outline=(14, 14, 18, 255), width=2)
-                d_.rectangle((cxs - bw / 4, by - bw / 4, cxs + bw / 4, by + bw / 4), fill=(60, 52, 64, 255))
+                bky = fy0 + fh * 0.45; bkw = sw * 1.15
+                d_.rectangle((cxs - bkw / 2, bky - bkw / 2, cxs + bkw / 2, bky + bkw / 2), fill=(150, 150, 160, 255), outline=(14, 14, 18, 255), width=2)
+                d_.rectangle((cxs - bkw / 4, bky - bkw / 4, cxs + bkw / 4, bky + bkw / 4), fill=(60, 52, 64, 255))
             wy = fy0 + fh * 0.74                                             # waist strap
             d_.rounded_rectangle((fx0 + fw * 0.16, wy - sw * 0.4, fx1 - fw * 0.16, wy + sw * 0.4), radius=sw // 3,
                                  fill=(60, 52, 64, 255), outline=(14, 14, 18, 255), width=2)
@@ -397,7 +409,8 @@ def build(spec, out):
     north_plates = {}
     for p, plate, full, wname in (('ArmL', 'plateLfull', 'armLfull', spec['weapon_l']), ('ArmR', 'plateRfull', 'armRfull', spec['weapon_r'])):
         P = Layer(); P.put_assembly(f'{src}/south_{plate}.png', f'{src}/south_{plate}_m.png')
-        F = Layer(); F.put_assembly(f'{src}/south_{full}_{wname}.png', f'{src}/south_{full}_{wname}_m.png')
+        fw = 'minigun' if wname == 'none' else wname
+        F = Layer(); F.put_assembly(f'{src}/south_{full}_{fw}.png', f'{src}/south_{full}_{fw}_m.png')
         pa = np.array(P.tex)[..., 3] > 100; fa = np.array(F.tex)[..., 3] > 100
         wy, wx = np.nonzero(fa & ~ndimage.binary_dilation(pa, iterations=3))
         mx = lambda x: C - x                                       # mirror across the canvas centre
@@ -406,9 +419,10 @@ def build(spec, out):
         x0, y0, x1, y1 = bbox(P.tex); box = (x0, y0, x1 + 1, y1 + 1)
         pw = x1 - x0
         # weapon rear view: same bottom as the front view's weapon, no wider than 70% of the plate
-        wt, wm = part(spec['weapons_north'][wname]); wh = int(spec['weapon_h'][wname] * K)
-        kk = min(wh / wt.height, pw * 0.70 / wt.width)
-        N.put((wt, wm), fx, bottom=wy.max(), h=int(wt.height * kk), flip=True)
+        if wname != 'none':
+            wt, wm = part(spec['weapons_north'][wname]); wh = int(spec['weapon_h'][wname] * K)
+            kk = min(wh / wt.height, pw * 0.70 / wt.width)
+            N.put((wt, wm), fx, bottom=wy.max(), h=int(wt.height * kk), flip=True)
         # shoulder plate from behind: the front plate's exact outline (mirrored), filled with the plate's back face
         sil = P.tex.crop(box).transpose(Image.FLIP_LEFT_RIGHT); sa = np.array(sil)[..., 3] > 100
         # back of the plate = the front plate mirrored, its dark hook interior painted over as solid back armour
@@ -591,7 +605,8 @@ def bughunter_spec(sp):
         s['body'] = dict(s['body'], north=f'{sp}/own/chassis_north_jumpnet.png', north_ref=f'{sp}/views/chassis_north_tall.png')
         s['full_east'] = dict(s['full_east'], body_image=f'{sp}/own/full_east_noarm_jumpnet.png', over_from=f'{sp}/own/full_east_noarm_jump.png', body_ref=f'{sp}/views/full_east_noarm.png')
     # its light plates in the side view (pauldron + elbow paintings), not the Bulwark's painted heavy arm
-    s['east_plates'] = {'flamer': f'{sp}/own/plate_east_fuel.png', 'hammer': f'{sp}/own/plate_east_pneumatic.png'}
+    s['east_plates'] = {'flamer': f'{sp}/own/plate_east_fuel.png', 'hammer': f'{sp}/own/plate_east_pneumatic.png',
+                        'none': f'{sp}/own/plate_east_fuel.png'}   # the near arm is the left (fuel) one
     return s
 
 
