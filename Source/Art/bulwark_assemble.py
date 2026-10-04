@@ -67,6 +67,13 @@ def chest_front():
         lab,n=ndimage.label(wall)
         if n: sz=ndimage.sum(wall,lab,range(1,n+1)); wall=lab==(np.argmax(sz)+1)
         band|=ndimage.binary_dilation(wall,iterations=2)&pa
+        # the plate's old inner-edge outline next to the wall: show the chest there too
+        dark=pa&(L<115)
+        for y in np.nonzero(wall.any(1))[0]:
+            wx=np.nonzero(wall[y])[0]
+            if side=='left': x0,x1=wx.max()+1,wx.max()+12
+            else: x0,x1=wx.min()-11,wx.min()
+            band[y,max(0,x0):x1]|=dark[y,max(0,x0):x1]
     band&=ca
     border=band&~ndimage.binary_erosion(band,iterations=1)&ndimage.binary_erosion(ca,iterations=2)
     out_t=np.zeros((S,WC,4),np.uint8); out_m=np.zeros((S,WC,4),np.uint8)
