@@ -157,3 +157,10 @@ pieces covering a body part are gone, hits there reach the pilot inside the fram
 or replaced individually. The owner wants visible legs back so damage to them can be shown: short stubby leg pieces under the hip armour (`legs_bulwark_south.png`), not full legs.
 Fits both modes: Exosuit mode already treats modules as separate items; lite mode would need the pieces
 as separate apparel with their own hit points.
+
+### Entry: the back opens
+
+The suit is entered from behind: the whole back panel (power-cell caps and release wheel on it) is hinged on
+one side and swings open like a door, showing the padded cavity with a seat harness
+(`chassis_bulwark_north_open.png`). Used for the empty/parked suit and as a frame of the climb-in animation
+(turn the release wheel, back swings open, pilot climbs in, back closes).
