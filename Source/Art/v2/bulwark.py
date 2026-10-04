@@ -13,15 +13,17 @@ B.plate(B.rrect(62,150,194,204,12),236,206)                                   # 
 for y in (168,182): B.mark(B.rrect(76,y,100,y+5,2),mirror=True)               # two vent slots each side
 B.plate(B.poly([(46,62),(122,72),(122,150),(78,156),(42,128)]),255,226,mirror=True)   # chest slabs
 B.plate(B.poly([(118,66),(138,66),(136,150),(128,158),(120,150)]),212)        # centre ridge (ends under the helmet)
-# ---------------- SHOULDERS
+# ---------------- SHOULDERS: one stylised pauldron per side, no arm plates below
 S=Layer()
-cut=lambda m,y: m&(np.arange(N)[:,None]<y*K)
-S.plate(S.poly([(10,118),(78,112),(84,166),(18,172)]),168,150,mirror=True)                       # under-plate
-pd=cut(S.ell(5,46,113,160),146)
-S.plate(pd,255,222,mirror=True)                                                                 # rounded pauldron
-S.plate(pd&~S.ell(15,52,121,166),204,stroke=0,mirror=True)                                       # outer rounded side face
-S.plate(cut(S.ell(32,62,94,132),132),246,216,stroke=3,mirror=True)                              # raised shield boss
-S.plate(S.poly([(12,140),(100,140),(100,150),(80,158),(16,156)]),190,stroke=3,mirror=True)         # lower rim band
+def arc(cx,cy,rx,ry,a0,a1,n=40):
+    return [(cx+rx*np.cos(t),cy+ry*np.sin(t)) for t in np.linspace(np.radians(a0),np.radians(a1),n)]
+shell=arc(60,112,56,62,180,330)+[(108,98),(104,122),(66,138),(26,146),(6,132)]   # domed top, flared angled lower edge
+S.plate(S.poly(shell),255,220,mirror=True)
+S.plate(S.poly(arc(60,112,56,62,180,262)+[(56,58),(46,66),(26,82),(14,104),(10,124)]),206,stroke=0,mirror=True)  # outer side face
+rim=S.poly(arc(60,112,56,62,196,320)+list(reversed(arc(60,120,46,54,196,320))))
+S.plate(rim,240,226,stroke=3,mirror=True)                                         # raised rim along the top
+S.plate(S.poly([(10,132),(26,146),(66,138),(104,122),(104,130),(66,148),(24,156),(8,142)]),188,stroke=3,mirror=True)  # lip under the flare
+S.plate(S.ell(46,84,82,118),246,212,stroke=3,mirror=True)                         # shield boss
 # ---------------- HELMET
 H=Layer()
 H.plate(H.poly(sym([(128,66),(98,68),(76,84),(68,120),(72,160),(88,186),(110,196),(128,199)])),255,222,stroke=7)  # shell
