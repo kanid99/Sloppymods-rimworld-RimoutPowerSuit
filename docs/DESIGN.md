@@ -107,3 +107,12 @@ Weapons are original designs that take their cues from vanilla ones (autocannon 
 perforated jacket; minigun: barrel cluster and a yellow ammo box; rocket pod: a box pod with bands and a handle, two red-tipped rockets poking out of its base; charge
 lance: tan spacer body and blue core; incendiary launcher: orange tank; zeus hammer: emitters in the head).
 No vanilla pixels are used; the official art source is only a reference (owner's Dropbox, not in the repo).
+
+### Gemini chat as a parts source
+
+The owner generates concepts in Gemini chat (style prompt: light grey plates, thick outline, chamfered
+side faces, suggested detail, no arms/legs). Results are inconsistent, so they are used as parts, not
+finished suits: `Source/Art/gemini/` holds the originals, `gem_parts.py` cuts parts out,
+`gem_kitbash.py` combines them with our kit parts (helmet, arm shields, weapons).
+Kept so far: the chest/abdomen/hip body (siege suit), the box rocket pod with a tube grid (fire support,
+replaces our rocket pod), the claw arm (breacher; Bughunter melee option), the long cannon (fire support).
