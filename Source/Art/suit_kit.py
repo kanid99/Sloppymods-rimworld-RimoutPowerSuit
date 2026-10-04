@@ -131,11 +131,15 @@ class Layer:
 def shield_part(path, top, bottom, widen=1.35):
     """a tower shield sized to stand from `top` to `bottom` (canvas px), made wider than the painting"""
     wt, wm = part(path)
+    ta = np.array(wt); solid = ndimage.binary_fill_holes(ta[..., 3] > 40)     # a shield is solid: no see-through face
+    edge = ndimage.binary_dilation(solid, iterations=3) & ~solid                # and a solid outline, no soft gap
+    ta[edge] = (14, 14, 18, 255); ta[..., 3] = np.where(solid | edge, 255, 0); wt = Image.fromarray(ta)
     a = np.array(wt)[..., 3] > 100; widths = a.sum(1); full = widths.max()
     start = int(np.argmax(widths > full * 0.6))            # drop the narrow mounting block on top
     wt, wm = wt.crop((0, start, wt.width, wt.height)), wm.crop((0, start, wm.width, wm.height))
     h = bottom - top; w = int(wt.width * h / wt.height * widen)
-    return wt.resize((w, h), Image.LANCZOS), wm.resize((w, h), Image.LANCZOS)
+    wt = wt.resize((w, h), Image.LANCZOS); a = np.array(wt); a[..., 3] = np.where(a[..., 3] > 60, 255, 0)
+    return Image.fromarray(a), wm.resize((w, h), Image.LANCZOS)
 
 
 def bbox(im):
@@ -213,7 +217,8 @@ def build(spec, out):
         ey = ab[1] + int((ab[3] - ab[1]) * 0.80)                   # the elbow, at the end of the ribbed hose
         if wname in spec.get('shields', ()):
             feet = bbox(pieces[('Legs', 'south')].tex)[3]
-            A_.put(shield_part(spec['weapons_east'][wname], ab[1] + 40, feet + 6, widen=1.6), ab[2] + 4, top=ab[1] + 40)
+            st0 = plL_bb[1] + 40                                     # same top as in the front and back views
+            A_.put(shield_part(spec['weapons_east'][wname], st0, feet + 6, widen=1.6), ab[2] + 4, top=st0)
         else:
             wt, wm = part(spec['weapons_east'][wname]); wt, wm = wt.rotate(90, expand=True), wm.rotate(90, expand=True)
             ln = int(spec['weapon_h'][wname] * K * 1.05); h = max(1, round(wt.height * ln / wt.width))
@@ -223,7 +228,8 @@ def build(spec, out):
         # the far arm: drawn behind everything, a little higher; only what sticks out past the body shows
         F_ = Layer(); far = spec['weapon_r']; feet = bbox(pieces[('Legs', 'south')].tex)[3]
         if far in spec.get('shields', ()):
-            F_.put(shield_part(spec['weapons_east'][far], ab[1] + 20, feet - 14, widen=1.6), ab[2] + 26, top=ab[1] + 20)
+            st0 = plL_bb[1] + 40
+            F_.put(shield_part(spec['weapons_east'][far], st0, feet + 6, widen=1.6), ab[2] + 26, top=st0)
         else:
             wt, wm = part(spec['weapons_east'][far]); wt, wm = wt.rotate(90, expand=True), wm.rotate(90, expand=True)
             ln = int(spec['weapon_h'][far] * K * 0.98); h = max(1, round(wt.height * ln / wt.width))
@@ -341,7 +347,14 @@ def build(spec, out):
                 if wname in spec.get('shields', ()):
                     pt = np.array(P.tex); pt[hole, 3] = 0; pm_ = np.array(P.mask); pm_[hole] = 0
                     S_ = Layer(); S_.tex = Image.fromarray(pt); S_.mask = Image.fromarray(np.where(pt[..., 3] > 100, pm_, 0).astype(np.uint8))
-                    S_.tex.alpha_composite(N.tex); S_.mask = Image.fromarray(np.maximum(np.array(S_.mask), np.array(N.mask)).astype(np.uint8))
+                    # the arm draws above the head for the shield; its plate must stay under the helmet
+                    helm_a = np.array(pieces[('Helmet', 'south')].tex)[..., 3] > 100
+                    under = helm_a & ~(np.array(N.tex)[..., 3] > 100)
+                    st_ = np.array(S_.tex); st_[under, 3] = 0; S_.tex = Image.fromarray(st_)
+                    sm_ = np.array(S_.mask); sm_[under] = 0; S_.mask = Image.fromarray(sm_)
+                    S_.tex.alpha_composite(N.tex)
+                    over = np.array(N.tex)[..., 3] > 20                    # over the shield only the shield's own paint
+                    S_.mask = Image.fromarray(np.where(over, np.array(N.mask), np.array(S_.mask)).astype(np.uint8))
                     pieces[(p_, 'south')] = S_; continue
                 pt = np.array(P.tex); pt[hole, 3] = 0; pm_ = np.array(P.mask); pm_[hole] = 0
                 N.tex.alpha_composite(Image.fromarray(pt)); N.mask = Image.fromarray(np.maximum(np.array(N.mask), np.where(pt[..., 3] > 100, pm_, 0)).astype(np.uint8))
