@@ -124,3 +124,16 @@ replaces our rocket pod), the claw arm (breacher; Bughunter melee option), the l
   plates, soft grey side faces, thin near-black inner lines, heavy black outline. `vdraw.use_soft_preset()`
   approximates it for our own drawing. Parts cut from it (`gemini/parts/`): Miner, Engineer and Hazard bodies,
   drill, pick-hammer and gripper claw; `nc_miner_kit.png` is a first Miner assembled from them.
+
+### Originality check for generated art (VFE Pirates)
+
+Gemini can reproduce VFE Pirates warcaskets. Before keeping any generated part, put it next to every VFE
+warcasket helmet and body (south) and reject anything that matches one. From the "armor & helmet
+spreadsheet" round:
+- Rejected (VFE copies): the "Original" helmet and both "Original" bodies (VFE base/Aerial warcasket),
+  the "Bulwark" helmet (VFE Marine helmet's T-visor, crest and flared cheeks). That image is not kept in the
+  repo.
+- Kept as starting points (`gemini/parts/sheet_*`): Miner helmet (forehead lamp, goggles), Medic helmet
+  (clear dome visor, green crosses), Bughunter helmet (twin filter gas mask, four eye lenses), and the
+  Miner / Medic / Bughunter bodies as references - they have legs and harness detail, so only the torso
+  ideas are used (vest with pouches, medic chest cross and belt, bughunter canisters at the hips).
