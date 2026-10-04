@@ -103,7 +103,7 @@ def scale_layer(pair,k):
         big=im.resize((int(im.width*k),int(im.height*k)),Image.LANCZOS); c=Image.new('RGBA',im.size)
         c.alpha_composite(big,(int(cx-cx*k),int(by-by*k))); out.append(c)
     return tuple(out)
-if os.environ.get('HSCALE'): HL=scale_layer(HL,float(os.environ['HSCALE']))
+HL=scale_layer(HL,float(os.environ.get('HSCALE','1.3')))
 if os.environ.get('FULLHEAD'): HL=match_height(HL,helm(SP+'/mod2/helmet_bulwark_fwd1.png'))
 if os.environ.get('SOFT'): ch=soften(ch); HL=soften(HL,keep=4)
 loadouts=[('minigun / rockets','minigun','rockets'),('laser / chainsaw','laser','chainsaw'),('flamer / minigun','flamer','minigun'),('hammer / rockets','hammer','rockets'),('laser / laser','laser','laser'),('chainsaw / flamer','chainsaw','flamer')]

@@ -41,5 +41,5 @@ swivel joint (three horizontal ribs) where each weapon meets its plate. Inner bl
 
 The assembled suit is drawn at **1.45x** the 256 body canvas so a pawn believably fits inside (checked
 with a pawn ghosted in, eyes on the helmet's eye slits: `Source/Art/bulwark_fit_check.py`). The helmet is
-scaled up on top of that (`HSCALE`, 1.15 - 1.3) so the pawn's head fits inside it. Leg stubs: knee and foot
+scaled up 1.3x on top of that (`HSCALE`, default 1.3) so the pawn's head fits inside it. Leg stubs: knee and foot
 only, under the hip armour. This replaces the earlier "only slightly bigger than cataphract" rule.
