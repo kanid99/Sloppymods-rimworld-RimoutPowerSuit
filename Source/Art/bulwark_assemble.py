@@ -123,8 +123,8 @@ for i,(lab,a,b) in enumerate(loadouts):
             return t,m
         os.makedirs(SP+'/kit_src',exist_ok=True)
         WEAPONS=[w for w in ('minigun','rockets','chainsaw','laser','flamer','hammer','autocannon','grenade','arc','towershield') if w in H]
-        layers=[('body',ch),('helmet',HL)]
-        for wn in WEAPONS: layers+= [(f'armL_{wn}',merge(arm(wn,'left'),band)),(f'armR_{wn}',merge(arm(wn,'right'),band))]
+        layers=[('body',ch),('helmet',HL),('plateLfull',merge(arm('minigun','left')[1:])),('plateRfull',merge(arm('minigun','right')[1:]))]
+        for wn in WEAPONS: layers+= [(f'armL_{wn}',merge(arm(wn,'left'),band)),(f'armR_{wn}',merge(arm(wn,'right'),band)),(f'armLfull_{wn}',merge(arm(wn,'left'))),(f'armRfull_{wn}',merge(arm(wn,'right')))]
         for name,pair in layers:
             pair[0].save(f'{SP}/kit_src/south_{name}.png'); pair[1].save(f'{SP}/kit_src/south_{name}_m.png')
     x,y=(i%3)*345,(i//3)*330

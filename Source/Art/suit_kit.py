@@ -12,8 +12,9 @@ helmet texture is stored 80 px LOWER than where it shows, and the preview lifts 
 
 Pieces (each its own apparel, so each can be damaged and lost on its own):
   Body, Legs, ArmL, ArmR (shoulder plate + joint + weapon), Helmet.
-Facings: south, east, north (the game mirrors east for west). In the east view only the near arm (ArmR) is
-drawn; ArmL is empty there.
+Facings: south, east (a side view, the owner's pick; guns aimed forward), north (the game mirrors east for west).
+ArmL is the arm on the left of the front view (the pawn's right arm): nearest the viewer facing east, on the
+right from behind.
 
 Usage: python3 suit_kit.py SPEC_NAME OUT_DIR  (see SPECS at the bottom)
 Writes OUT_DIR/<Piece>_<facing>.png and OUT_DIR/<Piece>_<facing>m.png (red = takes the suit colour),
@@ -104,6 +105,23 @@ class Layer:
             yy = y0 + (y1 - y0) * k / 4; d.line((x0, yy, x1, yy), fill=(30, 30, 36, 255), width=3)
         d.line((x0 + 4, y0 + 3, x1 - 4, y0 + 3), fill=(190, 192, 200, 255), width=2)
 
+    def collar(self, cx, cy, w, h, t=None, col=(150, 146, 158)):
+        """front half of a collar ring (thickness t) centred on (cx, cy): drawn over what is behind it, painted"""
+        t = t or max(10, h // 3)
+        K4 = 4; W, H = self.tex.size
+        m = Image.new('L', (W * K4, H * K4), 0); d = ImageDraw.Draw(m)
+        box = lambda r: ((cx - w / 2 - r) * K4, (cy - h / 2 - r) * K4, (cx + w / 2 + r) * K4, (cy + h / 2 + r) * K4)
+        d.ellipse(box(0), fill=255); d.ellipse(box(-t), fill=0)
+        ring = np.array(m.resize((W, H), Image.LANCZOS)) > 127
+        ring[:int(cy)] = False                                      # only the near (lower) half
+        yy = np.arange(H)[:, None] * np.ones((1, W)); shade = np.clip(1.08 - (yy - cy) / (h / 2 + t) * 0.35, 0.7, 1.1)
+        line = ndimage.binary_dilation(ring, iterations=3) & ~ring
+        line[:int(cy)] = False
+        a = np.array(self.tex); mk = np.array(self.mask)
+        for c in range(3): a[..., c][ring] = np.clip(col[c] * shade[ring], 0, 255)
+        a[..., 3][ring] = 255; a[line] = INK; mk[ring] = 255
+        self.tex = Image.fromarray(a); self.mask = Image.fromarray(mk)
+
     def save(self, out, name):
         self.tex.save(f'{out}/{name}.png')
         a = np.array(self.tex)[..., 3]; m = np.array(self.mask)
@@ -129,31 +147,38 @@ def build(spec, out):
     # legs (south) under the hips
     L = Layer(); L.put(legs_stub(spec['legs']['south']), cx, top=body_bb[3] - int(body_h * 0.12), w=int((body_bb[2] - body_bb[0]) * 0.72), behind=True)
     pieces[('Legs', 'south')] = L
-    # ---------------- east (side view): body, near arm, helmet, legs
+    def moved(f, cx_to, top_to, k=1.0, flip=False):
+        """a full front-view arm layer, scaled by k and moved so its centre x / top land on cx_to / top_to"""
+        L = Layer(); L.put_assembly(f'{src}/south_{f}.png', f'{src}/south_{f}_m.png')
+        x0, y0, x1, y1 = bbox(L.tex); box = (x0, y0, x1 + 1, y1 + 1)
+        pm = (L.tex.crop(box), L.mask.crop(box)); N = Layer()
+        N.put(pm, cx_to, top=top_to, h=int((y1 - y0) * k), flip=flip); return N
+    armR_bb = bbox(pieces[('ArmR', 'south')].tex)
+    bw = body_bb[2] - body_bb[0]
+    # ---------------- east (side view, the owner's pick over the three-quarter view): one near arm, gun aimed forward
     L = Layer(); L.put(part(spec['body']['east']), cx, bottom=body_bb[3], h=body_h); pieces[('Body', 'east')] = L
     eb = bbox(L.tex)
     L = Layer(); L.put(legs_stub(spec['legs']['east']), cx, top=eb[3] - int(body_h * 0.12), h=int(body_h * 0.42)); pieces[('Legs', 'east')] = L
     L = Layer(); L.put(part(spec['helmet']['east']), cx + 4, bottom=helm_bb[3] - int(helm_h * 0.06), h=int(helm_h * 0.92)); pieces[('Helmet', 'east')] = L
     L = Layer()
     pb = L.put(part(spec['plate']['east']), cx - 4, top=eb[1] + int(body_h * 0.16), h=int(plate_h * 0.85))
-    wh = int(spec['weapon_h'][spec['weapon_r']] * K)
-    L.put(part(spec['weapons_east'][spec['weapon_r']]), cx, top=pb[3] - 18, h=wh, behind=True)
-    L.joint(cx, pb[3] - 22)
-    pieces[('ArmR', 'east')] = L; pieces[('ArmL', 'east')] = Layer()
-    # ---------------- north (back view): mirrored arm sides, back panel with the cell caps
+    wname = spec['weapon_l']
+    wt, wm = part(spec['weapons_east'][wname]); wt, wm = wt.rotate(90, expand=True), wm.rotate(90, expand=True)
+    ln = int(spec['weapon_h'][wname] * K); h = max(1, round(wt.height * ln / wt.width))
+    elbow_y = pb[3] - 8
+    L.put((wt, wm), pb[0] + (pb[2] - pb[0]) * 0.3 + ln / 2, top=elbow_y - h // 2, w=ln)
+    L.joint(int((pb[0] + pb[2]) / 2), elbow_y - 18)
+    pieces[('ArmL', 'east')] = L; pieces[('ArmR', 'east')] = Layer()
+    # ---------------- north (back view): the arms swap sides and are mirrored; shoulders cover the body
     L = Layer(); L.put(part(spec['body']['north']), cx, bottom=body_bb[3], h=body_h); pieces[('Body', 'north')] = L
     nb = bbox(L.tex)
-    L = Layer(); L.put(legs_stub(spec['legs']['north']), cx, top=nb[3] - int(body_h * 0.12), w=int((body_bb[2] - body_bb[0]) * 0.72)); pieces[('Legs', 'north')] = L
-    L = Layer(); L.put(part(spec['helmet']['north']), cx, bottom=helm_bb[3], h=helm_h); pieces[('Helmet', 'north')] = L
-    armR_bb = bbox(pieces[('ArmR', 'south')].tex)
-    for p, sbb, wname in (('ArmL', armR_bb, spec['weapon_l']), ('ArmR', armL_bb, spec['weapon_r'])):
-        # seen from behind the arm that was on the left is on the right
-        acx = (sbb[0] + sbb[2]) / 2; flip = p == 'ArmR'
-        L = Layer()
-        pb = L.put(part(spec['plate']['north']), acx, top=plate_top, h=plate_h, flip=flip)
-        L.put(part(spec['weapons_south'][wname]), acx, top=pb[3] - 18, h=int(spec['weapon_h'][wname] * K), flip=True, behind=True)
-        L.joint(acx, pb[3] - 22)
-        pieces[(p, 'north')] = L
+    L = Layer(); L.put(legs_stub(spec['legs']['north']), cx, top=nb[3] - int(body_h * 0.12), w=int(bw * 0.72)); pieces[('Legs', 'north')] = L
+    L = Layer(); hb = L.put(part(spec['helmet']['north']), cx, bottom=helm_bb[3] - int(helm_h * 0.10), h=int(helm_h * 0.86))
+    # the back rim of the collar is nearer than the head from behind: a shaded armour band over the helmet's base
+    L.collar((hb[0] + hb[2]) / 2, hb[3] - int(helm_h * 0.22), int((hb[2] - hb[0]) * 1.04), int(helm_h * 0.42), t=int(helm_h * 0.13))
+    pieces[('Helmet', 'north')] = L
+    pieces[('ArmL', 'north')] = moved(f"armLfull_{spec['weapon_l']}", (armR_bb[0] + armR_bb[2]) / 2, armL_bb[1], 1.0, flip=True)
+    pieces[('ArmR', 'north')] = moved(f"armRfull_{spec['weapon_r']}", (armL_bb[0] + armL_bb[2]) / 2, armR_bb[1], 1.0, flip=True)
     # ---------------- save: helmet stored HEAD px lower (the game lifts it to the head)
     for (p, f), L in pieces.items():
         if p == 'Helmet': L.shift(HEAD)
@@ -161,8 +186,8 @@ def build(spec, out):
     preview(out, spec.get('colors', [(0.56, 0.58, 0.60), (0.58, 0.60, 0.42)]))
 
 
-ORDER = {'south': ['Legs', 'Body', 'ArmL', 'ArmR', 'Helmet'], 'east': ['ArmL', 'Legs', 'Body', 'ArmR', 'Helmet'],
-         'north': ['Legs', 'Helmet', 'ArmL', 'ArmR', 'Body']}
+ORDER = {'south': ['Legs', 'Body', 'ArmL', 'ArmR', 'Helmet'], 'east': ['ArmR', 'Legs', 'Body', 'ArmL', 'Helmet'],
+         'north': ['Legs', 'Body', 'ArmL', 'ArmR', 'Helmet']}
 
 
 def stack(out, facing, color=None):

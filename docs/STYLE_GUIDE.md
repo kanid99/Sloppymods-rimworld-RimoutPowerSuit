@@ -53,7 +53,10 @@ stored 80 px lower because the game draws it at the head position. Each piece is
 later be its own apparel / module and be damaged and lost on its own.
 - South layers come from the front-view assembly (`bulwark_assemble.py` with `EXPORT=1` writes
   `kit_src/south_*.png` incl. an arm layer per weapon, with the hole where the chest nests into the plate).
-- East/north come from the side/back paintings; the back of a hanging weapon is its front mirrored.
+- East = side view (owner preferred it to a three-quarter view; the three-quarter paintings are kept in
+  `kit/bulwark_src/q/`), guns aimed forward from the elbow so the firing animation matches.
+- North = back painting; the arms are the front-view arm layers mirrored and swapped, drawn over the body so
+  the shoulders are covered; a collar band is drawn over the helmet base.
 - A new suit = a new spec function (like `bulwark_spec`) pointing at its parts. Weapon side views and the
   leg stubs are shared between suits.
 Bulwark sources: `Source/Art/kit/bulwark_src/`; output: `Source/Art/kit/out_bulwark/`
