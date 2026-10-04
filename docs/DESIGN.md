@@ -91,7 +91,7 @@ Decisions agreed with the owner, to build from. Numbers are starting points for 
 - **Tower shield** - a non-weapon arm: a slab shield that adds armour from the front and doubles the
   siege shield's strength while standing still; pairs with any weapon on the other arm.
 
-### Art style: VFE / vanilla RimWorld (adopted)
+### Art style: VFE / vanilla RimWorld (tried, dropped - see docs/STYLE_GUIDE.md; files in Source/Art/archive/)
 
 Matches VFE Pirates' warcaskets: light grey parts (the game tints them), soft form shading (rounded parts darken toward the rim, light from the upper left, plates cast soft shadows; crisp chamfer side faces, lit toward the upper left and clearly darker facing away; `fill_vfe(..., bevel=)`), two or three tones with a soft
 top-down gradient, thin dark inner lines between big plates, a heavy black silhouette outline, and detail only
@@ -143,3 +143,8 @@ spreadsheet" round:
 Redrawn from the kept Gemini idea: egg-shaped skull, cheek plates, a brow ridge with two small upper lenses,
 two big teardrop lenses slanting up and out (insect-like), a narrow snout with a hexagonal port, twin filter
 canisters hanging low, two crown lamps. `Source/Art/vfe_bughunter_helmet.py`.
+
+
+### Current art base
+
+The approved painted modular set (`Source/Art/nano/modular/`) is the base again. Rules: `docs/STYLE_GUIDE.md`.
