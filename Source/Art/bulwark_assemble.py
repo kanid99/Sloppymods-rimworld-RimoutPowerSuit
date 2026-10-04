@@ -103,6 +103,7 @@ img=Image.new('RGBA',(3*345,2*330),floor); d=ImageDraw.Draw(img)
 for i,(lab,a,b) in enumerate(loadouts):
     out=Image.new('RGBA',(WC,S))
     for t,m in [ch,*arm(a,'left'),*arm(b,'right'),chest_front(),HL]: out.alpha_composite(tint(t,m,COL['bulwark']))
+    out.save(f'{SP}/suit_{i}.png')
     x,y=(i%3)*345,(i//3)*330
     d.text((x+6,y+4),lab,fill=(255,255,255,255))
     img.alpha_composite(out,(x+8,y+20)); img.alpha_composite(out.resize((82,64),Image.LANCZOS),(x+130,y+262))

@@ -154,6 +154,6 @@ The approved painted modular set (`Source/Art/nano/modular/`) is the base again.
 Each armour piece (helmet, chest, each shoulder/arm, legs) has its own condition and can be damaged and
 destroyed independently of the frame. A destroyed piece falls off and its slot is exposed; when the
 pieces covering a body part are gone, hits there reach the pilot inside the frame. Pieces are repaired
-or replaced individually. The owner wants visible legs back so damage to them can be shown.
+or replaced individually. The owner wants visible legs back so damage to them can be shown: short stubby leg pieces under the hip armour (`legs_bulwark_south.png`), not full legs.
 Fits both modes: Exosuit mode already treats modules as separate items; lite mode would need the pieces
 as separate apparel with their own hit points.
