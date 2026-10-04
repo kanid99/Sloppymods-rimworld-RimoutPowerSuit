@@ -1,15 +1,20 @@
 from PIL import ImageDraw
+import os
 import sys
 SP=sys.argv[1]
 exec(open(SP+'/bulwark_chest.py').read().split("HF=helm")[0])
-def place(path,cx,top,h,side):
+def place(path,cx,top,h,side,ref=None):
     rgb=load(path); fig=cut_out(rgb)
     ys,xs=np.nonzero(fig); y0,y1,x0,x1=ys.min(),ys.max()+1,xs.min(),xs.max()+1
     scale=h/(y1-y0)
+    if ref is not None:   # a repaint of a reference piece: keep the reference's scale and anchor, extras hang outside it
+        f=rgb.shape[0]/ref[4]; ry0,ry1,rx0,rx1=[round(v*f) for v in ref[:4]]; scale=h/(ry1-ry0)
+        cx=cx+(x0+x1-rx0-rx1)/2*scale; top=top+round((y0-ry0)*scale*float(os.environ.get('PSQ','1')))
+    sq=float(os.environ.get('PSQ','1')) if ref is not None else 1.0   # squash a plate shorter, same width
     ring=ndimage.binary_dilation(fig,iterations=max(1,round(OUTER/scale)))&~fig
     rgb[ring]=8; fig=fig|ring
     mask=plate_mask(rgb)*fig; rgb[~fig]=0
-    c=lambda a:a[y0:y1,x0:x1]; w,hh=round((x1-x0)*scale),round((y1-y0)*scale)
+    c=lambda a:a[y0:y1,x0:x1]; w,hh=round((x1-x0)*scale),round((y1-y0)*scale*sq)
     body=Image.fromarray(np.dstack([c(rgb).astype(np.uint8),c((fig*255).astype(np.uint8))]),'RGBA').resize((w,hh),Image.LANCZOS)
     m=Image.fromarray(c((mask*255).astype(np.uint8)),'L').resize((w,hh),Image.LANCZOS)
     left=int(cx-w/2); tex=Image.new('RGBA',(WC,S)); tex.paste(body,(left,top),body)
@@ -17,7 +22,6 @@ def place(path,cx,top,h,side):
     pair=(tex,Image.merge('RGBA',(red,z,z,tex.split()[3])))
     if side=='right': pair=tuple(i.transpose(Image.FLIP_LEFT_RIGHT) for i in pair)
     return pair
-import os
 _p=place(SP+'/arms/arm_bulwark.png',WC//2,58,110,'left')[0]
 _w=int(np.count_nonzero((np.array(_p.split()[3])>0).any(0))); print('plate w',_w)
 PW_CX=pad+int(os.environ.get('PR','62'))-_w/2
@@ -31,13 +35,22 @@ def _outlined(pair,w=1,round_r=10):
     t=np.array(tex).copy(); t[...,3]=np.where(a,255,0); t[ring]=(14,14,18,255)
     mm=np.array(m).copy(); mm[...,3]=np.where(a|ring,255,0); mm[ring,0]=0
     return Image.fromarray(t,'RGBA'),Image.fromarray(mm,'RGBA')
-plate=lambda side: _outlined(place(SP+'/arms/arm_bulwark.png',PW_CX,int(os.environ.get('PT','58')),110,side))
+# PLATE_BASE: the suit's own plain plate (default the Bulwark's); PLATES: per-weapon repaints of it,
+# e.g. PLATES=hammer:arm_pneumatic_lc,flamer:arm_fuel_lc - placed at the base's scale and anchor
+BASE=os.environ.get('PLATE_BASE','arm_bulwark')
+_rf=cut_out(load(f'{SP}/arms/{BASE}.png')); _ry,_rx=np.nonzero(_rf); REF=(_ry.min(),_ry.max()+1,_rx.min(),_rx.max()+1,_rf.shape[0])
+PLATES=dict(kv.split(':') for kv in os.environ.get('PLATES','').split(',') if kv)
+PH=int(os.environ.get('PH','110'))
+def plate(side,wn=None):
+    f=PLATES.get(wn,BASE)
+    if f=='arm_bulwark': return _outlined(place(SP+'/arms/arm_bulwark.png',PW_CX,int(os.environ.get('PT','58')),110,side))
+    return _outlined(place(f'{SP}/arms/{f}.png',PW_CX,int(os.environ.get('PT','58')),PH,side,ref=REF),round_r=3)
 pb=np.array(plate('left')[0].split()[3])>0; xs=np.nonzero(pb.any(0))[0]; PCX=(xs.min()+xs.max())/2
 import os; OUT=int(os.environ.get('OUT','8'))
 H={w:120 for w in ('minigun','rockets','chainsaw','laser','flamer','hammer','autocannon','grenade','arc','towershield')}   # one length: both arms end at the same height
 def arm(name,side):
     w=clip_behind(place(f'{SP}/weap/{name}.png',PCX-OUT,58+int(os.environ.get('TOP','80')),H[name],side),ringw)
-    return [w,plate(side),joint(side)]
+    return [w,plate(side,name),joint(side)]
 import cv2
 def joint(side,w=22,h=18):
     "a ribbed square swivel between the shoulder plate and the weapon"
@@ -53,7 +66,7 @@ def joint(side,w=22,h=18):
         yy=y0+(y1-y0)*k/4; d.line((x0,yy,x1,yy),fill=(30,30,36,255),width=int(1.4*K))
     d.line((x0+2*K,y0+1.5*K,x1-2*K,y0+1.5*K),fill=(190,192,200,255),width=int(K))   # top highlight
     img=img.resize((WC,S),Image.LANCZOS); return img,Image.new('RGBA',(WC,S))
-def chest_front():
+def chest_front(wl=None,wr=None):
     """the chest armour shows through every part of each shoulder plate that is not its lit front:
     the hook and the front block (with their own outline) stay in front, the rest of the plate is cut away"""
     ct,cm=ch; ca=np.array(ct.split()[3])>100
@@ -65,8 +78,15 @@ def chest_front():
         lab,n=ndimage.label(light); sz=ndimage.sum(light,lab,range(1,n+1))
         light=np.isin(lab,np.nonzero(np.array(sz)>40)[0]+1)
         front=ndimage.binary_dilation(ndimage.binary_fill_holes(light),iterations=2)   # lit faces + their outline
-        band|=pa&~front
+        cut=pa&~front
+        wn=wl if side=='left' else wr
+        if PLATES.get(wn):    # weapon hardware on a repainted plate always stays in front of the chest
+            pv=np.array(plate(side,wn)[0]).astype(float); va=pv[...,3]>100
+            hw=(va&~pa)|(va&pa&(np.abs(pv[...,:3]-pt[...,:3]).max(2)>30))
+            cut&=~ndimage.binary_dilation(hw,iterations=2)
+        band|=cut
     band&=ca
+    if os.environ.get('NEST','1')=='0': band[:]=False   # a light plate sits fully in front of the chest
     out_t=np.zeros((S,WC,4),np.uint8); out_m=np.zeros((S,WC,4),np.uint8)
     out_t[band]=T[band]; out_m[band]=Mk[band]
     return Image.fromarray(out_t,'RGBA'),Image.fromarray(out_m,'RGBA')
@@ -106,15 +126,15 @@ def scale_layer(pair,k):
 HL=scale_layer(HL,float(os.environ.get('HSCALE','1.3')))
 if os.environ.get('FULLHEAD'): HL=match_height(HL,helm(SP+'/mod2/helmet_bulwark_fwd1.png'))
 if os.environ.get('SOFT'): ch=soften(ch); HL=soften(HL,keep=4)
-loadouts=[('minigun / rockets','minigun','rockets'),('laser / chainsaw','laser','chainsaw'),('flamer / minigun','flamer','minigun'),('hammer / rockets','hammer','rockets'),('laser / laser','laser','laser'),('chainsaw / flamer','chainsaw','flamer')]
+loadouts=[(os.environ['WL']+' / '+os.environ['WR'],os.environ['WL'],os.environ['WR'])] if os.environ.get('WL') else [('minigun / rockets','minigun','rockets'),('laser / chainsaw','laser','chainsaw'),('flamer / minigun','flamer','minigun'),('hammer / rockets','hammer','rockets'),('laser / laser','laser','laser'),('chainsaw / flamer','chainsaw','flamer')]
 img=Image.new('RGBA',(3*345,2*330),floor); d=ImageDraw.Draw(img)
 for i,(lab,a,b) in enumerate(loadouts):
     out=Image.new('RGBA',(WC,S))
-    for t,m in [ch,*arm(a,'left'),*arm(b,'right'),chest_front(),HL]: out.alpha_composite(tint(t,m,COL['bulwark']))
+    for t,m in [ch,*arm(a,'left'),*arm(b,'right'),chest_front(a,b),HL]: out.alpha_composite(tint(t,m,COL['bulwark']))
     out.save(f'{SP}/suit_{i}.png')
     if os.environ.get('EXPORT') and i==0:
         import pickle
-        band=np.array(chest_front()[0].split()[3])>0
+        band=np.array(chest_front(os.environ.get('WL'),os.environ.get('WR'))[0].split()[3])>0
         def merge(parts,cut=None):
             t=Image.new('RGBA',(WC,S)); m=Image.new('RGBA',(WC,S))
             for tt,mm in parts: t.alpha_composite(tt); m.alpha_composite(mm)
@@ -123,7 +143,8 @@ for i,(lab,a,b) in enumerate(loadouts):
             return t,m
         KS=os.environ.get('KITSRC',SP+'/kit_src'); os.makedirs(KS,exist_ok=True)
         WEAPONS=[w for w in ('minigun','rockets','chainsaw','laser','flamer','hammer','autocannon','grenade','arc','towershield') if w in H]
-        layers=[('body',ch),('helmet',HL),('plateLfull',merge(arm('minigun','left')[1:])),('plateRfull',merge(arm('minigun','right')[1:]))]
+        layers=[('body',ch),('helmet',HL),('plateLfull',merge(arm(os.environ.get('WL','minigun'),'left')[1:])),('plateRfull',merge(arm(os.environ.get('WR','minigun'),'right')[1:]))]
+        layers+=[('plateLbase',plate('left')),('plateRbase',plate('right'))]
         for wn in WEAPONS: layers+= [(f'armL_{wn}',merge(arm(wn,'left'),band)),(f'armR_{wn}',merge(arm(wn,'right'),band)),(f'armLfull_{wn}',merge(arm(wn,'left'))),(f'armRfull_{wn}',merge(arm(wn,'right')))]
         for name,pair in layers:
             pair[0].save(f'{KS}/south_{name}.png'); pair[1].save(f'{KS}/south_{name}_m.png')

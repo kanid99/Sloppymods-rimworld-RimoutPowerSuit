@@ -147,6 +147,13 @@ def bbox(im):
     return xs.min(), ys.min(), xs.max(), ys.max()
 
 
+def base_plate(src, side, P):
+    """the suit's plain plate (no weapon hardware), if the assembly exported one: it sets the cuff and the back view"""
+    f = f'{src}/south_plate{side}base.png'
+    if not os.path.exists(f): return P
+    B = Layer(); B.put_assembly(f, f'{src}/south_plate{side}base_m.png'); return B
+
+
 def build(spec, out):
     os.makedirs(out, exist_ok=True)
     src = spec['assembly']                       # front-view layers exported by the assembly
@@ -220,6 +227,19 @@ def build(spec, out):
         A_ = pieces[('ArmL', 'east')]
         ab = bbox(A_.tex); wname = spec['weapon_l']
         ey = ab[1] + int((ab[3] - ab[1]) * 0.80)                   # the elbow, at the end of the ribbed hose
+        if spec.get('east_plate_from_front'):
+            # this suit's own plate (light frame + weapon hardware) replaces the painted heavy one:
+            # its outer face, i.e. the front-view plate, over a ribbed swivel; the weapon hangs at its cuff
+            P_ = Layer(); P_.put_assembly(f'{src}/south_plateLfull.png', f'{src}/south_plateLfull_m.png')
+            B_ = base_plate(src, 'L', P_); bx = bbox(B_.tex); px = bbox(P_.tex)
+            k_ = (ab[3] - ab[1]) * 0.78 / (bx[3] - bx[1])
+            box_ = (px[0], px[1], px[2] + 1, px[3] + 1)
+            A_ = Layer(); pieces[('ArmL', 'east')] = A_
+            pcx_ = (ab[0] + ab[2]) / 2 - ((bx[0] + bx[2]) / 2 - (px[0] + px[2]) / 2) * k_
+            A_.put((P_.tex.crop(box_), P_.mask.crop(box_)), pcx_, top=ab[1] + int((px[1] - bx[1]) * k_), h=int((px[3] - px[1]) * k_))
+            ey = ab[1] + int((bx[3] - bx[1]) * k_) - 6
+            A_.joint(int((ab[0] + ab[2]) / 2), ey - 12)
+            ab = (ab[0], ab[1], ab[2], ey)
         if wname in spec.get('shields', ()):
             feet = bbox(pieces[('Legs', 'south')].tex)[3]
             st0 = plL_bb[1] + 40                                     # same top as in the front and back views
@@ -274,6 +294,7 @@ def build(spec, out):
         wy, wx = np.nonzero(fa & ~ndimage.binary_dilation(pa, iterations=3))
         mx = lambda x: C - x                                       # mirror across the canvas centre
         N = Layer(); fx = mx((wx.min() + wx.max()) / 2)
+        P = base_plate(src, plate[5], P)                          # from behind: the plain plate
         x0, y0, x1, y1 = bbox(P.tex); box = (x0, y0, x1 + 1, y1 + 1)
         pw = x1 - x0
         # weapon rear view: same bottom as the front view's weapon, no wider than 70% of the plate
@@ -317,8 +338,9 @@ def build(spec, out):
         cutL = Layer(); cutL.put_assembly(f'{src}/south_arm{side}_{wname}.png', f'{src}/south_arm{side}_{wname}_m.png')
         fullL = Layer(); fullL.put_assembly(f'{src}/south_arm{side}full_{wname}.png', f'{src}/south_arm{side}full_{wname}_m.png')
         hole = (np.array(fullL.tex)[..., 3] > 100) & ~(np.array(cutL.tex)[..., 3] > 100)   # where the chest nests in
-        x0, y0, x1, y1 = bbox(P.tex); pw = x1 - x0
-        pa_ = np.array(P.tex)[..., 3] > 100; cuff_x = np.nonzero(pa_[y1 - 12:y1 + 1].any(0))[0]
+        Pb = base_plate(src, side, P)                              # the cuff is on the plain plate, not its hoses
+        x0, y0, x1, y1 = bbox(Pb.tex); pw = x1 - x0
+        pa_ = np.array(Pb.tex)[..., 3] > 100; cuff_x = np.nonzero(pa_[y1 - 12:y1 + 1].any(0))[0]
         pcx = (cuff_x.min() + cuff_x.max()) / 2; cw = cuff_x.max() - cuff_x.min()
         for facing in ('south', 'north'):
             N = Layer()
@@ -439,6 +461,10 @@ def bughunter_spec(sp):
     s['helmet'] = dict(east=s['helmet']['east'], east_override=f'{sp}/own/bh_helmet_east.png', north=f'{sp}/own/bh_helmet_north.png')
     s['weapon_l'], s['weapon_r'] = 'flamer', 'hammer'
     s['colors'] = [(0.66, 0.56, 0.40), (0.56, 0.58, 0.60)]
+    if os.environ.get('JUMP', '1') == '1':          # the jump-pack backpack (three cells, thrusters)
+        s['body'] = dict(s['body'], north=f'{sp}/own/chassis_north_jump.png')
+        s['full_east'] = dict(s['full_east'], body_image=f'{sp}/own/full_east_noarm_jump.png')
+    s['east_plate_from_front'] = True                  # its light plates, not the Bulwark's painted side plate
     return s
 
 

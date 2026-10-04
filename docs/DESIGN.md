@@ -48,16 +48,32 @@ Decisions agreed with the owner, to build from. Numbers are starting points for 
   (high sharp armour - claws, bites, stings) and **deal blunt damage** (hammer). The Bulwark is
   the all-round tank. The Bughunter is also **heat resistant** (high heat armour, and its pieces
   are not damaged by its own flamer), so it can fight inside its own fire.
-- **Weapon-integrated shoulder plates** (Bughunter only; each replaces the plain plate on its arm):
+- **Shoulder plates:** the Bughunter has its own **light open-frame plates**. They are shorter
+  and slimmer than the Bulwark's slabs, with cut-out slots. They add some armour, but their job is
+  to boost the suit's weapons:
   - **Pneumatic pressure plate** (hammer arm): twin pressure cylinders, a gauge, and a braided hose
-    down to the hammer. It turns the hammer into a **power hammer** (more blunt damage, plus
-    stagger or knockback). Art: `arm_pneumatic`.
+    down to the hammer. It turns the hammer into a **power hammer** (more blunt damage, plus stagger
+    or knockback). Art: `nano/modular/arm_bughunter_pneumatic_south.png`.
   - **Fuel-injection plate** (flamer arm): a banded fuel canister, an injector pump with a valve wheel,
-    and two fuel lines down to the flamer. **More range and more fire damage**. Art: `arm_fuel`.
-- **Jump-pack modification** (backpack variant, idea): an escape ability for when the suit is swarmed.
-  It is a targeted jump to a spot a few tiles away, like the vanilla jump pack. It costs a lot of
-  suit power and has a long cooldown. Art: the tall backpack with two thruster nozzles under the
-  cell caps.
+    and fuel lines down to the flamer. **More range and more fire damage.**
+    Art: `nano/modular/arm_bughunter_fuel_south.png`.
+- **Jump-pack backpack** (Bughunter only): holds **three power cells** (three round cell caps above
+  the release wheel) and has two thrusters with a vent grille. It is an escape ability for when the
+  suit is swarmed: a targeted jump a few tiles away, like the vanilla jump pack. **Each jump uses a
+  big share of the suit's power**, and it has a long cooldown. Art: `kit/bughunter_src/own/`.
+
+### Shoulder plates and backpacks are per suit
+- **Shoulder plates fit one suit type.** Bulwark plates fit only the Bulwark, and Bughunter plates
+  fit only the Bughunter.
+  - **Bulwark plates:** heavy slabs that add **a lot to the overall armour rating**.
+  - **Bughunter plates:** light frames with **some** extra armour, built around **attack boosts**
+    (power hammer, fuel injection).
+  - **Generic plates** (to make): a plain plate that fits every suit, for the other chassis and as a
+    fallback.
+- **Backpacks are unique to each suit type**, and an upgraded backpack needs **three cells**:
+  - **Bughunter:** the jump pack (above).
+  - **Bulwark:** an optional **shield-generator backpack**. It powers the standing-still shield
+    system and needs three cells.
 
 ## Power cells
 

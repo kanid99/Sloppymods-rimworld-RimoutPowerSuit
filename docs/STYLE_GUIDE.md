@@ -97,4 +97,21 @@ A Bulwark variant built with almost no new art: `SPEC=bughunter python3 suit_kit
 kit/out_bughunter`. Its own: the front layers (chevron chest, lamps-on-top helmet) exported by
 `bulwark_assemble.py` with `CHAS=chassis_bughunter_v2.png HELM=helmet_bughunter_lamps1.png
 KITSRC=.../kit_src EXPORT=1`, and the helmet's side and back paintings (`kit/bughunter_src/own/`, 2 requests).
+Current Bughunter export (light plates, smaller helmet, weapons higher):
+`PR=88 PT=64 OUT=14 TOP=86 CHAS=chassis_bughunter_v2.png HELM=helmet_bughunter_lamps1.png HSCALE=1.017
+WL=flamer WR=hammer PLATE_BASE=arm_light PH=124 PSQ=0.8 NEST=0 PLATES=hammer:arm_pneumatic_lc,flamer:arm_fuel_lc
+KITSRC=.../kit_src EXPORT=1`. Where these come from:
+- **Helmet:** `HSCALE=1.017` makes it the Bulwark helmet's height (it was 28% taller).
+- **Plates:**
+  - `PLATE_BASE` is the suit's plain plate, painted as a light open frame from the Bulwark plate.
+  - The `PLATES` repaints are that plate with the weapon hardware moved on in code. The hardware was
+    cut from heavy-plate repaints by pixel difference (`nano/modular/arm_*_heavy_src.png`).
+  - `PSQ` squashes the plate shorter.
+  - `NEST=0` keeps the light frame in front of the chest.
+  - The export also writes `south_plate{L,R}base`, the plain plate. The kit uses it to place the cuff,
+    so hoses don't push the weapon down, and to draw the plate in the back view.
+  - In the side view, `east_plate_from_front` draws the suit's own plate instead of the painted heavy
+    one.
+- **Jump pack:** `own/chassis_north_jump.png` (three cells, thrusters) and `own/full_east_noarm_jump.png`.
+  `JUMP=0` builds the plain backpack.
 Shared with the Bulwark (symlinked): side and back body, legs, shoulder plates, all weapon views.
