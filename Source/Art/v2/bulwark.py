@@ -9,11 +9,10 @@ B.plate(B.rrect(72,18,184,92,30),245,225)                                     # 
 B.plate(B.ell(84,30,172,96),82,stroke=4)                                      # neck opening
 B.plate(B.poly([(42,186),(94,192),(100,248),(54,242),(38,212)]),205,178,mirror=True)   # side hip plates
 B.plate(B.poly([(90,196),(166,196),(158,252),(98,252)]),242,208)              # centre hip plate
-B.plate(B.rrect(66,158,190,202,10),192,176)                                   # abdomen
-for y in (170,184): B.mark(B.rrect(80,y,104,y+5,2),mirror=True)               # two vent slots each side
-B.plate(B.poly([(46,62),(122,72),(122,154),(72,166),(42,128)]),255,226,mirror=True)   # chest slabs
-B.plate(B.poly([(72,166),(122,154),(122,164),(76,176)]),204,mirror=True)      # slab under-bevel
-B.plate(B.poly([(118,66),(138,66),(135,170),(128,180),(121,170)]),212)        # centre ridge
+B.plate(B.rrect(62,150,194,204,12),236,206)                                   # lower chest plate, the part seen below the helmet
+for y in (168,182): B.mark(B.rrect(76,y,100,y+5,2),mirror=True)               # two vent slots each side
+B.plate(B.poly([(46,62),(122,72),(122,150),(78,156),(42,128)]),255,226,mirror=True)   # chest slabs
+B.plate(B.poly([(118,66),(138,66),(136,150),(128,158),(120,150)]),212)        # centre ridge (ends under the helmet)
 # ---------------- SHOULDERS
 S=Layer()
 cut=lambda m,y: m&(np.arange(N)[:,None]<y*K)
