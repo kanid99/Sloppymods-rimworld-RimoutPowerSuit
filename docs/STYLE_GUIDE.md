@@ -43,3 +43,18 @@ The assembled suit is drawn at **1.45x** the 256 body canvas so a pawn believabl
 with a pawn ghosted in, eyes on the helmet's eye slits: `Source/Art/bulwark_fit_check.py`). The helmet is
 scaled up 1.3x on top of that (`HSCALE`, default 1.3) so the pawn's head fits inside it. Leg stubs: knee and foot
 only, under the hip armour. This replaces the earlier "only slightly bigger than cataphract" rule.
+
+## Suit kit (game textures for any suit)
+
+`Source/Art/suit_kit.py SRC OUT` turns a suit's parts into one texture + paint mask per piece and facing
+(Body, Legs, ArmL, ArmR, Helmet x south/east/north) on a shared 768 canvas, plus `OUT/preview.png`
+(stacked as the game draws them, unpainted and in two paints). drawSize 3.26 in game; the helmet texture is
+stored 80 px lower because the game draws it at the head position. Each piece is its own texture so it can
+later be its own apparel / module and be damaged and lost on its own.
+- South layers come from the front-view assembly (`bulwark_assemble.py` with `EXPORT=1` writes
+  `kit_src/south_*.png` incl. an arm layer per weapon, with the hole where the chest nests into the plate).
+- East/north come from the side/back paintings; the back of a hanging weapon is its front mirrored.
+- A new suit = a new spec function (like `bulwark_spec`) pointing at its parts. Weapon side views and the
+  leg stubs are shared between suits.
+Bulwark sources: `Source/Art/kit/bulwark_src/`; output: `Source/Art/kit/out_bulwark/`
+(choose weapons with WEAPON_L / WEAPON_R).

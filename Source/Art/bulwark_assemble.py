@@ -34,7 +34,7 @@ def _outlined(pair,w=1,round_r=10):
 plate=lambda side: _outlined(place(SP+'/arms/arm_bulwark.png',PW_CX,int(os.environ.get('PT','58')),110,side))
 pb=np.array(plate('left')[0].split()[3])>0; xs=np.nonzero(pb.any(0))[0]; PCX=(xs.min()+xs.max())/2
 import os; OUT=int(os.environ.get('OUT','8'))
-H={'minigun':118,'rockets':104,'chainsaw':124,'laser':118,'flamer':112,'hammer':112}
+H={'minigun':118,'rockets':104,'chainsaw':124,'laser':118,'flamer':112,'hammer':112,'autocannon':150,'grenade':104,'arc':134,'towershield':136}
 def arm(name,side):
     w=clip_behind(place(f'{SP}/weap/{name}.png',PCX-OUT,58+int(os.environ.get('TOP','80')),H[name],side),ringw)
     return [w,plate(side),joint(side)]
@@ -112,6 +112,21 @@ for i,(lab,a,b) in enumerate(loadouts):
     out=Image.new('RGBA',(WC,S))
     for t,m in [ch,*arm(a,'left'),*arm(b,'right'),chest_front(),HL]: out.alpha_composite(tint(t,m,COL['bulwark']))
     out.save(f'{SP}/suit_{i}.png')
+    if os.environ.get('EXPORT') and i==0:
+        import pickle
+        band=np.array(chest_front()[0].split()[3])>0
+        def merge(parts,cut=None):
+            t=Image.new('RGBA',(WC,S)); m=Image.new('RGBA',(WC,S))
+            for tt,mm in parts: t.alpha_composite(tt); m.alpha_composite(mm)
+            if cut is not None:
+                ta=np.array(t); ma=np.array(m); ta[cut,3]=0; ma[cut,3]=0; t=Image.fromarray(ta); m=Image.fromarray(ma)
+            return t,m
+        os.makedirs(SP+'/kit_src',exist_ok=True)
+        WEAPONS=[w for w in ('minigun','rockets','chainsaw','laser','flamer','hammer','autocannon','grenade','arc','towershield') if w in H]
+        layers=[('body',ch),('helmet',HL)]
+        for wn in WEAPONS: layers+= [(f'armL_{wn}',merge(arm(wn,'left'),band)),(f'armR_{wn}',merge(arm(wn,'right'),band))]
+        for name,pair in layers:
+            pair[0].save(f'{SP}/kit_src/south_{name}.png'); pair[1].save(f'{SP}/kit_src/south_{name}_m.png')
     x,y=(i%3)*345,(i//3)*330
     d.text((x+6,y+4),lab,fill=(255,255,255,255))
     img.alpha_composite(out,(x+8,y+20)); img.alpha_composite(out.resize((82,64),Image.LANCZOS),(x+130,y+262))
