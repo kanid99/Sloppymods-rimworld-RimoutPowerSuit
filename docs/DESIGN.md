@@ -116,3 +116,7 @@ finished suits: `Source/Art/gemini/` holds the originals, `gem_parts.py` cuts pa
 `gem_kitbash.py` combines them with our kit parts (helmet, arm shields, weapons).
 Kept so far: the chest/abdomen/hip body (siege suit), the box rocket pod with a tube grid (fire support,
 replaces our rocket pod), the claw arm (breacher; Bughunter melee option), the long cannon (fire support).
+- Non-combat concepts (`gemini/noncombat1.jpg`): miner (drill arm + pick-hammer), engineer (hand + block tool),
+  hazard/vacuum (fishbowl visor, chest filter canisters, gripper claw). Gemini washed them out; 
+  `Source/Art/gemini_restyle.py` restores dark lines, a heavy outline and stronger tones.
+  Note: Gemini drew full mechanical arms; for RimWorld only the tool ends are kept as arm parts.
