@@ -71,6 +71,9 @@ soft airbrushed shading, rim lights, highlights or cast shadows.
 - The visor/eyes are dark-grey shapes (70 - 100), not glowing colour, drawn as recesses: a thin line
   (1.5 - 2 px, not the 4 px plate outline), a lighter strip (~130) along the inside bottom edge where the far
   wall catches light, and a soft bevel rim (~210) around the opening. That is what gives them depth.
+- Lamps, sensors and similar fittings are set into the shell as recessed windows (bevel rim, thin-lined
+  recess, a bright lens), not separate bulbs stuck on top.
+- Prefer smooth curves for big face plates (a brow is one arch across the face, not a jagged band).
 - Keep features apart: leave clear plate between eyes, mouth and other openings so their lines never run
   into each other.
 
