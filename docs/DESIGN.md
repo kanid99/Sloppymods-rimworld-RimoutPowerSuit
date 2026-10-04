@@ -44,6 +44,20 @@ Decisions agreed with the owner, to build from. Numbers are starting points for 
   the lower chest edge - the only hint of teeth.
 - Drawbacks: **slow** (large move-speed penalty) and **power hungry** (high drain).
 - Compensation: holds **two power cells** instead of one.
+- **Versus the Bulwark** (owner, 2026-10): the Bughunter is built to **take sharp damage**
+  (high sharp armour - claws, bites, stings) and **deal blunt damage** (hammer). The Bulwark is
+  the all-round tank. The Bughunter is also **heat resistant** (high heat armour, and its pieces
+  are not damaged by its own flamer), so it can fight inside its own fire.
+- **Weapon-integrated shoulder plates** (Bughunter only; each replaces the plain plate on its arm):
+  - **Pneumatic pressure plate** (hammer arm): twin pressure cylinders, a gauge, and a braided hose
+    down to the hammer. It turns the hammer into a **power hammer** (more blunt damage, plus
+    stagger or knockback). Art: `arm_pneumatic`.
+  - **Fuel-injection plate** (flamer arm): a banded fuel canister, an injector pump with a valve wheel,
+    and two fuel lines down to the flamer. **More range and more fire damage**. Art: `arm_fuel`.
+- **Jump-pack modification** (backpack variant, idea): an escape ability for when the suit is swarmed.
+  It is a targeted jump to a spot a few tiles away, like the vanilla jump pack. It costs a lot of
+  suit power and has a long cooldown. Art: the tall backpack with two thruster nozzles under the
+  cell caps.
 
 ## Power cells
 
