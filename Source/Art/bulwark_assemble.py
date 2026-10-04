@@ -96,6 +96,14 @@ def match_height(pair,ref):
         big=im.resize((int(im.width*k),int(im.height*k)),Image.LANCZOS); c=Image.new('RGBA',im.size)
         c.alpha_composite(big,(int(cx-cx*k),int(s1-by*k))) if True else None; out.append(c)
     return tuple(out)
+def scale_layer(pair,k):
+    "scale a layer about its bottom centre (the collar it sits in stays put)"
+    x0,y0,x1,y1=_hbox(pair); cx,by=(x0+x1)/2,y1; out=[]
+    for im in pair:
+        big=im.resize((int(im.width*k),int(im.height*k)),Image.LANCZOS); c=Image.new('RGBA',im.size)
+        c.alpha_composite(big,(int(cx-cx*k),int(by-by*k))); out.append(c)
+    return tuple(out)
+if os.environ.get('HSCALE'): HL=scale_layer(HL,float(os.environ['HSCALE']))
 if os.environ.get('FULLHEAD'): HL=match_height(HL,helm(SP+'/mod2/helmet_bulwark_fwd1.png'))
 if os.environ.get('SOFT'): ch=soften(ch); HL=soften(HL,keep=4)
 loadouts=[('minigun / rockets','minigun','rockets'),('laser / chainsaw','laser','chainsaw'),('flamer / minigun','flamer','minigun'),('hammer / rockets','hammer','rockets'),('laser / laser','laser','laser'),('chainsaw / flamer','chainsaw','flamer')]

@@ -36,3 +36,10 @@ chest's shoulder wedge with a thin (1 px) outline all round; the chest armour dr
 dark inner wall, so the chest sits inside the curl of the hook; weapons at the outer edges; a ribbed square
 swivel joint (three horizontal ribs) where each weapon meets its plate. Inner black detail lines stay
 (removing them by filling looked like a poor eraser job; `SOFT=1` keeps that experiment).
+
+## Bulwark size (agreed)
+
+The assembled suit is drawn at **1.45x** the 256 body canvas so a pawn believably fits inside (checked
+with a pawn ghosted in, eyes on the helmet's eye slits: `Source/Art/bulwark_fit_check.py`). The helmet is
+scaled up on top of that (`HSCALE`, 1.15 - 1.3) so the pawn's head fits inside it. Leg stubs: knee and foot
+only, under the hip armour. This replaces the earlier "only slightly bigger than cataphract" rule.
