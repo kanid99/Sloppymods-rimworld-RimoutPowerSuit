@@ -211,6 +211,11 @@ def build(spec, out):
             x = int(cx - (xs.min() + xs.max()) / 2 * k); y = int(sy0 - ys.min() * k + (HEAD if q == 'Helmet' else 0) - (HEAD if q == 'Helmet' else 0))
             L.tex.alpha_composite(t, (x, y)); L.mask.paste(mk, (x, y), t.split()[3])
             pieces[(q, 'east')] = L
+        if spec['helmet'].get('east_override'):
+            # this suit's own helmet in the side view, in the painted helmet's place and size
+            H_ = pieces[('Helmet', 'east')]; hb_ = bbox(H_.tex); N_ = Layer()
+            N_.put(part(spec['helmet']['east_override']), (hb_[0] + hb_[2]) / 2, bottom=hb_[3], h=hb_[3] - hb_[1])
+            pieces[('Helmet', 'east')] = N_
         # the shoulder armour starts at the same height as in the front and back views
         A_ = pieces[('ArmL', 'east')]
         ab = bbox(A_.tex); wname = spec['weapon_l']
@@ -428,9 +433,20 @@ def bulwark_spec(sp):
         weapon_h={w: 120 for w in ws})
 
 
+def bughunter_spec(sp):
+    """the Bughunter: a Bulwark variant - shares body side/back, legs, plates and weapons; own front chest and helmet"""
+    s = bulwark_spec(sp)
+    s['helmet'] = dict(east=s['helmet']['east'], east_override=f'{sp}/own/bh_helmet_east.png', north=f'{sp}/own/bh_helmet_north.png')
+    s['weapon_l'], s['weapon_r'] = 'flamer', 'hammer'
+    s['colors'] = [(0.66, 0.56, 0.40), (0.56, 0.58, 0.60)]
+    return s
+
+
+SPECS = {'bulwark': bulwark_spec, 'bughunter': bughunter_spec}
+
 if __name__ == '__main__':
     sp, out = sys.argv[1], sys.argv[2]
-    spec = bulwark_spec(sp)
+    spec = SPECS[os.environ.get('SPEC', 'bulwark')](sp)
     for k in ('weapon_l', 'weapon_r'):
         if os.environ.get(k.upper()): spec[k] = os.environ[k.upper()]
     build(spec, out)

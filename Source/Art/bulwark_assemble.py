@@ -85,7 +85,7 @@ def soften(pair,keep=4,depth=0.72,erode=0):
     if line.any():                                   # paint the filled lines like their neighbours
         r=mm[...,0].astype(float); rf=cv2.inpaint(np.ascontiguousarray(mm[...,0]),(line*255).astype(np.uint8),5,cv2.INPAINT_TELEA); mm[...,0]=np.where(line,rf,r)
     return Image.fromarray(t,'RGBA'),Image.fromarray(mm,'RGBA')
-ch=chas(SP+'/mod4/chassis_bulwark_plated2.png'); cb=np.nonzero((np.array(ch[0].split()[3])>0).any(0))[0]; print('chassis x',cb.min(),cb.max(),'plate cx',PCX); HL=helm(SP+'/mod2/'+os.environ.get('HELM','helmet_bulwark_fwd2.png'))
+ch=chas(SP+'/mod4/'+os.environ.get('CHAS','chassis_bulwark_plated2.png')); cb=np.nonzero((np.array(ch[0].split()[3])>0).any(0))[0]; print('chassis x',cb.min(),cb.max(),'plate cx',PCX); HL=helm(SP+'/mod2/'+os.environ.get('HELM','helmet_bulwark_fwd2.png'))
 def _hbox(pair):
     a=np.array(pair[0].split()[3])>100; ys,xs=np.nonzero(a); return xs.min(),ys.min(),xs.max(),ys.max()
 def match_height(pair,ref):
@@ -121,12 +121,12 @@ for i,(lab,a,b) in enumerate(loadouts):
             if cut is not None:
                 ta=np.array(t); ma=np.array(m); ta[cut,3]=0; ma[cut,3]=0; t=Image.fromarray(ta); m=Image.fromarray(ma)
             return t,m
-        os.makedirs(SP+'/kit_src',exist_ok=True)
+        KS=os.environ.get('KITSRC',SP+'/kit_src'); os.makedirs(KS,exist_ok=True)
         WEAPONS=[w for w in ('minigun','rockets','chainsaw','laser','flamer','hammer','autocannon','grenade','arc','towershield') if w in H]
         layers=[('body',ch),('helmet',HL),('plateLfull',merge(arm('minigun','left')[1:])),('plateRfull',merge(arm('minigun','right')[1:]))]
         for wn in WEAPONS: layers+= [(f'armL_{wn}',merge(arm(wn,'left'),band)),(f'armR_{wn}',merge(arm(wn,'right'),band)),(f'armLfull_{wn}',merge(arm(wn,'left'))),(f'armRfull_{wn}',merge(arm(wn,'right')))]
         for name,pair in layers:
-            pair[0].save(f'{SP}/kit_src/south_{name}.png'); pair[1].save(f'{SP}/kit_src/south_{name}_m.png')
+            pair[0].save(f'{KS}/south_{name}.png'); pair[1].save(f'{KS}/south_{name}_m.png')
     x,y=(i%3)*345,(i//3)*330
     d.text((x+6,y+4),lab,fill=(255,255,255,255))
     img.alpha_composite(out,(x+8,y+20)); img.alpha_composite(out.resize((82,64),Image.LANCZOS),(x+130,y+262))

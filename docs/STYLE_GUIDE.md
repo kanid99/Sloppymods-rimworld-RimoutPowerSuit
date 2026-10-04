@@ -90,3 +90,11 @@ Bulwark sources: `Source/Art/kit/bulwark_src/`; output: `Source/Art/kit/out_bulw
   above the head for that facing). Facing north the shield's back (front shape mirrored, plain, in shadow) sits
   behind the body. In the side view the far arm is drawn behind everything, a little higher and in shadow, so
   only what sticks out past the body shows (a shield's edge, a barrel's end).
+
+## Bughunter (from the kit)
+
+A Bulwark variant built with almost no new art: `SPEC=bughunter python3 suit_kit.py kit/bughunter_src
+kit/out_bughunter`. Its own: the front layers (chevron chest, lamps-on-top helmet) exported by
+`bulwark_assemble.py` with `CHAS=chassis_bughunter_v2.png HELM=helmet_bughunter_lamps1.png
+KITSRC=.../kit_src EXPORT=1`, and the helmet's side and back paintings (`kit/bughunter_src/own/`, 2 requests).
+Shared with the Bulwark (symlinked): side and back body, legs, shoulder plates, all weapon views.
