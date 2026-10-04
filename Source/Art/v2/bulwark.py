@@ -41,10 +41,12 @@ S.plate(S.ell(46,84,82,118),246,212,stroke=3,mirror=True)                       
 H=Layer()
 H.plate(H.poly(sym([(128,66),(98,68),(76,84),(68,120),(72,160),(88,186),(110,196),(128,199)])),255,222,stroke=7)  # shell
 H.plate(H.poly([(71,112),(86,110),(93,168),(89,184),(75,160)]),200,stroke=3,mirror=True)                   # cheek planes
-H.plate(H.poly(sym([(128,152),(104,154),(100,186),(128,196)])),200,184,stroke=3)                            # simple chin plate
-H.mark(H.rrect(116,170,140,176,2))                                                                         # one slot
+H.plate(H.poly(sym([(128,164),(108,166),(104,188),(128,197)])),200,184,stroke=2)                            # simple chin plate, clear of the eyes
+H.mark(H.rrect(118,176,138,181,2))                                                                         # one slot
 H.plate(H.poly(sym([(128,104),(100,97),(77,104),(80,123),(104,123),(128,129)])),252,226,stroke=3)         # heavy brow
-H.plate(H.poly([(88,128),(121,137),(120,147),(91,141)]),80,stroke=3,mirror=True)                           # slanted eye slits
+H.plate(H.poly([(84,124),(125,133),(124,151),(87,145)]),212,stroke=0,mirror=True)                          # bevel rim around the socket
+H.plate(H.poly([(88,128),(121,137),(120,147),(91,141)]),68,stroke=1.5,mirror=True)                         # eye recess (thin line)
+H.plate(H.poly([(92,137),(120,143),(120,147),(91,141)]),128,stroke=0,mirror=True)                          # lit inner bottom wall = depth
 H.plate(H.ell(84,62,108,86),214,stroke=3,mirror=True)                                                      # crown lamp housings, on the shell
 H.plate(H.ell(89,66,103,80),252,stroke=2,mirror=True)                                                      # lamp lenses
 body,sh,hm=B.image(),S.image(),H.image()
