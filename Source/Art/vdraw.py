@@ -72,3 +72,41 @@ def fill_cyl(c,mask,col,edge=4,hi=0.32):
     ring=mask&~ndimage.binary_erosion(mask,iterations=edge)
     c.rgb[ring]=c.rgb[ring]*0.25+INK*0.75
     c.a|=mask
+
+# ---- VFE / vanilla style: flat tone + soft top-down gradient, thin dark inner line, no bevel/specular
+FLAT_LINE=(40,40,44)
+def fill_flat(c,mask,col,line=10,grad=0.14,line_col=FLAT_LINE):
+    col=np.array(col,float); yy,xx=np.nonzero(mask)
+    if not len(yy): return
+    t=np.clip((np.arange(c.n)-yy.min())/max(1,yy.max()-yy.min()),0,1)[:,None]*np.ones((1,c.n))
+    f=1+grad*(0.5-t)
+    cc=np.clip(col[None,None,:]*f[...,None],0,255); c.rgb[mask]=cc[mask]
+    if line:
+        ring=mask&~ndimage.binary_erosion(mask,iterations=line); c.rgb[ring]=line_col
+    c.a|=mask
+
+# ---- VFE shading v2: soft form shading + cast shadows, still clean and light
+SHADE=dict(form=0.34, light=0.22, shadow=0.32, shadow_off=(10,14), shadow_blur=8)
+def fill_vfe(c,mask,col,line=10,form='round',line_col=FLAT_LINE,shadow=True,k=None):
+    k=k or SHADE; col=np.array(col,float)
+    yy,xx=np.nonzero(mask)
+    if not len(yy): return
+    # cast shadow of this piece onto what is already drawn underneath
+    if shadow and c.a.any():
+        dx,dy=k['shadow_off']; sh=np.zeros_like(mask); sh[dy:,dx:]=mask[:-dy,:-dx]
+        sh=ndimage.gaussian_filter(sh.astype(float),k['shadow_blur'])*(c.a&~mask)
+        c.rgb*=(1-k['shadow']*sh)[...,None]
+    y0,y1,x0,x1=yy.min(),yy.max(),xx.min(),xx.max()
+    Y,X=np.mgrid[0:c.n,0:c.n]
+    u=(X-x0)/max(1,x1-x0); v=(Y-y0)/max(1,y1-y0)
+    if form=='round':
+        d=ndimage.distance_transform_edt(mask); dn=d/max(1,d.max())
+        f=1-k['form']*(1-np.sqrt(np.clip(dn,0,1)))          # darker toward the rim, soft
+    elif form=='cyl':
+        f=1-k['form']*np.clip(np.abs(u-0.36)*1.8,0,1)**1.5   # light band left of centre
+    else: f=np.ones_like(u,dtype=float)
+    f=f+k['light']*(0.5-0.5*u-0.5*v)                          # light from the upper left
+    cc=np.clip(col[None,None,:]*f[...,None],0,255); c.rgb[mask]=cc[mask]
+    if line:
+        ring=mask&~ndimage.binary_erosion(mask,iterations=line); c.rgb[ring]=line_col
+    c.a|=mask

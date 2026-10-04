@@ -4,11 +4,11 @@ import numpy as np
 from PIL import Image
 from scipy import ndimage
 import vdraw
-from vdraw import fill_cyl, fill_flat
+from vdraw import fill_cyl, fill_flat, fill_vfe
 import vdraw as _v
-def _flat_fill(self,mask,col,**k): fill_flat(self,mask,col,24)
+def _flat_fill(self,mask,col,**k): fill_vfe(self,mask,col,24,form='round',k=dict(form=0.34,light=0.22,shadow=0.32,shadow_off=(26,36),shadow_blur=20))
 _v.Canvas.fill=_flat_fill
-fill_cyl=lambda c,m,col,**k: fill_flat(c,m,col,24)
+fill_cyl=lambda c,m,col,**k: fill_vfe(c,m,col,24,form='cyl',k=dict(form=0.42,light=0.12,shadow=0.32,shadow_off=(26,36),shadow_blur=20))
 _v.Canvas.glow=lambda self,*a,**k: None
 N=2048; X=1024
 STEEL=(150,152,160); DK=(86,88,96); BLK=(26,26,32); OLIVE=(104,116,82); PALE=(214,206,150)

@@ -93,7 +93,7 @@ Decisions agreed with the owner, to build from. Numbers are starting points for 
 
 ### Art style: VFE / vanilla RimWorld (adopted)
 
-Matches VFE Pirates' warcaskets: light grey parts (the game tints them), two or three flat tones with a soft
+Matches VFE Pirates' warcaskets: light grey parts (the game tints them), soft form shading (rounded parts darken toward the rim, light from the upper left, plates cast soft shadows; `fill_vfe`), two or three tones with a soft
 top-down gradient, thin dark inner lines between big plates, a heavy black silhouette outline, and detail only
 suggested (a seam, a couple of bolts, a slot). Tools: `Source/Art/vdraw.py` `fill_flat`, the parts in
 `vfe_parts.py` / `vfe_helmet.py`, flat weapons in `vweap_vfe.py`, assembly in `vfe_build.py`; `vfe_style.py`
