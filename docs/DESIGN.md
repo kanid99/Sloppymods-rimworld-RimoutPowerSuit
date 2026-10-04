@@ -190,6 +190,10 @@ as separate apparel with their own hit points.
 
 ### Entry: the back opens
 
+_Update:_ the pack opens **gullwing style**. It is hinged at its top edge and swings up over the head, so every
+backpack variant reuses the same open cavity. The **net launcher** sits on the Bughunter's pack, at the top right
+shoulder, and points forward.
+
 The suit is entered from behind: the whole back panel (power-cell caps and release wheel on it) is hinged on
 one side and swings open like a door, showing an upright padded cavity for a standing pilot (who faces away from the viewer: no seat) with arm holes in the side walls, leg holes in the floor and the neck hole at the top; the harness straps are on the inside of the door and close around the pilot's back
 (`chassis_bulwark_north_open.png`). Used for the empty/parked suit and as a frame of the climb-in animation

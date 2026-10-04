@@ -54,6 +54,18 @@ def part(path, outline=1.5):
     return tex, mask
 
 
+def src_bbox(path):
+    """the painted part's box in its own painting (paintings repainted from one another share a frame)"""
+    fg = cut_out(load(path)); ys, xs = np.nonzero(fg); return xs.min(), ys.min(), xs.max() + 1, ys.max() + 1
+
+
+def put_like(L, path, ref, cx, top, h):
+    """place a repaint (e.g. a backpack with pylons sticking up) at the scale and spot its reference would take"""
+    if not ref: return L.put(part(path), cx, top=top, h=h)
+    r0, r1, r2, r3 = src_bbox(ref); v0, v1, v2, v3 = src_bbox(path); k = h / (r3 - r1)
+    return L.put(part(path), cx + ((v0 + v2) - (r0 + r2)) / 2 * k, top=top - (r1 - v1) * k, h=(v3 - v1) * k)
+
+
 def legs_stub(path):
     """leg stubs: only the knee and foot of a generated pair of legs"""
     tex, mask = part(path)
@@ -210,6 +222,15 @@ def build(spec, out):
         for q in ('Helmet', 'Legs'): rest &= ~masks[q][1]
         if 'body' not in srcs: rest &= ~arm_m
         masks['Body'] = ('body' if 'body' in srcs else 'full', rest)
+        if fe.get('over_from'):
+            # pack hardware on the near shoulder (e.g. a net launcher): what the pack repaint added over its base,
+            # in the top part of the painting, drawn over the helmet instead of being cut away with it
+            base = load(fe['over_from']); r_ = srcs['body'][0]
+            add = (np.abs(r_.astype(float) - base.astype(float)).max(2) > 40) & srcs['body'][1]
+            add[int(n * fe.get('over_rows', 0.36)):] = False
+            add = ndimage.binary_opening(add, iterations=2)
+            add = ndimage.binary_dilation(ndimage.binary_fill_holes(ndimage.binary_closing(add, iterations=6)), iterations=3) & srcs['body'][1]
+            masks['Over'] = ('body', add); masks['Body'] = (masks['Body'][0], rest & ~add)
         for q, (which, m) in masks.items():
             L = Layer(); r_, f_, pm_ = srcs[which]
             t = Image.fromarray(np.dstack([np.where(m[..., None], r_, 0).astype(np.uint8), (m * 255).astype(np.uint8)]), 'RGBA')
@@ -255,6 +276,10 @@ def build(spec, out):
             A_.put((wt, wm), ab[0] + (ab[2] - ab[0]) * 0.80 + ln / 2, top=ey - h // 2, w=ln)
         before = np.array(A_.tex)[..., 3] > 100
         A_.shift(plL_bb[1] - bbox(A_.tex)[1]); after = np.array(A_.tex)[..., 3] > 100
+        if ('Over', 'east') in pieces:                           # over the helmet, under the near plate
+            O_ = pieces.pop(('Over', 'east')); arm_a = np.array(A_.tex)[..., 3] > 100
+            A_.mask = Image.fromarray(np.where(arm_a, np.array(A_.mask), np.array(O_.mask)).astype(np.uint8))
+            A_.tex = Image.alpha_composite(O_.tex, A_.tex)
         # the far arm: drawn behind everything, a little higher; only what sticks out past the body shows
         F_ = Layer(); far = spec['weapon_r']; feet = bbox(pieces[('Legs', 'south')].tex)[3]
         if far in spec.get('shields', ()):
@@ -284,7 +309,40 @@ def build(spec, out):
         pieces[('ArmL', 'east')] = L; pieces[('ArmR', 'east')] = Layer()
     # ---------------- north (back view): the arms swap sides and are mirrored; shoulders cover the body
     side_top = bbox(pieces[('Body', 'east')].tex)[1]
-    L = Layer(); L.put(part(spec['body']['north']), cx, top=side_top, h=body_bb[3] - side_top); pieces[('Body', 'north')] = L
+    if spec.get('full_east', {}).get('body_ref'):
+        # a pack repaint with pylons or a launcher sticking up: the body's top is the plain pack's top
+        fe = spec['full_east']; rest_ref = cut_out(load(fe['body_ref']))
+        for q in ('Helmet', 'Legs'): rest_ref &= ~poly_mask(fe['pieces'][q])
+        side_top = int(sy0 - ys.min() * k + np.nonzero(rest_ref.any(1))[0].min() * k)
+    nref = spec['body'].get('north_ref')
+    L = Layer(); put_like(L, spec['body']['north'], nref, cx, side_top, body_bb[3] - side_top); pieces[('Body', 'north')] = L
+    if spec['body'].get('cavity'):
+        # the open back (climbing in), gullwing: the pack swings up on a hinge at its top edge. From behind we see its
+        # outside upside down and foreshortened above the shoulders, over the open cavity - so every pack reuses its own
+        # closed back art, and one cavity painting serves every suit.
+        nb_ = bbox(L.tex); O = Layer()
+        cb = O.put(part(spec['body']['cavity']), cx, bottom=nb_[3], w=nb_[2] - nb_[0])
+        ref = nref or spec['body']['north']; base = spec['body'].get('pack_base', ref)
+        rgb = load(spec['body']['north']); fg = cut_out(rgb); n_ = rgb.shape[0]; f_ = n_ / 1024
+        x0_, x1_, yb_ = [int(v * f_) for v in spec['body'].get('pack_box', (300, 724, 830))]
+        col = np.zeros_like(fg); col[:yb_, x0_:x1_] = True
+        added = (np.abs(rgb.astype(float) - load(base).astype(float)).max(2) > 40) & fg   # what this pack adds (pylons, thrusters...)
+        added = ndimage.binary_opening(added, iterations=2)
+        pk = fg & (col | ndimage.binary_dilation(added, iterations=3))
+        lab, nl = ndimage.label(pk); sz = ndimage.sum(pk, lab, range(1, nl + 1))
+        pk = np.isin(lab, np.nonzero(np.array(sz) > 400)[0] + 1)
+        ring = ndimage.binary_dilation(pk, iterations=2) & ~pk; r2 = rgb.copy(); r2[ring] = 12; pk = pk | ring
+        ys_, xs_ = np.nonzero(pk); bx = (xs_.min(), ys_.min(), xs_.max() + 1, ys_.max() + 1)
+        r2 = r2.astype(float) * 0.84; r2[~pk] = 0                                  # tilted away from the light
+        t = Image.fromarray(np.dstack([r2.astype(np.uint8), (pk * 255).astype(np.uint8)]), 'RGBA').crop(bx)
+        mk = Image.fromarray((plate_mask(rgb) * pk * 255).astype(np.uint8), 'L').crop(bx)
+        t, mk = t.transpose(Image.FLIP_TOP_BOTTOM), mk.transpose(Image.FLIP_TOP_BOTTOM)  # swung up past level: bottom edge on top
+        rb = src_bbox(ref); kk = (body_bb[3] - side_top) / (rb[3] - rb[1])
+        pw_, ph_ = (bx[2] - bx[0]) * kk, (bx[3] - bx[1]) * kk * spec['body'].get('gull_squash', 0.5)
+        t, mk = t.resize((max(1, round(pw_)), max(1, round(ph_))), Image.LANCZOS), mk.resize((max(1, round(pw_)), max(1, round(ph_))), Image.LANCZOS)
+        pcx = cx + ((bx[0] + bx[2]) - (rb[0] + rb[2])) / 2 * kk
+        PK = Layer(); PK.put((t, mk), pcx, bottom=cb[1] + int((cb[3] - cb[1]) * 0.08), h=t.height)
+        pieces[('Body', 'northopen')] = O; open_pack = PK          # joined at the end, under the helmet
     nb = bbox(L.tex)
     L = Layer(); L.put(legs_stub(spec['legs']['north']), cx, top=nb[3] - int(body_h * 0.12), w=int(bw * 0.72)); pieces[('Legs', 'north')] = L
     eh = bbox(pieces[('Helmet', 'east')].tex)
@@ -331,10 +389,13 @@ def build(spec, out):
         pieces[(p, 'north')] = N
     if spec.get('backpack_peek'):
         bt, bm = part(spec['body']['north'])
-        bt = bt.crop((0, 0, bt.width, int(bt.height * 0.30))); bm = bm.crop((0, 0, bm.width, int(bm.height * 0.30)))
+        rb = src_bbox(nref or spec['body']['north']); vb = src_bbox(spec['body']['north'])
+        cut = int((rb[1] - vb[1]) + (rb[3] - rb[1]) * 0.30)        # 30% of the backpack, plus what sticks up above it
+        bt = bt.crop((0, 0, bt.width, cut)); bm = bm.crop((0, 0, bm.width, cut))
         a = np.array(bt).astype(float); a[..., :3] *= 0.72; bt = Image.fromarray(a.astype(np.uint8), 'RGBA')   # the far side: in shadow
         nbb = bbox(pieces[('Body', 'north')].tex)
-        pieces[('Body', 'south')].put((bt, bm), cx, top=side_top, w=int((nbb[2] - nbb[0]) * 0.55), behind=True)
+        kp = (nbb[3] - nbb[1]) / (vb[3] - vb[1])                    # the back view's scale
+        pieces[('Body', 'south')].put((bt, bm), cx, top=nbb[1], w=int(bt.width * kp * 0.55), behind=True)
     # ---------------- weapons aimed forward in the front/back views too (end-on art), where it exists
     fwd = spec.get('weapons_fwd', {}); front_over = set()
     for p_, plate, wname, side in (('ArmL', 'plateLfull', spec['weapon_l'], 'L'), ('ArmR', 'plateRfull', spec['weapon_r'], 'R')):
@@ -401,6 +462,13 @@ def build(spec, out):
                     nm = np.array(N.mask); nm[hide] = 0; N.tex = Image.fromarray(na); N.mask = Image.fromarray(nm)
                 N.tex.alpha_composite(BP.tex); N.mask = Image.fromarray(np.maximum(np.array(N.mask), np.array(BP.mask)).astype(np.uint8))
                 pieces[(p_, 'north')] = N
+    if ('Body', 'northopen') in pieces:
+        # the raised pack is beyond the head from behind: the helmet covers it; the collar covers its hinge
+        O = pieces[('Body', 'northopen')]; ha = np.array(pieces[('Helmet', 'north')].tex)[..., 3] > 100
+        pt = np.array(open_pack.tex); pt[ha, 3] = 0; pm = np.array(open_pack.mask); pm[ha] = 0
+        J = Layer(); J.tex = Image.fromarray(pt); J.mask = Image.fromarray(pm)
+        J.tex.alpha_composite(O.tex); oa = np.array(O.tex)[..., 3] > 100
+        J.mask = Image.fromarray(np.where(oa, np.array(O.mask), pm).astype(np.uint8)); pieces[('Body', 'northopen')] = J
     # ---------------- save: helmet stored HEAD px lower (the game lifts it to the head)
     for (p, f), L in pieces.items():
         if p == 'Helmet': L.shift(HEAD)
@@ -438,7 +506,7 @@ def preview(out, colors):
     sheet.save(f'{out}/preview.png')
 
 
-def bulwark_spec(sp):
+def _bulwark_base(sp):
     """the Bulwark; sp = folder with the source paintings (scratchpad or Source/Art/nano/modular)"""
     ws = ['minigun', 'rockets', 'chainsaw', 'laser', 'flamer', 'hammer', 'autocannon', 'grenade', 'arc', 'towershield']
     return dict(
@@ -460,15 +528,24 @@ def bulwark_spec(sp):
         weapon_h={w: 120 for w in ws})
 
 
+def bulwark_spec(sp):
+    s = _bulwark_base(sp)
+    s['body'] = dict(s['body'], cavity=f'{sp}/views/chassis_north_cavity.png', pack_base=f'{sp}/views/chassis_north_tall.png')
+    if os.environ.get('PACK') == 'shield':          # the optional shield-generator backpack (three cells, emitter pylons)
+        s['body'] = dict(s['body'], north=f'{sp}/own/chassis_north_shield.png', north_ref=f'{sp}/views/chassis_north_tall.png')
+        s['full_east'] = dict(s['full_east'], body_image=f'{sp}/own/full_east_noarm_shield.png', body_ref=f'{sp}/views/full_east_noarm.png')
+    return s
+
+
 def bughunter_spec(sp):
     """the Bughunter: a Bulwark variant - shares body side/back, legs, plates and weapons; own front chest and helmet"""
     s = bulwark_spec(sp)
     s['helmet'] = dict(east=s['helmet']['east'], east_override=f'{sp}/own/bh_helmet_east.png', north=f'{sp}/own/bh_helmet_north.png')
     s['weapon_l'], s['weapon_r'] = 'flamer', 'hammer'
     s['colors'] = [(0.66, 0.56, 0.40), (0.56, 0.58, 0.60)]
-    if os.environ.get('JUMP', '1') == '1':          # the jump-pack backpack (three cells, thrusters)
-        s['body'] = dict(s['body'], north=f'{sp}/own/chassis_north_jump.png')
-        s['full_east'] = dict(s['full_east'], body_image=f'{sp}/own/full_east_noarm_jump.png')
+    if os.environ.get('JUMP', '1') == '1':          # the jump-pack backpack (three cells, thrusters) with the net launcher on top
+        s['body'] = dict(s['body'], north=f'{sp}/own/chassis_north_jumpnet.png', north_ref=f'{sp}/views/chassis_north_tall.png')
+        s['full_east'] = dict(s['full_east'], body_image=f'{sp}/own/full_east_noarm_jumpnet.png', over_from=f'{sp}/own/full_east_noarm_jump.png', body_ref=f'{sp}/views/full_east_noarm.png')
     # its light plates in the side view (pauldron + elbow paintings), not the Bulwark's painted heavy arm
     s['east_plates'] = {'flamer': f'{sp}/own/plate_east_fuel.png', 'hammer': f'{sp}/own/plate_east_pneumatic.png'}
     return s

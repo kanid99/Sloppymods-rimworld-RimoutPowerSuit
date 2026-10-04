@@ -117,3 +117,20 @@ KITSRC=.../kit_src EXPORT=1`. Where these come from:
 - **Jump pack:** `own/chassis_north_jump.png` (three cells, thrusters) and `own/full_east_noarm_jump.png`.
   `JUMP=0` builds the plain backpack.
 Shared with the Bulwark (symlinked): side and back body, legs, shoulder plates, all weapon views.
+
+## Backpacks and the open back (kit)
+
+- **Backpacks are repaints of the plain tall pack** in the back and side paintings:
+  - Bughunter jump pack with net launcher: `own/chassis_north_jumpnet.png`, `own/full_east_noarm_jumpnet.png`.
+  - Bulwark shield pack (`PACK=shield`): `own/chassis_north_shield.png`, `own/full_east_noarm_shield.png`.
+  - `north_ref` and `body_ref` point at the plain pack, so the suit keeps its scale when a launcher or
+    pylon sticks up.
+  - `over_from` draws what a side-view repaint added near the top (the net launcher) over the helmet.
+- **The open back is a gullwing:**
+  - The pack swings up on a hinge at its top edge. It is drawn as the pack's own closed back art,
+    flipped, squashed to half height, shaded, and placed above the collar under the helmet.
+  - It sits over one doorless cavity painting, `views/chassis_north_cavity.png`, made in code from
+    `chassis_north_open4` by mirroring its right half. So any pack opens without new art.
+  - The pack is the plain pack's column (`pack_box`) plus whatever the repaint added over
+    `pack_base`.
+  - Output: `Body_northopen`.
