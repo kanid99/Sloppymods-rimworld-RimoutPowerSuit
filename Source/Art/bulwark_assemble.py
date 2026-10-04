@@ -34,7 +34,7 @@ def _outlined(pair,w=1,round_r=10):
 plate=lambda side: _outlined(place(SP+'/arms/arm_bulwark.png',PW_CX,int(os.environ.get('PT','58')),110,side))
 pb=np.array(plate('left')[0].split()[3])>0; xs=np.nonzero(pb.any(0))[0]; PCX=(xs.min()+xs.max())/2
 import os; OUT=int(os.environ.get('OUT','8'))
-H={'minigun':118,'rockets':104,'chainsaw':124,'laser':118,'flamer':112,'hammer':112,'autocannon':150,'grenade':104,'arc':134,'towershield':136}
+H={w:120 for w in ('minigun','rockets','chainsaw','laser','flamer','hammer','autocannon','grenade','arc','towershield')}   # one length: both arms end at the same height
 def arm(name,side):
     w=clip_behind(place(f'{SP}/weap/{name}.png',PCX-OUT,58+int(os.environ.get('TOP','80')),H[name],side),ringw)
     return [w,plate(side),joint(side)]

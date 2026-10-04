@@ -53,8 +53,14 @@ stored 80 px lower because the game draws it at the head position. Each piece is
 later be its own apparel / module and be damaged and lost on its own.
 - South layers come from the front-view assembly (`bulwark_assemble.py` with `EXPORT=1` writes
   `kit_src/south_*.png` incl. an arm layer per weapon, with the hole where the chest nests into the plate).
-- East = side view (owner preferred it to a three-quarter view; the three-quarter paintings are kept in
-  `kit/bulwark_src/q/`), guns aimed forward from the elbow so the firing animation matches.
+- East = ONE whole side painting of the suit (made from the finished front view, so it keeps the bulk), cut
+  into pieces by outlines (`full_east` in the spec). The body, helmet and legs come from a second copy painted
+  with the arm removed (`body_image`), so the body under the arm is real (also the arm-destroyed look). The arm
+  is moved so its shoulder armour starts at the front view's height. Gun aimed forward.
+- The suit's tall backpack (from the side painting) is used in all views: the back painting shows it, the front
+  view shows its top peeking out behind the helmet, and from behind it hides the helmet's lower part.
+- Check heights across views with `kit/out_bulwark/guides.png` (helmet top, body top, shoulder armour top and
+  bottom, weapon bottom, feet must line up).
 - North = back painting; the shoulder plates are the front-view plates mirrored and swapped at the same
   height (so they cover the shoulders), each weapon is its own rear view (no muzzles), with the ribbed joint;
   a collar band is drawn over the helmet base.
