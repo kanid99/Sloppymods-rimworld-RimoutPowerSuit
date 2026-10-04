@@ -225,6 +225,7 @@ def build(spec, out):
     L = Layer(); hb = L.put(part(spec['helmet']['north']), cx, top=eh[1], h=int(helm_h * 0.86))   # same top as the side view
     # the back rim of the collar is nearer than the head from behind: a shaded armour band over the helmet's base
     pieces[('Helmet', 'north')] = L
+    north_plates = {}
     for p, plate, full, wname in (('ArmL', 'plateLfull', 'armLfull', spec['weapon_l']), ('ArmR', 'plateRfull', 'armRfull', spec['weapon_r'])):
         P = Layer(); P.put_assembly(f'{src}/south_{plate}.png', f'{src}/south_{plate}_m.png')
         F = Layer(); F.put_assembly(f'{src}/south_{full}_{wname}.png', f'{src}/south_{full}_{wname}_m.png')
@@ -259,7 +260,7 @@ def build(spec, out):
         tb = Image.fromarray(pt.astype(np.uint8), 'RGBA').transpose(Image.FLIP_LEFT_RIGHT)
         mb = Image.fromarray(pmk.astype(np.uint8), 'L').transpose(Image.FLIP_LEFT_RIGHT)
         N.put((tb, mb), mx((x0 + x1) / 2), top=y0, h=y1 - y0)
-        N.joint(int(fx), y1 - 26)
+        BP = Layer(); BP.put((tb, mb), mx((x0 + x1) / 2), top=y0, h=y1 - y0); north_plates[p] = BP
         pieces[(p, 'north')] = N
     if spec.get('backpack_peek'):
         bt, bm = part(spec['body']['north'])
@@ -275,26 +276,22 @@ def build(spec, out):
         cutL = Layer(); cutL.put_assembly(f'{src}/south_arm{side}_{wname}.png', f'{src}/south_arm{side}_{wname}_m.png')
         fullL = Layer(); fullL.put_assembly(f'{src}/south_arm{side}full_{wname}.png', f'{src}/south_arm{side}full_{wname}_m.png')
         hole = (np.array(fullL.tex)[..., 3] > 100) & ~(np.array(cutL.tex)[..., 3] > 100)   # where the chest nests in
-        x0, y0, x1, y1 = bbox(P.tex); pw = x1 - x0; pcx = (x0 + x1) / 2
+        x0, y0, x1, y1 = bbox(P.tex); pw = x1 - x0
+        pa_ = np.array(P.tex)[..., 3] > 100; cuff_x = np.nonzero(pa_[y1 - 12:y1 + 1].any(0))[0]
+        pcx = (cuff_x.min() + cuff_x.max()) / 2; cw = cuff_x.max() - cuff_x.min()
         for facing in ('south', 'north'):
             N = Layer()
-            wt, wm = part(fwd[wname][facing]); kk = pw * 0.78 / wt.width
+            wt, wm = part(fwd[wname][facing]); kk = cw * 1.6 / wt.width
             wcx = pcx if facing == 'south' else C - pcx
-            N.put((wt, wm), wcx, top=y1 - 34, h=int(wt.height * kk))
+            N.put((wt, wm), wcx, top=y1 - 6, h=int(wt.height * kk), behind=True)
             if facing == 'south':
                 pt = np.array(P.tex); pt[hole, 3] = 0; pm_ = np.array(P.mask); pm_[hole] = 0
                 N.tex.alpha_composite(Image.fromarray(pt)); N.mask = Image.fromarray(np.maximum(np.array(N.mask), np.where(pt[..., 3] > 100, pm_, 0)).astype(np.uint8))
-                N.joint(int(wcx), y1 - 30); pieces[(p_, 'south')] = N
+                pieces[(p_, 'south')] = N
             else:
-                old = pieces[(p_, 'north')]
-                # keep the back plate already built for this arm, swap only the weapon underneath
-                oa = np.array(old.tex); keep = oa[..., 1] >= 0
-                ob = bbox(old.tex)
-                plate_only = np.zeros_like(oa); cut = int(y1 + 4)
-                plate_only[:cut] = oa[:cut]
-                N.tex.alpha_composite(Image.fromarray(plate_only))
-                om = np.array(old.mask); om[cut:] = 0; N.mask = Image.fromarray(np.maximum(np.array(N.mask), om).astype(np.uint8))
-                N.joint(int(wcx), y1 - 30); pieces[(p_, 'north')] = N
+                BP = north_plates[p_]
+                N.tex.alpha_composite(BP.tex); N.mask = Image.fromarray(np.maximum(np.array(N.mask), np.array(BP.mask)).astype(np.uint8))
+                pieces[(p_, 'north')] = N
     # ---------------- save: helmet stored HEAD px lower (the game lifts it to the head)
     for (p, f), L in pieces.items():
         if p == 'Helmet': L.shift(HEAD)
