@@ -96,7 +96,7 @@ def match_height(pair,ref):
         big=im.resize((int(im.width*k),int(im.height*k)),Image.LANCZOS); c=Image.new('RGBA',im.size)
         c.alpha_composite(big,(int(cx-cx*k),int(s1-by*k))) if True else None; out.append(c)
     return tuple(out)
-if 'fwd2' in os.environ.get('HELM','helmet_bulwark_fwd2.png'): HL=match_height(HL,helm(SP+'/mod2/helmet_bulwark_fwd1.png'))
+if os.environ.get('FULLHEAD'): HL=match_height(HL,helm(SP+'/mod2/helmet_bulwark_fwd1.png'))
 if os.environ.get('SOFT'): ch=soften(ch); HL=soften(HL,keep=4)
 loadouts=[('minigun / rockets','minigun','rockets'),('laser / chainsaw','laser','chainsaw'),('flamer / minigun','flamer','minigun'),('hammer / rockets','hammer','rockets'),('laser / laser','laser','laser'),('chainsaw / flamer','chainsaw','flamer')]
 img=Image.new('RGBA',(3*345,2*330),floor); d=ImageDraw.Draw(img)
