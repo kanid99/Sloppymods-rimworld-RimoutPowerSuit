@@ -78,3 +78,10 @@ Bulwark sources: `Source/Art/kit/bulwark_src/`; output: `Source/Art/kit/out_bulw
   Done for minigun and rocket pod; the other eight weapons still need their two end-on paintings.
 - Back-view shoulder plates = the front plates mirrored, with the hook interior painted over as solid back
   armour, at the same height as the front and side views.
+- Weapons in every view: front = end-on art pointing at the viewer (`weap_fwd/<w>_south`), side = level and
+  forward from the elbow (`weap_east`, swapped per loadout onto the painted shoulder), back = rear end at the
+  cuff with the weapon running away and down (`weap_back2`). Each hangs from the shoulder plate's own ribbed
+  cuff (no extra joint).
+- The tower shield is a hand shield, drawn the VEF way: a big shield in front of the body facing south, in
+  front of the chest side-on facing east/west, and behind the body facing north (only the edge past the body
+  shows). Listed in the spec's `shields`.
