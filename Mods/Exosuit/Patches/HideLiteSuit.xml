@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- In Exosuit mode the suit is crafted as the framework core above; the lightweight suit
-     stays defined (so old saves keep theirs) but can no longer be crafted. -->
+<!-- In Exosuit mode the suit is crafted as the framework core above; the lightweight suits
+     (Bulwark, Bughunter) stay defined (so old saves keep theirs) but can no longer be crafted. -->
 <Patch>
   <Operation Class="PatchOperationRemove">
-    <xpath>Defs/ThingDef[defName="RPS_PowerSuitFrame"]/recipeMaker</xpath>
+    <xpath>Defs/ThingDef[defName="RPS_PowerSuitFrame" or defName="RPS_PowerSuitBughunter"]/recipeMaker</xpath>
   </Operation>
 </Patch>

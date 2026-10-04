@@ -3,20 +3,22 @@
   <name>SloppyMods Rimout Power Suit</name>
   <author>SloppyMod</author>
   <packageId>sloppymod.rimoutpowersuit</packageId>
-  <modVersion>0.9.8</modVersion>
+  <modVersion>0.9.9</modVersion>
   <!-- 1.6 only: the assembly is built against 1.6 signatures. -->
   <supportedVersions>
     <li>1.6</li>
   </supportedVersions>
-  <description>Build 0.9.8
+  <description>Build 0.9.9
 
 Walking tanks for your colonists. A power suit is a hulking armoured frame that stands on its own until a colonist climbs inside to work and fight in it, and climbs back out when the job is done.
+
+Two suits so far: the Bulwark, a heavy tank, and the Bughunter, built for clearing insect hives - hard to cut, bite or burn.
 
 A pilot in a power suit can wield the heavy warcasket weapons from Vanilla Factions Expanded - Pirates. Unlike a warcasket, nobody is welded in for life.
 
 Works on its own, or - if Exosuit Framework is installed - as an Exosuit Framework suit, with its modules, maintenance bays and repairs, while still standing wherever you leave it.
 
-Early build: the suit, climbing in and out, and warcasket weapon support. Power cells and charging racks, more modules and wrecked suits that trap their pilot are on the way.
+Early build: the suits, climbing in and out, and warcasket weapon support. Fitted weapon arms, suit backpacks (shield generator, jump pack), power cells, suit pieces that break off one at a time and more suits are on the way.
 
 Requires Vanilla Factions Expanded - Pirates.</description>
   <modDependencies>

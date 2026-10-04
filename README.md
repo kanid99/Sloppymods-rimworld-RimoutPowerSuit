@@ -9,12 +9,21 @@ Requires [Harmony](https://github.com/pardeike/HarmonyRimWorld),
 Vanilla Expanded Framework and
 [Vanilla Factions Expanded - Pirates](https://github.com/Vanilla-Expanded/VanillaFactionsExpanded-Pirates).
 
+## Suits
+
+- **Bulwark** - the heavy tank: thick armour against everything, slow.
+- **Bughunter** - built for insect hives: very hard to cut, bite or burn, hits harder up close,
+  even slower.
+
 ## Planned
 
 - Power cells: removable batteries that drain while the suit works, recharged on a powered
   charging rack.
-- One suit frame with swappable plating, arm and system modules - heavy tank plating, a field
-  medical system, built-in melee arms for fighting insects.
+- Weapon arms fitted to the suit (minigun, rocket pod, flamer, power hammer...), shoulder plates
+  and backpacks made for each suit (the Bulwark's shield generator, the Bughunter's jump pack
+  and net launcher).
+- Suit pieces that are damaged and knocked off one at a time.
+- More suits: medic, builder, miner and more.
 - Wrecked suits that trap their pilot until another colonist cuts them out.
 
 ## Building

@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
 
-  <ThingDef ParentName="ArmorMachineableBase">
-    <defName>RPS_PowerSuitFrame</defName>
-    <label>power suit frame</label>
-    <description>A hulking powered exoskeleton, wrapped in armour plate, that stands on its own until a colonist climbs inside. The servos let its pilot carry far more and hit far harder, at the cost of speed.\n\nThe frame encloses its pilot completely: outer armour and headgear are left behind when they climb in. A pilot can wield the heavy weapons built for warcaskets, and can climb back out at any time.</description>
+  <!-- What every power suit shares. Each suit below adds its look (graphicData and the
+       render nodes of its pieces), its armour and its handling. -->
+  <ThingDef Name="RPS_PowerSuitBase" ParentName="ArmorMachineableBase" Abstract="True">
     <thingClass>RimoutPowerSuit.Apparel_PowerSuit</thingClass>
     <techLevel>Spacer</techLevel>
-    <!-- The standing suit, as it looks when nobody is inside. -->
+    <!-- The standing suit, as it looks when nobody is inside. CutoutComplex reads the _m mask
+         beside the texture: red marks the armour plates, which take the suit's colour. -->
     <graphicData>
-      <texPath>Things/Item/PowerSuit/PowerSuitFrame</texPath>
       <graphicClass>Graphic_Single</graphicClass>
-      <!-- CutoutComplex reads the _m mask beside the texture: red marks the armour plates,
-           which take the suit's colour; the frame, hoses and lamp keep their own. -->
       <shaderType>CutoutComplex</shaderType>
-      <drawSize>(1.5,1.5)</drawSize>
+      <drawSize>(2.649,2.649)</drawSize>
     </graphicData>
     <thingCategories>
       <li>ApparelArmor</li>
@@ -22,25 +19,11 @@
     <stackLimit>1</stackLimit>
     <pathCost>30</pathCost>
     <statBases>
-      <MaxHitPoints>450</MaxHitPoints>
       <WorkToMake>60000</WorkToMake>
-      <Mass>85</Mass>
-      <Flammability>0.2</Flammability>
-      <ArmorRating_Sharp>1.0</ArmorRating_Sharp>
-      <ArmorRating_Blunt>0.5</ArmorRating_Blunt>
-      <ArmorRating_Heat>0.6</ArmorRating_Heat>
-      <Insulation_Cold>25</Insulation_Cold>
-      <Insulation_Heat>10</Insulation_Heat>
       <!-- Seconds to climb in or out. -->
       <EquipDelay>5</EquipDelay>
       <Beauty>-3</Beauty>
     </statBases>
-    <equippedStatOffsets>
-      <MoveSpeed>-0.6</MoveSpeed>
-      <CarryingCapacity>75</CarryingCapacity>
-      <VEF_MassCarryCapacity>100</VEF_MassCarryCapacity>
-      <MeleeDamageFactor>0.3</MeleeDamageFactor>
-    </equippedStatOffsets>
     <costList>
       <Plasteel>120</Plasteel>
       <Steel>200</Steel>
@@ -70,9 +53,8 @@
       <layers Inherit="False">
         <li>RPS_PowerSuit</li>
       </layers>
-      <wornGraphicPath>Things/Pawn/PowerSuit/PowerSuitFrame</wornGraphicPath>
-      <!-- Worn masks are _southm / _eastm / _northm (no underscore before the m). -->
-      <useWornGraphicMask>true</useWornGraphicMask>
+      <!-- The worn suit is drawn piece by piece (render nodes, set per suit below), not as
+           one worn graphic. -->
       <parentTagDef>ApparelBody</parentTagDef>
       <!-- The helmet is part of the suit: the pilot's head is not drawn. -->
       <renderSkipFlags Inherit="False">
@@ -129,13 +111,218 @@
         </li>
       </options>
     </colorGenerator>
-    <modExtensions>
-      <!-- One texture for every body type, as the warcaskets do (Vanilla Expanded Framework). -->
-      <li Class="VEF.Apparels.ApparelExtension">
-        <isUnifiedApparel>true</isUnifiedApparel>
-      </li>
-    </modExtensions>
     <generateAllowChance>0</generateAllowChance>
+  </ThingDef>
+
+  <!-- The Bulwark: the heavy tank. Keeps the original defName, so suits in old saves become Bulwarks. -->
+  <ThingDef ParentName="RPS_PowerSuitBase">
+    <defName>RPS_PowerSuitFrame</defName>
+    <label>Bulwark power suit</label>
+    <description>A heavy walking tank: thick bolted slabs over the chest and big hooked shoulder plates, with a tall backpack holding its power cells. It stands on its own until a colonist climbs inside, and its servos let the pilot carry far more and hit far harder, at the cost of speed.\n\nThe suit encloses its pilot completely: outer armour and headgear are left behind when they climb in. A pilot can wield the heavy weapons built for warcaskets, and can climb back out at any time.</description>
+    <graphicData>
+      <texPath>Things/Item/PowerSuit/Bulwark</texPath>
+    </graphicData>
+    <statBases>
+      <MaxHitPoints>450</MaxHitPoints>
+      <Mass>85</Mass>
+      <Flammability>0.2</Flammability>
+      <ArmorRating_Sharp>1.0</ArmorRating_Sharp>
+      <ArmorRating_Blunt>0.5</ArmorRating_Blunt>
+      <ArmorRating_Heat>0.6</ArmorRating_Heat>
+      <Insulation_Cold>25</Insulation_Cold>
+      <Insulation_Heat>10</Insulation_Heat>
+    </statBases>
+    <equippedStatOffsets>
+      <MoveSpeed>-0.6</MoveSpeed>
+      <CarryingCapacity>75</CarryingCapacity>
+      <VEF_MassCarryCapacity>100</VEF_MassCarryCapacity>
+      <MeleeDamageFactor>0.3</MeleeDamageFactor>
+    </equippedStatOffsets>
+    <apparel>
+      <renderNodeProperties>
+        <li>
+          <debugLabel>Bulwark Legs</debugLabel>
+          <nodeClass>RimoutPowerSuit.PawnRenderNode_SuitPiece</nodeClass>
+          <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
+          <parentTagDef>ApparelBody</parentTagDef>
+          <texPath>Things/Pawn/PowerSuit/Bulwark/Legs</texPath>
+          <drawSize>(2.649,2.649)</drawSize>
+          <baseLayer>60</baseLayer>
+          <drawData>
+            <dataSouth><layer>60</layer></dataSouth>
+            <dataEast><layer>61</layer></dataEast>
+            <dataWest><layer>61</layer></dataWest>
+            <dataNorth><layer>60</layer></dataNorth>
+          </drawData>
+        </li>
+        <li>
+          <debugLabel>Bulwark Body</debugLabel>
+          <nodeClass>RimoutPowerSuit.PawnRenderNode_SuitPiece</nodeClass>
+          <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
+          <parentTagDef>ApparelBody</parentTagDef>
+          <texPath>Things/Pawn/PowerSuit/Bulwark/Body</texPath>
+          <drawSize>(2.649,2.649)</drawSize>
+          <baseLayer>61</baseLayer>
+          <drawData>
+            <dataSouth><layer>61</layer></dataSouth>
+            <dataEast><layer>62</layer></dataEast>
+            <dataWest><layer>62</layer></dataWest>
+            <dataNorth><layer>62</layer></dataNorth>
+          </drawData>
+        </li>
+        <li>
+          <debugLabel>Bulwark ArmL</debugLabel>
+          <nodeClass>RimoutPowerSuit.PawnRenderNode_SuitPiece</nodeClass>
+          <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
+          <parentTagDef>ApparelBody</parentTagDef>
+          <texPath>Things/Pawn/PowerSuit/Bulwark/ArmL</texPath>
+          <drawSize>(2.649,2.649)</drawSize>
+          <baseLayer>62</baseLayer>
+          <drawData>
+            <dataSouth><layer>62</layer></dataSouth>
+            <dataEast><layer>64</layer></dataEast>
+            <dataWest><layer>64</layer></dataWest>
+            <dataNorth><layer>63</layer></dataNorth>
+          </drawData>
+        </li>
+        <li>
+          <debugLabel>Bulwark ArmR</debugLabel>
+          <nodeClass>RimoutPowerSuit.PawnRenderNode_SuitPiece</nodeClass>
+          <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
+          <parentTagDef>ApparelBody</parentTagDef>
+          <texPath>Things/Pawn/PowerSuit/Bulwark/ArmR</texPath>
+          <drawSize>(2.649,2.649)</drawSize>
+          <baseLayer>63</baseLayer>
+          <drawData>
+            <dataSouth><layer>63</layer></dataSouth>
+            <dataEast><layer>60</layer></dataEast>
+            <dataWest><layer>60</layer></dataWest>
+            <dataNorth><layer>64</layer></dataNorth>
+          </drawData>
+        </li>
+        <li>
+          <debugLabel>Bulwark Helmet</debugLabel>
+          <nodeClass>RimoutPowerSuit.PawnRenderNode_SuitPiece</nodeClass>
+          <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
+          <parentTagDef>ApparelBody</parentTagDef>
+          <texPath>Things/Pawn/PowerSuit/Bulwark/Helmet</texPath>
+          <drawSize>(2.649,2.649)</drawSize>
+          <baseLayer>64</baseLayer>
+          <drawData>
+            <dataSouth><layer>64</layer></dataSouth>
+            <dataEast><layer>63</layer></dataEast>
+            <dataWest><layer>63</layer></dataWest>
+            <dataNorth><layer>61</layer></dataNorth>
+          </drawData>
+        </li>
+      </renderNodeProperties>
+    </apparel>
+  </ThingDef>
+
+  <!-- The Bughunter: built for the hive. Shrugs off claws, bites and stings (sharp) and its own
+       fire (heat), hits harder up close, and is slower than the Bulwark. -->
+  <ThingDef ParentName="RPS_PowerSuitBase">
+    <defName>RPS_PowerSuitBughunter</defName>
+    <label>Bughunter power suit</label>
+    <description>A walking suit built for clearing insect hives: hardened against claws, bites and stings, sealed and heat-shielded so it can stand in its own fire, with light open-frame shoulder plates and a jump pack on its back. It stands on its own until a colonist climbs inside; its servos let the pilot hit much harder up close, at the cost of speed.\n\nThe suit encloses its pilot completely: outer armour and headgear are left behind when they climb in. A pilot can wield the heavy weapons built for warcaskets, and can climb back out at any time.</description>
+    <graphicData>
+      <texPath>Things/Item/PowerSuit/Bughunter</texPath>
+    </graphicData>
+    <statBases>
+      <MaxHitPoints>400</MaxHitPoints>
+      <Mass>80</Mass>
+      <Flammability>0</Flammability>
+      <ArmorRating_Sharp>1.25</ArmorRating_Sharp>
+      <ArmorRating_Blunt>0.35</ArmorRating_Blunt>
+      <ArmorRating_Heat>1.0</ArmorRating_Heat>
+      <Insulation_Cold>20</Insulation_Cold>
+      <Insulation_Heat>30</Insulation_Heat>
+    </statBases>
+    <equippedStatOffsets>
+      <MoveSpeed>-0.7</MoveSpeed>
+      <CarryingCapacity>60</CarryingCapacity>
+      <VEF_MassCarryCapacity>80</VEF_MassCarryCapacity>
+      <MeleeDamageFactor>0.5</MeleeDamageFactor>
+    </equippedStatOffsets>
+    <apparel>
+      <renderNodeProperties>
+        <li>
+          <debugLabel>Bughunter Legs</debugLabel>
+          <nodeClass>RimoutPowerSuit.PawnRenderNode_SuitPiece</nodeClass>
+          <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
+          <parentTagDef>ApparelBody</parentTagDef>
+          <texPath>Things/Pawn/PowerSuit/Bughunter/Legs</texPath>
+          <drawSize>(2.649,2.649)</drawSize>
+          <baseLayer>60</baseLayer>
+          <drawData>
+            <dataSouth><layer>60</layer></dataSouth>
+            <dataEast><layer>61</layer></dataEast>
+            <dataWest><layer>61</layer></dataWest>
+            <dataNorth><layer>60</layer></dataNorth>
+          </drawData>
+        </li>
+        <li>
+          <debugLabel>Bughunter Body</debugLabel>
+          <nodeClass>RimoutPowerSuit.PawnRenderNode_SuitPiece</nodeClass>
+          <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
+          <parentTagDef>ApparelBody</parentTagDef>
+          <texPath>Things/Pawn/PowerSuit/Bughunter/Body</texPath>
+          <drawSize>(2.649,2.649)</drawSize>
+          <baseLayer>61</baseLayer>
+          <drawData>
+            <dataSouth><layer>61</layer></dataSouth>
+            <dataEast><layer>62</layer></dataEast>
+            <dataWest><layer>62</layer></dataWest>
+            <dataNorth><layer>62</layer></dataNorth>
+          </drawData>
+        </li>
+        <li>
+          <debugLabel>Bughunter ArmL</debugLabel>
+          <nodeClass>RimoutPowerSuit.PawnRenderNode_SuitPiece</nodeClass>
+          <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
+          <parentTagDef>ApparelBody</parentTagDef>
+          <texPath>Things/Pawn/PowerSuit/Bughunter/ArmL</texPath>
+          <drawSize>(2.649,2.649)</drawSize>
+          <baseLayer>62</baseLayer>
+          <drawData>
+            <dataSouth><layer>62</layer></dataSouth>
+            <dataEast><layer>64</layer></dataEast>
+            <dataWest><layer>64</layer></dataWest>
+            <dataNorth><layer>63</layer></dataNorth>
+          </drawData>
+        </li>
+        <li>
+          <debugLabel>Bughunter ArmR</debugLabel>
+          <nodeClass>RimoutPowerSuit.PawnRenderNode_SuitPiece</nodeClass>
+          <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
+          <parentTagDef>ApparelBody</parentTagDef>
+          <texPath>Things/Pawn/PowerSuit/Bughunter/ArmR</texPath>
+          <drawSize>(2.649,2.649)</drawSize>
+          <baseLayer>63</baseLayer>
+          <drawData>
+            <dataSouth><layer>63</layer></dataSouth>
+            <dataEast><layer>60</layer></dataEast>
+            <dataWest><layer>60</layer></dataWest>
+            <dataNorth><layer>64</layer></dataNorth>
+          </drawData>
+        </li>
+        <li>
+          <debugLabel>Bughunter Helmet</debugLabel>
+          <nodeClass>RimoutPowerSuit.PawnRenderNode_SuitPiece</nodeClass>
+          <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
+          <parentTagDef>ApparelBody</parentTagDef>
+          <texPath>Things/Pawn/PowerSuit/Bughunter/Helmet</texPath>
+          <drawSize>(2.649,2.649)</drawSize>
+          <baseLayer>64</baseLayer>
+          <drawData>
+            <dataSouth><layer>64</layer></dataSouth>
+            <dataEast><layer>63</layer></dataEast>
+            <dataWest><layer>63</layer></dataWest>
+            <dataNorth><layer>61</layer></dataNorth>
+          </drawData>
+        </li>
+      </renderNodeProperties>
+    </apparel>
   </ThingDef>
 
 </Defs>

@@ -72,24 +72,32 @@ commit pushed to `main` is what the game loads next**.
 - Do not reuse VFE Pirates' `Apparel_Warcasket` / `WarcasketDef` types: their
   patches block unlocking, stripping and spawning them on the ground, which
   is the opposite of a suit you climb in and out of.
-- The suit design is ORIGINAL (a diving-helmet industrial suit: a round dive helmet
-  with a straight amber visor band, a chin grille and a miner's lamp, big round
-  shoulder plates, twin cells and a release wheel on the back). Never give an image generator another game's armour - Fallout's
-  power armour included - as a reference: copies are a copyright risk. Only "inspired
-  by" ideas (a walking suit, a release wheel) are fine.
-- Art must read at the size the game shows a pawn (~40-64px): a helmet about half
-  the sprite's width, a few large smooth plates, a very thick silhouette outline, one
-  accent colour, no small details (rivets, stencils, stripes, vents). Judge every
-  candidate with `python3 Source/Art/check_scale.py OUT.png candidate.png ...`, which
-  shows it processed and painted at in-game sizes, before choosing it.
-- Suit art is painted with Nano Banana Pro (`Source/Art/nano.py`, which reads the
-  key from `GEMINI_API_KEY` - never commit a key), in the format and style of VFE
-  Pirates' warcaskets: no arms, no legs, helmet + torso +
-  pauldrons + hip plates. The paintings live in `Source/Art/nano/`;
-  `python3 Source/Art/process_nano.py` turns them into the textures: cut-out, scaled
-  to the 256px body canvas, one texture per direction for every body type (VEF
-  `isUnifiedApparel`), plus CutoutComplex masks (`_southm`/`_eastm`/`_northm`, `_m`
-  for the standing suit) whose red marks the plates that take the suit's colour.
+- **Suits.** Lite mode has two suits: the **Bulwark** (`RPS_PowerSuitFrame` - the old defName,
+  kept so saves carry over), the heavy tank, and the **Bughunter** (`RPS_PowerSuitBughunter`),
+  hardened against sharp and heat damage. Both share the abstract `RPS_PowerSuitBase`.
+  The roadmap, the per-suit mechanics and the design notes are in `docs/DESIGN.md`
+  on the `art/modular` branch.
+- **Art is original.** Never give an image generator another game's armour as a reference,
+  Fallout's power armour and VFE Pirates' warcaskets included: copies are a copyright risk.
+  Only "inspired by" ideas, like a walking suit or a release wheel, are fine.
+- **The art source lives on the `art/modular` branch** (`Source/Art`, `docs/STYLE_GUIDE.md`):
+  - The painted parts and the suit kit (`suit_kit.py`) build every piece of every suit for
+    south, east and north.
+  - `python3 Source/Art/export_game.py <this repo> Bulwark=kit/out_bulwark_bare
+    Bughunter=kit/out_bughunter_bare` writes the game textures. It writes
+    `Textures/Things/Pawn/PowerSuit/<Suit>/<Piece>_<facing>` plus masks, and the standing suit
+    `Textures/Things/Item/PowerSuit/<Suit>`, and prints the drawSize the defs use.
+  - Don't edit these textures by hand; re-export them.
+- **The worn suit is drawn piece by piece.** Each suit lists render nodes in
+  `apparel.renderNodeProperties`, one per piece: Legs, Body, ArmL, ArmR, Helmet.
+  - Each node is a `PawnRenderNode_SuitPiece`, drawn by a `PawnRenderNodeWorker_SuitPiece`.
+  - Each has its own drawSize, since the suit is bigger than the pawn's mesh.
+  - Each has a layer per facing, since the pieces overlap differently from each side.
+  - This is so pieces can be damaged and drawn on their own, and arms can carry weapons.
+  - There is no `wornGraphicPath`.
+  - Masks are CutoutComplex: red marks the parts that take the suit's colour.
+- **Exosuit mode still uses the old single-texture suit art**
+  (`Things/Pawn/PowerSuit/PowerSuitFrame`). Don't delete those textures.
 - The suit is apparel locked onto its pilot; only the exit job unlocks it
   (`PowerSuitUtility.AllowUnlock`).
 
