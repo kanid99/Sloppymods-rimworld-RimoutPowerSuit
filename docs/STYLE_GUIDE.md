@@ -33,7 +33,9 @@ the same 256 canvas, so these positions are what line them up):
 | Shoulders | 0,54 - 255,157      | top 7 - 54, bottom to 195 |
 | Helmet    | 67,65 - 188,197     | top 57 - 65, bottom to 214 |
 
-The helmet sits low, over the middle of the body, not on top of it.
+The helmet sits low, over the middle of the body, not on top of it. The body's dark neck opening (the inside
+of the collar, seen from slightly above) must be wide and low enough that the helmet covers its lower part:
+only a dark crescent of the far rim shows above the helmet. No band of collar between hole and helmet.
 
 The assembled sprite is a compact, nearly square mass, wider than it is tall: helmet in front of the
 upper torso, pauldrons out to the canvas edges, hip plates at the bottom. Not a human torso shape.

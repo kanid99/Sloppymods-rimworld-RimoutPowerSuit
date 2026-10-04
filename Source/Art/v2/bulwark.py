@@ -5,8 +5,8 @@ def sym(left):            # left half points (x<128) -> full symmetric outline
 # ---------------- BODY
 B=Layer()
 B.plate(B.rrect(40,26,216,212,36),226,196)                                    # torso block
-B.plate(B.rrect(78,18,178,70,24),245,225)                                     # collar rim
-B.plate(B.ell(102,28,154,52),82,stroke=4)                                      # neck opening
+B.plate(B.rrect(72,18,184,92,30),245,225)                                     # collar rim
+B.plate(B.ell(84,30,172,96),82,stroke=4)                                      # neck opening
 B.plate(B.poly([(42,186),(94,192),(100,248),(54,242),(38,212)]),205,178,mirror=True)   # side hip plates
 B.plate(B.poly([(90,196),(166,196),(158,252),(98,252)]),242,208)              # centre hip plate
 B.plate(B.rrect(66,158,190,202,10),192,176)                                   # abdomen
