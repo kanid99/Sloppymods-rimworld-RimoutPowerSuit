@@ -54,31 +54,21 @@ def joint(side,w=22,h=18):
     d.line((x0+2*K,y0+1.5*K,x1-2*K,y0+1.5*K),fill=(190,192,200,255),width=int(K))   # top highlight
     img=img.resize((WC,S),Image.LANCZOS); return img,Image.new('RGBA',(WC,S))
 def chest_front():
-    "the chest armour shows inside the curl of each shoulder plate: wherever the plate's dark inner wall is"
+    """the chest armour shows through every part of each shoulder plate that is not its lit front:
+    the hook and the front block (with their own outline) stay in front, the rest of the plate is cut away"""
     ct,cm=ch; ca=np.array(ct.split()[3])>100
     T=np.array(ct); Mk=np.array(cm); band=np.zeros((S,WC),bool)
     for side in ('left','right'):
         pt=np.array(plate(side)[0]).astype(float); pa=pt[...,3]>100; L=pt[...,:3].mean(2)
-        xs=np.nonzero(pa.any(0))[0]; cx=(xs.min()+xs.max())/2
-        X=np.arange(WC)[None,:]*np.ones((S,1))
-        inner_half=(X>cx-4) if side=='left' else (X<cx+4)
-        wall=pa&(L>45)&(L<int(os.environ.get('WALL','120')))&inner_half
-        wall=ndimage.binary_opening(wall,iterations=1)
-        lab,n=ndimage.label(wall)
-        if n: sz=ndimage.sum(wall,lab,range(1,n+1)); wall=lab==(np.argmax(sz)+1)
-        band|=ndimage.binary_dilation(wall,iterations=2)&pa
-        # the plate's old inner-edge outline next to the wall: show the chest there too
-        dark=pa&(L<115)
-        for y in np.nonzero(wall.any(1))[0]:
-            wx=np.nonzero(wall[y])[0]
-            if side=='left': x0,x1=wx.max()+1,wx.max()+12
-            else: x0,x1=wx.min()-11,wx.min()
-            band[y,max(0,x0):x1]|=dark[y,max(0,x0):x1]
+        light=pa&(L>=int(os.environ.get('LIGHT','118')))
+        light=ndimage.binary_opening(light,iterations=1)
+        lab,n=ndimage.label(light); sz=ndimage.sum(light,lab,range(1,n+1))
+        light=np.isin(lab,np.nonzero(np.array(sz)>40)[0]+1)
+        front=ndimage.binary_dilation(ndimage.binary_fill_holes(light),iterations=2)   # lit faces + their outline
+        band|=pa&~front
     band&=ca
-    border=band&~ndimage.binary_erosion(band,iterations=1)&ndimage.binary_erosion(ca,iterations=2)
     out_t=np.zeros((S,WC,4),np.uint8); out_m=np.zeros((S,WC,4),np.uint8)
     out_t[band]=T[band]; out_m[band]=Mk[band]
-    out_t[border]=(18,18,22,255); out_m[border,0]=0
     return Image.fromarray(out_t,'RGBA'),Image.fromarray(out_m,'RGBA')
 def soften(pair,keep=4,depth=0.72,erode=0):
     "remove inner black lines: fill them from the surrounding paint, leave a soft crease"
