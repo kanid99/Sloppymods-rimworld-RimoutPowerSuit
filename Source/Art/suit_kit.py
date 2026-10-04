@@ -338,6 +338,40 @@ def build(spec, out):
         t = Image.fromarray(np.dstack([r2.astype(np.uint8), (pk * 255).astype(np.uint8)]), 'RGBA').crop(bx)
         mk = Image.fromarray((plate_mask(rgb) * pk * 255).astype(np.uint8), 'L').crop(bx)
         t, mk = t.transpose(Image.FLIP_TOP_BOTTOM), mk.transpose(Image.FLIP_TOP_BOTTOM)  # swung up past level: bottom edge on top
+        if spec['body'].get('lid_inside', True):
+            # the lid swings up toward us, so we see its INSIDE: drawn on the pack's own outline - lilac rim, recessed
+            # dark face, two harness straps with buckles and a waist strap (colours from the old swing door)
+            outside = np.array(t).astype(float)
+            colm = (pk & ndimage.binary_dilation(col & fg, iterations=2))[bx[1]:bx[3], bx[0]:bx[2]][::-1]
+            colm = colm & (ndimage.gaussian_filter(colm.astype(float), 9 * f_) > 0.5)
+            sil = colm; H_, W_ = sil.shape
+            rim_w = max(6, int(min(H_, W_) * 0.07))
+            face = ndimage.binary_erosion(sil, iterations=rim_w); lip = ndimage.binary_erosion(sil, iterations=3)
+            img = np.zeros((H_, W_, 4), np.uint8)
+            img[sil] = (14, 14, 18, 255); img[lip] = (165, 137, 160, 255)
+            yy = np.arange(H_)[:, None] * np.ones((1, W_))
+            shade = (0.85 + 0.25 * yy / H_)[..., None]                     # lit toward the hinge (bottom)
+            img[face, :3] = np.clip(np.array([92, 74, 96]) * shade, 0, 255)[face]
+            edge = face & ~ndimage.binary_erosion(face, iterations=3); img[edge, :3] = (14, 14, 18)
+            inner = ndimage.binary_erosion(face, iterations=3); top_sh = inner & (yy < np.nonzero(inner.any(1))[0].min() + 10)
+            img[top_sh, :3] = (66, 48, 69)                                   # the rim's shadow on the face
+            im_ = Image.fromarray(img, 'RGBA'); d_ = ImageDraw.Draw(im_)
+            fy, fx = np.nonzero(face); fx0, fx1, fy0, fy1 = fx.min(), fx.max(), fy.min(), fy.max(); fw, fh = fx1 - fx0, fy1 - fy0
+            sw = max(6, int(fw * 0.13))
+            for cxs in (fx0 + fw * 0.34, fx0 + fw * 0.66):              # shoulder straps
+                d_.rounded_rectangle((cxs - sw / 2, fy0 + fh * 0.08, cxs + sw / 2, fy1 - fh * 0.08), radius=sw // 3,
+                                     fill=(60, 52, 64, 255), outline=(14, 14, 18, 255), width=2)
+                by = fy0 + fh * 0.45; bw = sw * 1.15
+                d_.rectangle((cxs - bw / 2, by - bw / 2, cxs + bw / 2, by + bw / 2), fill=(150, 150, 160, 255), outline=(14, 14, 18, 255), width=2)
+                d_.rectangle((cxs - bw / 4, by - bw / 4, cxs + bw / 4, by + bw / 4), fill=(60, 52, 64, 255))
+            wy = fy0 + fh * 0.74                                             # waist strap
+            d_.rounded_rectangle((fx0 + fw * 0.16, wy - sw * 0.4, fx1 - fw * 0.16, wy + sw * 0.4), radius=sw // 3,
+                                 fill=(60, 52, 64, 255), outline=(14, 14, 18, 255), width=2)
+            d_.rectangle((fx0 + fw / 2 - sw * 0.55, wy - sw * 0.55, fx0 + fw / 2 + sw * 0.55, wy + sw * 0.55), fill=(150, 150, 160, 255), outline=(14, 14, 18, 255), width=2)
+            # hardware on the outside (thrusters, launcher, pylons) peeks past the lid's edges, in shadow
+            outside[..., :3] *= 0.55; outside[sil, 3] = 0
+            t = Image.fromarray(outside.astype(np.uint8), 'RGBA'); t.alpha_composite(im_)
+            mk = Image.fromarray(np.where(lip & ~face, 255, 0).astype(np.uint8), 'L')   # the rim takes the paint
         rb = src_bbox(ref); kk = (body_bb[3] - side_top) / (rb[3] - rb[1])
         pw_, ph_ = (bx[2] - bx[0]) * kk, (bx[3] - bx[1]) * kk * spec['body'].get('gull_squash', 0.5)
         t, mk = t.resize((max(1, round(pw_)), max(1, round(ph_))), Image.LANCZOS), mk.resize((max(1, round(pw_)), max(1, round(ph_))), Image.LANCZOS)

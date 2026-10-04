@@ -127,9 +127,12 @@ Shared with the Bulwark (symlinked): side and back body, legs, shoulder plates, 
     pylon sticks up.
   - `over_from` draws what a side-view repaint added near the top (the net launcher) over the helmet.
 - **The open back is a gullwing:**
-  - The pack swings up on a hinge at its top edge. It is drawn as the pack's own closed back art,
-    flipped, squashed to half height and shaded. Its hinge edge rests on the top of the opening, drawn over the collar
-    with two hinge knuckles, so it reads as attached.
+  - The pack swings up on a hinge at the top of the opening, toward the viewer, so we see its inside.
+    The inside is drawn in code on the plain pack's outline, flipped and squashed to half height: a lilac
+    rim (the paint), a recessed dark face, and harness straps with buckles. The colours are taken from the
+    old swing door.
+  - Hardware on the pack's outside (thrusters, launcher, pylons) peeks past the lid's edges in shadow.
+  - Two hinge knuckles sit where the lid meets the collar.
   - It sits over one doorless cavity painting, `views/chassis_north_cavity.png`, made in code from
     `chassis_north_open4` by mirroring its right half. So any pack opens without new art.
   - The pack is the plain pack's column (`pack_box`) plus whatever the repaint added over
