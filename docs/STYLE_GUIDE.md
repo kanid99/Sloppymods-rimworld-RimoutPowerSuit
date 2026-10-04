@@ -82,6 +82,7 @@ Bulwark sources: `Source/Art/kit/bulwark_src/`; output: `Source/Art/kit/out_bulw
   forward from the elbow (`weap_east`, swapped per loadout onto the painted shoulder), back = rear end at the
   cuff with the weapon running away and down (`weap_back2`). Each hangs from the shoulder plate's own ribbed
   cuff (no extra joint).
-- The tower shield is a hand shield, drawn the VEF way: a big shield in front of the body facing south, in
+- The tower shield is a hand shield, sized from the shoulder to the feet and 1.35x wider than its painting
+  (`shield_part`), drawn the VEF way: in front of the body facing south, in
   front of the chest side-on facing east/west, and behind the body facing north (only the edge past the body
   shows). Listed in the spec's `shields`.

@@ -128,6 +128,12 @@ class Layer:
         Image.fromarray(np.dstack([m, np.zeros_like(m), np.zeros_like(m), a]), 'RGBA').save(f'{out}/{name}m.png')
 
 
+def shield_part(path, top, bottom, widen=1.35):
+    """a tower shield sized to stand from `top` to `bottom` (canvas px), made wider than the painting"""
+    wt, wm = part(path); h = bottom - top; w = int(wt.width * h / wt.height * widen)
+    return wt.resize((w, h), Image.LANCZOS), wm.resize((w, h), Image.LANCZOS)
+
+
 def bbox(im):
     a = np.array(im)[..., 3] > 100; ys, xs = np.nonzero(a)
     return xs.min(), ys.min(), xs.max(), ys.max()
@@ -202,8 +208,8 @@ def build(spec, out):
         ab = bbox(A_.tex); wname = spec['weapon_l']
         ey = ab[1] + int((ab[3] - ab[1]) * 0.80)                   # the elbow, at the end of the ribbed hose
         if wname in spec.get('shields', ()):
-            wt, wm = part(spec['weapons_east'][wname])
-            A_.put((wt, wm), ab[2] + 10, top=ab[1] + 40, h=int(body_h * 0.92))
+            feet = bbox(pieces[('Legs', 'south')].tex)[3]
+            A_.put(shield_part(spec['weapons_east'][wname], ab[1] + 40, feet + 6, widen=1.6), ab[2] + 4, top=ab[1] + 40)
         else:
             wt, wm = part(spec['weapons_east'][wname]); wt, wm = wt.rotate(90, expand=True), wm.rotate(90, expand=True)
             ln = int(spec['weapon_h'][wname] * K * 1.05); h = max(1, round(wt.height * ln / wt.width))
@@ -294,14 +300,14 @@ def build(spec, out):
             wcx = pcx if facing == 'south' else C - pcx
             if wname in spec.get('shields', ()):
                 # a hand shield (VEF style): a big shield in front of the body facing south, behind it facing north
-                sh = int(body_h * 0.92)
-                inward = (cx - pcx) * 0.45
+                feet = bbox(pieces[('Legs', 'south')].tex)[3]
+                inward = (cx - pcx) * 0.55
                 if facing == 'south':
-                    wt, wm = part(spec['weapons_south'][wname])
-                    N.put((wt, wm), pcx + inward, top=y1 - 70, h=sh)
+                    pm2 = shield_part(spec['weapons_south'][wname], y0 + 40, feet + 6)
+                    N.put(pm2, pcx + inward, top=y0 + 40)
                 else:
-                    wt, wm = part(spec['weapons_back'][wname])
-                    N.put((wt, wm), C - pcx - inward * 0.2, top=y1 - 70, h=sh, flip=True, behind=True)
+                    pm2 = shield_part(spec['weapons_back'][wname], y0 + 40, feet + 6)
+                    N.put(pm2, C - pcx - inward * 0.15, top=y0 + 40, flip=True, behind=True)
             elif facing == 'north' and spec.get('weapons_back'):
                 wt, wm = part(spec['weapons_back'][wname])
                 kk = min(int(spec['weapon_h'][wname] * K * 0.85) / wt.height, cw * 1.9 / wt.width)
