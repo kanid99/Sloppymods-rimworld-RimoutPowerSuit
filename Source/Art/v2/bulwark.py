@@ -2,22 +2,27 @@ import sys; sys.path.insert(0,sys.argv[1]); SP=sys.argv[1]
 from rw_style import *
 def sym(left):            # left half points (x<128) -> full symmetric outline
     return left+[(256-x,y) for x,y in reversed(left)]
-# ---------------- BODY
+# ---------------- BODY: a rounded cuirass (breastplate, belly plates, belt, hanging hip plates)
 B=Layer()
-B.plate(B.rrect(40,26,216,212,36),226,196)                                    # torso block
-B.plate(B.rrect(72,18,184,92,30),245,225)                                     # collar rim
-B.plate(B.ell(84,30,172,96),82,stroke=4)                                      # neck opening
-B.plate(B.poly([(42,186),(94,192),(100,248),(54,242),(38,212)]),205,178,mirror=True)   # side hip plates
-B.plate(B.poly([(90,196),(166,196),(158,252),(98,252)]),242,208)              # centre hip plate
-B.plate(B.rrect(62,150,194,204,12),236,206)                                   # lower chest plate, the part seen below the helmet
-for y in (168,182): B.mark(B.rrect(76,y,100,y+5,2),mirror=True)               # two vent slots each side
-B.plate(B.poly([(46,62),(122,72),(122,150),(78,156),(42,128)]),255,226,mirror=True)   # chest slabs
-B.plate(B.poly([(118,66),(138,66),(136,150),(128,158),(120,150)]),212)        # centre ridge (ends under the helmet)
+cut=lambda m,y: m&(np.arange(N)[:,None]<y*K)
+cuir=cut(B.ell(34,18,222,250),214)
+B.plate(cuir,236,206)                                                          # cuirass (sides show as the flanks)
+B.plate(cuir&~B.ell(50,18,206,250),204,stroke=0)                               # rounded flank side faces
+B.plate(B.rrect(76,16,180,92,30),245,225)                                      # collar rim
+B.plate(B.ell(84,30,172,96),82,stroke=4)                                       # neck opening (under the helmet)
+B.plate(cut(B.ell(36,26,220,204),184),255,230)                                 # breastplate, full chest width, curved lower edge
+B.plate(B.poly([(118,60),(138,60),(136,168),(128,178),(120,168)]),222,stroke=3)  # breastplate keel
+B.plate(B.rrect(56,180,200,198,10),230,214)                                    # belly plate 1
+B.plate(B.rrect(66,196,190,212,9),220,204)                                     # belly plate 2
+B.plate(B.poly([(40,212),(94,216),(98,250),(58,246),(38,228)]),212,184,mirror=True)   # hip plates (tassets)
+B.plate(B.rrect(56,206,200,220,6),172)                                         # belt
+B.plate(B.poly([(100,220),(156,220),(150,254),(106,254)]),240,210)             # centre hip plate
+B.mark(B.rrect(120,209,136,217,2),110)                                         # belt buckle
 # ---------------- SHOULDERS: one stylised pauldron per side, no arm plates below
 S=Layer()
-SX,SY=0.82,-16                     # pauldron placement: narrower toward the helmet, raised
+SX,SY=0.76,-12                     # pauldron placement: narrower toward the helmet, raised
 _poly,_ell=S.poly,S.ell
-TILT=np.radians(14); PX,PY=96,110        # tilt: outer edge rises, pivoting near the inner corner
+TILT=np.radians(19); PX,PY=96,110        # tilt: outer edge rises, pivoting near the inner corner
 def _tf(x,y):
     x,y=x-PX,y-PY; x,y=x*np.cos(TILT)-y*np.sin(TILT),x*np.sin(TILT)+y*np.cos(TILT); x,y=x+PX,y+PY
     return 2+(x-2)*SX, y+SY
