@@ -110,8 +110,10 @@ KITSRC=.../kit_src EXPORT=1`. Where these come from:
   - `NEST=0` keeps the light frame in front of the chest.
   - The export also writes `south_plate{L,R}base`, the plain plate. The kit uses it to place the cuff,
     so hoses don't push the weapon down, and to draw the plate in the back view.
-  - In the side view, `east_plate_from_front` draws the suit's own plate instead of the painted heavy
-    one.
+  - In the side view, `east_plates` maps each weapon to the suit's own side-view pauldron painting
+    (`own/plate_east_fuel.png`, `own/plate_east_pneumatic.png`), drawn in the painted heavy arm's box.
+    Both are repaints of the Bulwark's painted side arm: an open frame with a solid top cap, then the
+    hardware swapped. Giving the generator a front-view plate as a reference only gets front views back.
 - **Jump pack:** `own/chassis_north_jump.png` (three cells, thrusters) and `own/full_east_noarm_jump.png`.
   `JUMP=0` builds the plain backpack.
 Shared with the Bulwark (symlinked): side and back body, legs, shoulder plates, all weapon views.

@@ -227,7 +227,12 @@ def build(spec, out):
         A_ = pieces[('ArmL', 'east')]
         ab = bbox(A_.tex); wname = spec['weapon_l']
         ey = ab[1] + int((ab[3] - ab[1]) * 0.80)                   # the elbow, at the end of the ribbed hose
-        if spec.get('east_plate_from_front'):
+        if wname in spec.get('east_plates', {}):
+            # this suit's own side-view plate painting (pauldron + elbow) replaces the painted heavy arm, same box
+            A_ = Layer(); pieces[('ArmL', 'east')] = A_
+            A_.put(part(spec['east_plates'][wname]), (ab[0] + ab[2]) / 2, top=ab[1], h=ab[3] - ab[1])
+            ab = bbox(A_.tex); ey = ab[1] + int((ab[3] - ab[1]) * 0.80)
+        elif spec.get('east_plate_from_front'):
             # this suit's own plate (light frame + weapon hardware) replaces the painted heavy one:
             # its outer face, i.e. the front-view plate, over a ribbed swivel; the weapon hangs at its cuff
             P_ = Layer(); P_.put_assembly(f'{src}/south_plateLfull.png', f'{src}/south_plateLfull_m.png')
@@ -464,7 +469,8 @@ def bughunter_spec(sp):
     if os.environ.get('JUMP', '1') == '1':          # the jump-pack backpack (three cells, thrusters)
         s['body'] = dict(s['body'], north=f'{sp}/own/chassis_north_jump.png')
         s['full_east'] = dict(s['full_east'], body_image=f'{sp}/own/full_east_noarm_jump.png')
-    s['east_plate_from_front'] = True                  # its light plates, not the Bulwark's painted side plate
+    # its light plates in the side view (pauldron + elbow paintings), not the Bulwark's painted heavy arm
+    s['east_plates'] = {'flamer': f'{sp}/own/plate_east_fuel.png', 'hammer': f'{sp}/own/plate_east_pneumatic.png'}
     return s
 
 
