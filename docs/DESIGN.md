@@ -56,7 +56,7 @@ Decisions agreed with the owner, to build from. Numbers are starting points for 
 - Role: heavy tank. Takes a lot of varied damage, best when standing still; deals heavy damage of several kinds.
 - Chassis: heavy bolted slab plates over the chest (no vents).
 - Helmet: brow plate, two slanted eye plates, centre ridge, breather snout; two lamps on top of the crown.
-- Arms: every arm keeps the shielded Bulwark shoulder plate; the weapon hangs beneath it.
+- Arms: every arm carries a short rounded arm shield over the shoulder (not the old tall hooked plate); the weapon hangs beneath it.
   South view: weapons hang straight down, muzzle to the ground (warcasket style), so nothing sticks out sideways.
   Options: minigun, rocket pod, chainsaw, laser, flamer, hammer. Weapon art is separate
   (`Source/Art/nano/modular/weapons/`), composited under the shared plate (`Source/Art/bulwark_hang.py`).
@@ -93,7 +93,7 @@ Decisions agreed with the owner, to build from. Numbers are starting points for 
 
 ### Art style: VFE / vanilla RimWorld (adopted)
 
-Matches VFE Pirates' warcaskets: light grey parts (the game tints them), soft form shading (rounded parts darken toward the rim, light from the upper left, plates cast soft shadows; `fill_vfe`), two or three tones with a soft
+Matches VFE Pirates' warcaskets: light grey parts (the game tints them), soft form shading (rounded parts darken toward the rim, light from the upper left, plates cast soft shadows; crisp chamfer side faces, lit toward the upper left and clearly darker facing away; `fill_vfe(..., bevel=)`), two or three tones with a soft
 top-down gradient, thin dark inner lines between big plates, a heavy black silhouette outline, and detail only
 suggested (a seam, a couple of bolts, a slot). Tools: `Source/Art/vdraw.py` `fill_flat`, the parts in
 `vfe_parts.py` / `vfe_helmet.py`, flat weapons in `vweap_vfe.py`, assembly in `vfe_build.py`; `vfe_style.py`
@@ -104,6 +104,6 @@ Scale: the suit with its helmet should be only slightly bigger than vanilla cata
 (about 1.3x our old 256px body canvas, so a larger canvas and render-node draw size in game).
 
 Weapons are original designs that take their cues from vanilla ones (autocannon turret: twin drums and a
-perforated jacket; minigun: barrel cluster and a yellow ammo box; Doomsday: ribbed housing and warhead; charge
+perforated jacket; minigun: barrel cluster and a yellow ammo box; rocket pod: a box pod with bands and a handle, two red-tipped rockets poking out of its base; charge
 lance: tan spacer body and blue core; incendiary launcher: orange tank; zeus hammer: emitters in the head).
 No vanilla pixels are used; the official art source is only a reference (owner's Dropbox, not in the repo).

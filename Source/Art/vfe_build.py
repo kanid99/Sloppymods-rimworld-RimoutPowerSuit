@@ -20,10 +20,10 @@ def fit_to(old_rgba,path,flip=False):
     im=im.resize((x1-x0+1,y1-y0+1),Image.LANCZOS)
     c=Image.new('RGBA',(WC,HT)); c.alpha_composite(im,(int(x0),int(y0))); return c
 CHF=fit_to(lay(ch),SP+'/mod2/chassis_bulwark_vfe.png')
-def plate_vfe(side,w=86):
+def plate_vfe(side,w=78):
     o=np.array(plate('left')[0])[...,3]>60; ys,xs=np.nonzero(o)
     im=Image.open(SP+'/mod2/plate_bulwark_vfe.png'); im=im.crop(im.getbbox()); im=im.resize((w,int(im.height*w/im.width)),Image.LANCZOS)
-    c=Image.new('RGBA',(WC,HT)); c.alpha_composite(im,(int(xs.max()+16-w),int(ys.min()-4)))
+    c=Image.new('RGBA',(WC,HT)); c.alpha_composite(im,(int(xs.max()+18-w),int(ys.min()+28)))
     return c if side=='left' else c.transpose(Image.FLIP_LEFT_RIGHT)
 PLF=Image.new('RGBA',(WC,HT)); PLF.alpha_composite(plate_vfe('left')); PLF.alpha_composite(plate_vfe('right'))
 def suit_vfe(a,b,top=136):

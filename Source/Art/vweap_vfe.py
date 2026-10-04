@@ -6,7 +6,7 @@ from scipy import ndimage
 import vdraw
 from vdraw import fill_cyl, fill_flat, fill_vfe
 import vdraw as _v
-def _flat_fill(self,mask,col,**k): fill_vfe(self,mask,col,24,form='round',k=dict(form=0.34,light=0.22,shadow=0.32,shadow_off=(26,36),shadow_blur=20))
+def _flat_fill(self,mask,col,**k): fill_vfe(self,mask,col,24,form='round',bevel=40,k=dict(form=0.34,light=0.22,shadow=0.32,shadow_off=(26,36),shadow_blur=20))
 _v.Canvas.fill=_flat_fill
 fill_cyl=lambda c,m,col,**k: fill_vfe(c,m,col,24,form='cyl',k=dict(form=0.42,light=0.12,shadow=0.32,shadow_off=(26,36),shadow_blur=20))
 _v.Canvas.glow=lambda self,*a,**k: None
@@ -54,12 +54,15 @@ def minigun():
 
 def rockets():
     c=vdraw.Canvas(N); mount(c)
-    c.fill(c.rrect((X-300,190,X+300,1060),50),STEEL,bevel=40)               # ribbed housing
-    for x in range(X-230,X+260,92): c.fill(c.rrect((x-18,250,x+18,1000),14),DK,bevel=8)
-    for sx in (-1,1): c.fill(c.poly([(X+sx*300,380),(X+sx*400,470),(X+sx*400,920),(X+sx*300,1000)]),DK,bevel=18)  # fins
-    c.fill(c.rrect((X-250,1000,X+250,1120),30),DK,bevel=18)                 # launch ring
-    c.fill(c.poly([(X-150,1080),(X+150,1080),(X+150,1260),(X+90,1400),(X,1460),(X-90,1400),(X-150,1260)]),RED,bevel=40,strength=0.7)  # warhead
-    c.fill(c.rrect((X-150,1110,X+150,1160),10),(150,40,30),bevel=6)
+    c.fill(c.rrect((X-260,190,X+260,1120),46),STEEL)                         # box pod
+    for y in (420,800): c.fill(c.rrect((X-275,y,X+275,y+70),18),DK)          # reinforcing bands
+    c.fill(c.rrect((X+250,300,X+330,700),30),DK)                             # carry handle
+    c.fill(c.rrect((X-210,500,X+210,560),14),(110,112,120))                  # one suggested seam
+    c.fill(c.rrect((X-240,1080,X+240,1200),26),DK)                           # slotted base
+    for bx in (X-125,X+125):                                                # two fat rockets with red warheads
+        c.fill(c.rrect((bx-95,1150,bx+95,1300),20),(176,178,186))
+        c.fill(c.ell((bx-95,1220,bx+95,1420)),RED)
+        c.fill(c.rrect((bx-95,1190,bx+95,1226),8),(120,122,130))
     save(c,'v_rockets')
 
 def laser():

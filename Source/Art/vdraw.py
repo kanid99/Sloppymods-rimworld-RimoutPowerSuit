@@ -110,3 +110,19 @@ def fill_vfe(c,mask,col,line=10,form='round',line_col=FLAT_LINE,shadow=True,k=No
     if line:
         ring=mask&~ndimage.binary_erosion(mask,iterations=line); c.rgb[ring]=line_col
     c.a|=mask
+
+# ---- chamfer faces: a crisp edge band, lit toward the upper left, clearly darker where it faces away
+def chamfer(c,mask,bevel,lit=1.10,side=0.60,mid=0.84,seam=3):
+    if bevel<=0: return
+    d=ndimage.distance_transform_edt(mask); band=mask&(d<bevel)
+    gy,gx=np.gradient(ndimage.gaussian_filter(d,bevel*0.35))
+    n=np.sqrt(gx*gx+gy*gy)+1e-6; dot=(0.6*gx+0.8*gy)/n        # outward normal . direction to the light
+    f=np.where(dot>0.25,lit,np.where(dot<-0.15,side,mid))
+    c.rgb[band]=np.clip(c.rgb[band]*f[band][:,None],0,255)
+    inner=mask&(d>=bevel)&(d<bevel+seam); c.rgb[inner]=c.rgb[inner]*0.72   # soft seam between face and top
+_fill_vfe_plain=fill_vfe
+def fill_vfe(c,mask,col,line=10,form='round',line_col=FLAT_LINE,shadow=True,k=None,bevel=0):
+    _fill_vfe_plain(c,mask,col,0,form,line_col,shadow,k)
+    chamfer(c,mask,bevel)
+    if line:
+        ring=mask&~ndimage.binary_erosion(mask,iterations=line); c.rgb[ring]=line_col
