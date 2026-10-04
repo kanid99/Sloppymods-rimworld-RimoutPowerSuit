@@ -41,8 +41,8 @@ S.plate(S.ell(46,84,82,118),246,212,stroke=3,mirror=True)                       
 H=Layer()
 H.plate(H.poly(sym([(128,66),(98,68),(76,84),(68,120),(72,160),(88,186),(110,196),(128,199)])),255,222,stroke=7)  # shell
 H.plate(H.poly([(71,112),(86,110),(93,168),(89,184),(75,160)]),200,stroke=3,mirror=True)                   # cheek planes
-H.plate(H.poly(sym([(128,148),(106,150),(94,170),(104,192),(128,197)])),186,170,stroke=3)                 # breather jaw (mid grey)
-for y in (162,174): H.mark(H.rrect(117,y,139,y+5,2))                                                        # breather slots
+H.plate(H.poly(sym([(128,152),(104,154),(100,186),(128,196)])),200,184,stroke=3)                            # simple chin plate
+H.mark(H.rrect(116,170,140,176,2))                                                                         # one slot
 H.plate(H.poly(sym([(128,104),(100,97),(77,104),(80,123),(104,123),(128,129)])),252,226,stroke=3)         # heavy brow
 H.plate(H.poly([(88,128),(121,137),(120,147),(91,141)]),80,stroke=3,mirror=True)                           # slanted eye slits
 H.plate(H.ell(84,62,108,86),214,stroke=3,mirror=True)                                                      # crown lamp housings, on the shell
