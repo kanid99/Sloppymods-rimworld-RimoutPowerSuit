@@ -120,3 +120,7 @@ replaces our rocket pod), the claw arm (breacher; Bughunter melee option), the l
   hazard/vacuum (fishbowl visor, chest filter canisters, gripper claw). Gemini washed them out; 
   `Source/Art/gemini_restyle.py` restores dark lines, a heavy outline and stronger tones.
   Note: Gemini drew full mechanical arms; for RimWorld only the tool ends are kept as arm parts.
+- Style target chosen by the owner (`gemini/noncombat_noattach.jpg`, "closer to RimWorld"): clean white
+  plates, soft grey side faces, thin near-black inner lines, heavy black outline. `vdraw.use_soft_preset()`
+  approximates it for our own drawing. Parts cut from it (`gemini/parts/`): Miner, Engineer and Hazard bodies,
+  drill, pick-hammer and gripper claw; `nc_miner_kit.png` is a first Miner assembled from them.

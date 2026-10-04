@@ -126,3 +126,19 @@ def fill_vfe(c,mask,col,line=10,form='round',line_col=FLAT_LINE,shadow=True,k=No
     chamfer(c,mask,bevel)
     if line:
         ring=mask&~ndimage.binary_erosion(mask,iterations=line); c.rgb[ring]=line_col
+
+# ---- "soft" preset, measured from the owner's target image: pale low-contrast fills, gentle side faces,
+#      near-black thin inner lines, thick black outer outline
+def use_soft_preset():
+    global FLAT_LINE
+    FLAT_LINE=(22,22,26); SHADE.update(form=0.10, light=0.07, shadow=0.14)
+    globals()['_CH']=dict(lit=1.03, side=0.74, mid=0.88, seam=0)
+_CH=dict(lit=1.10, side=0.60, mid=0.84, seam=3)
+_chamfer_orig=chamfer
+def chamfer(c,mask,bevel,**k):
+    p=dict(_CH); p.update(k); _chamfer_orig(c,mask,bevel,**p)
+def fill_vfe(c,mask,col,line=10,form='round',line_col=None,shadow=True,k=None,bevel=0):
+    _fill_vfe_plain(c,mask,col,0,form,FLAT_LINE,shadow,k)
+    chamfer(c,mask,bevel)
+    if line:
+        ring=mask&~ndimage.binary_erosion(mask,iterations=line); c.rgb[ring]=line_col or FLAT_LINE
