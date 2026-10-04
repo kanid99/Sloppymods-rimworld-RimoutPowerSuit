@@ -331,6 +331,7 @@ def build(spec, out):
         pk = fg & (col | ndimage.binary_dilation(added, iterations=3))
         lab, nl = ndimage.label(pk); sz = ndimage.sum(pk, lab, range(1, nl + 1))
         pk = np.isin(lab, np.nonzero(np.array(sz) > 400)[0] + 1)
+        pk = pk & (ndimage.gaussian_filter(pk.astype(float), 9 * f_) > 0.5)        # round off the cut corners
         ring = ndimage.binary_dilation(pk, iterations=2) & ~pk; r2 = rgb.copy(); r2[ring] = 12; pk = pk | ring
         ys_, xs_ = np.nonzero(pk); bx = (xs_.min(), ys_.min(), xs_.max() + 1, ys_.max() + 1)
         r2 = r2.astype(float) * 0.84; r2[~pk] = 0                                  # tilted away from the light
@@ -341,8 +342,18 @@ def build(spec, out):
         pw_, ph_ = (bx[2] - bx[0]) * kk, (bx[3] - bx[1]) * kk * spec['body'].get('gull_squash', 0.5)
         t, mk = t.resize((max(1, round(pw_)), max(1, round(ph_))), Image.LANCZOS), mk.resize((max(1, round(pw_)), max(1, round(ph_))), Image.LANCZOS)
         pcx = cx + ((bx[0] + bx[2]) - (rb[0] + rb[2])) / 2 * kk
-        PK = Layer(); PK.put((t, mk), pcx, bottom=cb[1] + int((cb[3] - cb[1]) * 0.08), h=t.height)
-        pieces[('Body', 'northopen')] = O; open_pack = PK          # joined at the end, under the helmet
+        # hinge = the top edge of the opening: the pack's hinge edge tucks behind the collar, so it rises out of the suit
+        hy = cb[1] + int((cb[3] - cb[1]) * spec['body'].get('hinge_at', 0.17))
+        PK = Layer(); pb_ = PK.put((t, mk), pcx, bottom=hy, h=t.height)
+        # two hinge knuckles where the pack meets the collar, either side of the head
+        d = ImageDraw.Draw(PK.tex); dm = ImageDraw.Draw(PK.mask); kw, kh = 26, 30
+        for hx in (pb_[0] + 22, pb_[2] - 22):
+            box = (hx - kw / 2, hy - kh / 2, hx + kw / 2, hy + kh / 2)
+            d.rounded_rectangle(box, radius=6, fill=(70, 70, 78, 255), outline=(14, 14, 18, 255), width=3)
+            for yy in (box[1] + kh / 3, box[1] + 2 * kh / 3): d.line((box[0] + 3, yy, box[2] - 3, yy), fill=(30, 30, 36, 255), width=2)
+            d.line((box[0] + 5, box[1] + 4, box[2] - 5, box[1] + 4), fill=(150, 150, 160, 255), width=2)
+            dm.rectangle(box, fill=0)
+        pieces[('Body', 'northopen')] = O; open_pack = PK          # joined at the end: behind the collar and the helmet
     nb = bbox(L.tex)
     L = Layer(); L.put(legs_stub(spec['legs']['north']), cx, top=nb[3] - int(body_h * 0.12), w=int(bw * 0.72)); pieces[('Legs', 'north')] = L
     eh = bbox(pieces[('Helmet', 'east')].tex)
@@ -463,12 +474,11 @@ def build(spec, out):
                 N.tex.alpha_composite(BP.tex); N.mask = Image.fromarray(np.maximum(np.array(N.mask), np.array(BP.mask)).astype(np.uint8))
                 pieces[(p_, 'north')] = N
     if ('Body', 'northopen') in pieces:
-        # the raised pack is beyond the head from behind: the helmet covers it; the collar covers its hinge
-        O = pieces[('Body', 'northopen')]; ha = np.array(pieces[('Helmet', 'north')].tex)[..., 3] > 100
-        pt = np.array(open_pack.tex); pt[ha, 3] = 0; pm = np.array(open_pack.mask); pm[ha] = 0
-        J = Layer(); J.tex = Image.fromarray(pt); J.mask = Image.fromarray(pm)
-        J.tex.alpha_composite(O.tex); oa = np.array(O.tex)[..., 3] > 100
-        J.mask = Image.fromarray(np.where(oa, np.array(O.mask), pm).astype(np.uint8)); pieces[('Body', 'northopen')] = J
+        # the raised pack is attached at the top of the opening: drawn over the collar (and the head behind it)
+        O = pieces[('Body', 'northopen')]; J = Layer(); J.tex = O.tex.copy(); J.mask = O.mask.copy()
+        pa = np.array(open_pack.tex)[..., 3] > 100
+        J.tex.alpha_composite(open_pack.tex)
+        J.mask = Image.fromarray(np.where(pa, np.array(open_pack.mask), np.array(O.mask)).astype(np.uint8)); pieces[('Body', 'northopen')] = J
     # ---------------- save: helmet stored HEAD px lower (the game lifts it to the head)
     for (p, f), L in pieces.items():
         if p == 'Helmet': L.shift(HEAD)
