@@ -198,7 +198,13 @@ def build(spec, out):
             L.tex.alpha_composite(t, (x, y)); L.mask.paste(mk, (x, y), t.split()[3])
             pieces[(q, 'east')] = L
         # the shoulder armour starts at the same height as in the front and back views
-        A_ = pieces[('ArmL', 'east')]; before = np.array(A_.tex)[..., 3] > 100
+        A_ = pieces[('ArmL', 'east')]
+        ab = bbox(A_.tex); wname = spec['weapon_l']
+        wt, wm = part(spec['weapons_east'][wname]); wt, wm = wt.rotate(90, expand=True), wm.rotate(90, expand=True)
+        ln = int(spec['weapon_h'][wname] * K * 1.05); h = max(1, round(wt.height * ln / wt.width))
+        ey = ab[1] + int((ab[3] - ab[1]) * 0.80)                   # the elbow, at the end of the ribbed hose
+        A_.put((wt, wm), ab[0] + (ab[2] - ab[0]) * 0.80 + ln / 2, top=ey - h // 2, w=ln)
+        before = np.array(A_.tex)[..., 3] > 100
         A_.shift(plL_bb[1] - bbox(A_.tex)[1]); after = np.array(A_.tex)[..., 3] > 100
         pieces[('ArmR', 'east')] = Layer()
     else:
@@ -281,9 +287,14 @@ def build(spec, out):
         pcx = (cuff_x.min() + cuff_x.max()) / 2; cw = cuff_x.max() - cuff_x.min()
         for facing in ('south', 'north'):
             N = Layer()
-            wt, wm = part(fwd[wname][facing]); kk = cw * 1.6 / wt.width
             wcx = pcx if facing == 'south' else C - pcx
-            N.put((wt, wm), wcx, top=y1 - 6, h=int(wt.height * kk), behind=True)
+            if facing == 'north' and spec.get('weapons_back'):
+                wt, wm = part(spec['weapons_back'][wname])
+                kk = min(int(spec['weapon_h'][wname] * K * 0.85) / wt.height, cw * 1.9 / wt.width)
+                N.put((wt, wm), wcx, top=y1 - 10, h=int(wt.height * kk), flip=True, behind=True)
+            else:
+                wt, wm = part(fwd[wname][facing]); kk = cw * 1.6 / wt.width
+                N.put((wt, wm), wcx, top=y1 - 6, h=int(wt.height * kk), behind=True)
             if facing == 'south':
                 pt = np.array(P.tex); pt[hole, 3] = 0; pm_ = np.array(P.mask); pm_[hole] = 0
                 N.tex.alpha_composite(Image.fromarray(pt)); N.mask = Image.fromarray(np.maximum(np.array(N.mask), np.where(pt[..., 3] > 100, pm_, 0)).astype(np.uint8))
@@ -335,10 +346,11 @@ def bulwark_spec(sp):
         weapons_south={w: f'{sp}/weap/{w}.png' for w in ws},
         weapons_east={w: f'{sp}/weap_east/{w}.png' for w in ws},
         weapons_north={w: f'{sp}/weap_north/{w}.png' for w in ws},
-        weapons_fwd={w: dict(south=f'{sp}/weap_fwd/{w}_south.png', north=f'{sp}/weap_fwd/{w}_north.png') for w in ('minigun', 'rockets')},
+        weapons_back={w: f'{sp}/weap_back2/{w}.png' for w in ws},
+        weapons_fwd={w: dict(south=f'{sp}/weap_fwd/{w}_south.png', north=f'{sp}/weap_fwd/{w}_north.png') for w in ws},
         full_east=dict(image=f'{sp}/views/full_east.png', body_image=f'{sp}/views/full_east_noarm.png', pieces={            # outlines in the 1024 painting
             'Helmet': [(372, 175), (378, 95), (450, 55), (650, 55), (705, 120), (705, 372), (640, 388), (590, 372), (560, 330), (540, 188)],
-            'ArmL': [(285, 330), (345, 185), (545, 182), (605, 318), (605, 488), (915, 488), (915, 685), (640, 685), (455, 640), (345, 605), (285, 480)],
+            'ArmL': [(285, 330), (345, 185), (545, 182), (605, 318), (605, 470), (545, 505), (505, 640), (455, 640), (345, 605), (285, 480)],
             'Legs': [(370, 772), (660, 772), (660, 1000), (370, 1000)]}),
         weapon_h={w: 120 for w in ws})
 
