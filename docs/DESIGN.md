@@ -91,10 +91,19 @@ Decisions agreed with the owner, to build from. Numbers are starting points for 
 - **Tower shield** - a non-weapon arm: a slab shield that adds armour from the front and doubles the
   siege shield's strength while standing still; pairs with any weapon on the other arm.
 
-### Vanilla art for kitbashing
+### Art style: VFE / vanilla RimWorld (adopted)
 
-Ludeon's official RimWorld art source (layered PSDs for the base game and every DLC) is the owner's
-"Game art source" Dropbox folder; it is not in the repo (1.3 GB). Read PSDs with `psd-tools` (+ `aggdraw` for
-vector layers), enlarge with `Source/Art/vanilla_kitbash.py` (premultiplied Lanczos, crisp alpha), rotate to
-the suit's facing. The Bulwark autocannon arm is the vanilla autocannon turret's gun (`TurretAutocannon_Top`),
-turned to point down; the earlier code-drawn one is kept as `autocannon_drawn_south.png`.
+Matches VFE Pirates' warcaskets: light grey parts (the game tints them), two or three flat tones with a soft
+top-down gradient, thin dark inner lines between big plates, a heavy black silhouette outline, and detail only
+suggested (a seam, a couple of bolts, a slot). Tools: `Source/Art/vdraw.py` `fill_flat`, the parts in
+`vfe_parts.py` / `vfe_helmet.py`, flat weapons in `vweap_vfe.py`, assembly in `vfe_build.py`; `vfe_style.py`
+is an automatic filter that converts painted art toward this style (good on big plates, not on faces).
+Parts: `Source/Art/nano/modular/vfe_style/`.
+
+Scale: the suit with its helmet should be only slightly bigger than vanilla cataphract armour with its helmet
+(about 1.3x our old 256px body canvas, so a larger canvas and render-node draw size in game).
+
+Weapons are original designs that take their cues from vanilla ones (autocannon turret: twin drums and a
+perforated jacket; minigun: barrel cluster and a yellow ammo box; Doomsday: ribbed housing and warhead; charge
+lance: tan spacer body and blue core; incendiary launcher: orange tank; zeus hammer: emitters in the head).
+No vanilla pixels are used; the official art source is only a reference (owner's Dropbox, not in the repo).
