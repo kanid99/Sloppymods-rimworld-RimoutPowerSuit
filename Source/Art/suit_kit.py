@@ -473,7 +473,7 @@ def build(spec, out):
             if wname in spec.get('shields', ()):
                 # a hand shield (VEF style): a big shield in front of the body facing south, behind it facing north
                 feet = bbox(pieces[('Legs', 'south')].tex)[3]
-                inward = (cx - pcx) * 0.55
+                inward = (cx - pcx) * float(os.environ.get('SHIELD_INWARD', '0.55'))   # a pair of shields: less, so they don't overlap
                 if facing == 'south':
                     pm2 = shield_part(spec['weapons_south'][wname], y0 + 40, feet + 6)
                     N.put(pm2, pcx + inward, top=y0 + 40)
@@ -615,6 +615,7 @@ SPECS = {'bulwark': bulwark_spec, 'bughunter': bughunter_spec}
 if __name__ == '__main__':
     sp, out = sys.argv[1], sys.argv[2]
     spec = SPECS[os.environ.get('SPEC', 'bulwark')](sp)
+    if os.environ.get('ASSEMBLY'): spec['assembly'] = os.environ['ASSEMBLY']   # e.g. a kit_src exported for other arms
     for k in ('weapon_l', 'weapon_r'):
         if os.environ.get(k.upper()): spec[k] = os.environ[k.upper()]
     build(spec, out)

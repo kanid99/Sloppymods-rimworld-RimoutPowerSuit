@@ -57,31 +57,44 @@ def load(out, piece, facing):
 
 
 def main():
+    """args: Suit=dir (every piece, bare arms) or Suit/L/weapon=dir, Suit/R/weapon=dir (one arm with a weapon)"""
     root = sys.argv[1]
-    suits = dict(a.split('=', 1) for a in sys.argv[2:])
-    layers = {s: {(p, f): load(o, p, f) for p in PIECES for f in FACINGS} for s, o in suits.items()}
+    layers = {}                                   # (suit, texture name, facing) -> (tex, mask)
+    for arg in sys.argv[2:]:
+        key, out = arg.split('=', 1)
+        parts = key.split('/')
+        if len(parts) == 1:
+            for p in PIECES:
+                for f in FACINGS:
+                    layers[(parts[0], p, f)] = load(out, p, f)
+        else:
+            suit, side, weapon = parts
+            for f in FACINGS:
+                layers[(suit, f'Arm{side}_{weapon}', f)] = load(out, f'Arm{side}', f)
     # one square crop, centred on the canvas centre, holding every piece of every suit
     half = 0
     c = kit.C / 2
-    for d in layers.values():
-        for t, _ in d.values():
-            bb = t.getbbox()
-            if bb:
-                half = max(half, c - bb[0], bb[2] - c, c - bb[1], bb[3] - c)
+    for t, _ in layers.values():
+        bb = t.getbbox()
+        if bb:
+            half = max(half, c - bb[0], bb[2] - c, c - bb[1], bb[3] - c)
     half = int(np.ceil(half / 8) * 8)
     box = (int(c - half), int(c - half), int(c + half), int(c + half))
     side = round(2 * half * SCALE)
     draw = kit.DRAW_SIZE * 2 * half / kit.C
-    for s, d in layers.items():
+    for (s, name, f), (t, m) in layers.items():
         pawn_dir = f'{root}/Textures/Things/Pawn/PowerSuit/{s}'
         os.makedirs(pawn_dir, exist_ok=True)
-        for (p, f), (t, m) in d.items():
-            t.crop(box).resize((side, side), Image.LANCZOS).save(f'{pawn_dir}/{p}_{f}.png')
-            m.crop(box).resize((side, side), Image.LANCZOS).save(f'{pawn_dir}/{p}_{f}m.png')
-        # the standing suit: the south pieces stacked in draw order
+        t.crop(box).resize((side, side), Image.LANCZOS).save(f'{pawn_dir}/{name}_{f}.png')
+        m.crop(box).resize((side, side), Image.LANCZOS).save(f'{pawn_dir}/{name}_{f}m.png')
+    suits = sorted({s for s, _, _ in layers})
+    for s in suits:
+        if (s, 'Body', 'south') not in layers:
+            continue
+        # the standing suit's icon: the south pieces stacked in draw order (the game draws the pieces itself)
         tex = Image.new('RGBA', (kit.C, kit.C)); msk = Image.new('RGBA', (kit.C, kit.C))
         for p in kit.ORDER['south']:
-            t, m = d[(p, 'south')]
+            t, m = layers[(s, p, 'south')]
             tex.alpha_composite(t)
             a = np.array(t)[..., 3:4] / 255.0
             mm = np.array(msk).astype(float); mm[..., :3] = mm[..., :3] * (1 - a) + np.array(m)[..., :3] * a
@@ -90,6 +103,15 @@ def main():
         os.makedirs(item_dir, exist_ok=True)
         tex.crop(box).resize((side, side), Image.LANCZOS).save(f'{item_dir}/{s}.png')
         msk.crop(box).resize((side, side), Image.LANCZOS).save(f'{item_dir}/{s}_m.png')
+    # arm module items: the left arm facing south, cropped to itself
+    for (s, name, f), (t, m) in layers.items():
+        if f != 'south' or not name.startswith('ArmL_'):
+            continue
+        bb = t.getbbox(); w, h = bb[2] - bb[0], bb[3] - bb[1]; n = max(w, h) + 16
+        icon = Image.new('RGBA', (n, n)); icon.alpha_composite(t.crop(bb), ((n - w) // 2, (n - h) // 2))
+        arm_dir = f'{root}/Textures/Things/Item/PowerSuit/Arms'
+        os.makedirs(arm_dir, exist_ok=True)
+        icon.resize((128, 128), Image.LANCZOS).save(f'{arm_dir}/{s}_{name[5:]}.png')
     print(f'texture {side}px, drawSize ({draw:.3f},{draw:.3f})')
 
 
