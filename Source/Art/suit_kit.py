@@ -521,6 +521,20 @@ def build(spec, out):
                     nm = np.array(N.mask); nm[hide] = 0; N.tex = Image.fromarray(na); N.mask = Image.fromarray(nm)
                 N.tex.alpha_composite(BP.tex); N.mask = Image.fromarray(np.maximum(np.array(N.mask), np.array(BP.mask)).astype(np.uint8))
                 pieces[(p_, 'north')] = N
+    if spec['body'].get('north_over_from'):
+        # pack hardware sticking up (the net launcher) would hide under the shoulder plate facing north: what the
+        # back painting adds over its base, in the top rows, is copied onto the topmost arm layer
+        B = Layer(); put_like(B, spec['body']['north_over_from'], nref, cx, side_top, body_bb[3] - side_top)
+        bt_ = np.array(pieces[('Body', 'north')].tex).astype(float); bb_ = np.array(B.tex).astype(float)
+        add = (np.abs(bt_[..., :3] - bb_[..., :3]).max(2) > 40) & (bt_[..., 3] > 100)
+        add[int(nb[1] + (nb[3] - nb[1]) * 0.30):] = False
+        add = ndimage.binary_opening(add, iterations=2)
+        add = ndimage.binary_dilation(ndimage.binary_fill_holes(ndimage.binary_closing(add, iterations=6)), iterations=3) & (bt_[..., 3] > 100)
+        top = ORDER['north'][-1]; T = pieces[(top, 'north')]
+        ov = np.array(pieces[('Body', 'north')].tex); ov[~add] = 0
+        om = np.array(pieces[('Body', 'north')].mask); om[~add] = 0
+        T.tex.alpha_composite(Image.fromarray(ov))
+        T.mask = Image.fromarray(np.where(add, om, np.array(T.mask)).astype(np.uint8))
     if ('Body', 'northopen') in pieces:
         # the raised pack is attached at the top of the opening: drawn over the collar (and the head behind it)
         O = pieces[('Body', 'northopen')]; J = Layer(); J.tex = O.tex.copy(); J.mask = O.mask.copy()
@@ -602,8 +616,13 @@ def bughunter_spec(sp):
     s['weapon_l'], s['weapon_r'] = 'flamer', 'hammer'
     s['colors'] = [(0.66, 0.56, 0.40), (0.56, 0.58, 0.60)]
     if os.environ.get('JUMP', '1') == '1':          # the jump-pack backpack (three cells, thrusters) with the net launcher on top
-        s['body'] = dict(s['body'], north=f'{sp}/own/chassis_north_jumpnet.png', north_ref=f'{sp}/views/chassis_north_tall.png')
+        s['body'] = dict(s['body'], north=f'{sp}/own/chassis_north_jumpnet.png', north_ref=f'{sp}/views/chassis_north_tall.png',
+                         north_over_from=f'{sp}/own/chassis_north_jump.png')
         s['full_east'] = dict(s['full_east'], body_image=f'{sp}/own/full_east_noarm_jumpnet.png', over_from=f'{sp}/own/full_east_noarm_jump.png', body_ref=f'{sp}/views/full_east_noarm.png')
+    else:                                            # the plain pack, with the net launcher (a chassis ability) on top
+        s['body'] = dict(s['body'], north=f'{sp}/own/chassis_north_net.png', north_ref=f'{sp}/views/chassis_north_tall.png',
+                         north_over_from=f'{sp}/views/chassis_north_tall.png')
+        s['full_east'] = dict(s['full_east'], body_image=f'{sp}/own/full_east_noarm_net.png', over_from=f'{sp}/views/full_east_noarm.png', body_ref=f'{sp}/views/full_east_noarm.png')
     # its light plates in the side view (pauldron + elbow paintings), not the Bulwark's painted heavy arm
     s['east_plates'] = {'flamer': f'{sp}/own/plate_east_fuel.png', 'hammer': f'{sp}/own/plate_east_pneumatic.png',
                         'none': f'{sp}/own/plate_east_fuel.png'}   # the near arm is the left (fuel) one

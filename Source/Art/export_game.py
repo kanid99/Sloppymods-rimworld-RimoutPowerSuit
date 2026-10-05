@@ -57,7 +57,8 @@ def load(out, piece, facing):
 
 
 def main():
-    """args: Suit=dir (every piece, bare arms) or Suit/L/weapon=dir, Suit/R/weapon=dir (one arm with a weapon)"""
+    """args: Suit=dir (every piece, bare arms), Suit/L/weapon=dir, Suit/R/weapon=dir (one arm with a weapon)
+    or Suit/Body/pack=dir (the body with a backpack fitted)"""
     root = sys.argv[1]
     layers = {}                                   # (suit, texture name, facing) -> (tex, mask)
     for arg in sys.argv[2:]:
@@ -67,6 +68,9 @@ def main():
             for p in PIECES:
                 for f in FACINGS:
                     layers[(parts[0], p, f)] = load(out, p, f)
+        elif parts[1] == 'Body':                  # Suit/Body/key: the body with another backpack
+            for f in FACINGS:
+                layers[(parts[0], f'Body_{parts[2]}', f)] = load(out, 'Body', f)
         else:
             suit, side, weapon = parts
             for f in FACINGS:
@@ -112,6 +116,15 @@ def main():
         arm_dir = f'{root}/Textures/Things/Item/PowerSuit/Arms'
         os.makedirs(arm_dir, exist_ok=True)
         icon.resize((128, 128), Image.LANCZOS).save(f'{arm_dir}/{s}_{name[5:]}.png')
+    # backpack items: the body with that pack, from behind, cropped to itself
+    for (s, name, f), (t, m) in layers.items():
+        if f != 'north' or not name.startswith('Body_'):
+            continue
+        bb = t.getbbox(); w, h = bb[2] - bb[0], bb[3] - bb[1]; n = max(w, h) + 16
+        icon = Image.new('RGBA', (n, n)); icon.alpha_composite(t.crop(bb), ((n - w) // 2, (n - h) // 2))
+        pack_dir = f'{root}/Textures/Things/Item/PowerSuit/Packs'
+        os.makedirs(pack_dir, exist_ok=True)
+        icon.resize((128, 128), Image.LANCZOS).save(f'{pack_dir}/{s}_{name[5:]}.png')
     print(f'texture {side}px, drawSize ({draw:.3f},{draw:.3f})')
 
 
