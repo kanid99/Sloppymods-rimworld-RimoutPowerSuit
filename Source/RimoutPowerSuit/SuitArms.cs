@@ -7,12 +7,35 @@ namespace RimoutPowerSuit
     public enum ArmSlot
     {
         Left,
-        Right
+        Right,
+        // the backpack (a module whose ArmModuleExtension has back = true)
+        Back
     }
 
-    // On an arm module item: what fitting it to a suit does.
+    // On a suit def: its power and its built-in abilities.
+    public class PowerSuitExtension : DefModExtension
+    {
+        // Power cells in the plain backpack; capacity = cells (charge is counted in cells).
+        public int cells = 1;
+        // Cells drained per day while a pilot is inside.
+        public float drainPerDay = 0.5f;
+        // Abilities the pilot gets from the suit itself (e.g. the Bughunter's net launcher).
+        public List<AbilityDef> abilities;
+        // Nets the net launcher holds (0 = no net launcher).
+        public int nets;
+    }
+
+    // On an arm module or backpack item: what fitting it to a suit does.
     public class ArmModuleExtension : DefModExtension
     {
+        // A backpack (fits the Back slot) rather than an arm.
+        public bool back;
+        // A backpack's power cells, replacing the suit's own.
+        public int cells;
+        // A backpack with a shield generator (Apparel_PowerSuit: the standing-still shield).
+        public bool shield;
+        // Abilities the pilot gets while it is fitted (e.g. the jump pack's jump).
+        public List<AbilityDef> abilities;
         // The suits it fits. Every suit has its own arms (their shoulder plates are the suit's own).
         public List<ThingDef> suits;
         // The arm's textures: <suit piece texPath>_<texKey>, e.g. Things/Pawn/PowerSuit/Bulwark/ArmL_minigun.
@@ -46,6 +69,30 @@ namespace RimoutPowerSuit
             return ext?.suits != null && ext.suits.Contains(suit);
         }
 
+        public static bool FitsSlot(ThingDef arm, ArmSlot slot)
+        {
+            var ext = Arm(arm);
+            return ext != null && ext.back == (slot == ArmSlot.Back);
+        }
+
+        public static PowerSuitExtension Suit(ThingDef suit) => suit?.GetModExtension<PowerSuitExtension>();
+
+        // Every ability the pilot gets from the suit and what is fitted to it.
+        public static IEnumerable<AbilityDef> Abilities(Apparel_PowerSuit suit)
+        {
+            var own = Suit(suit.def)?.abilities;
+            if (own != null)
+                foreach (AbilityDef a in own)
+                    yield return a;
+            foreach (ThingDef def in suit.FittedArms())
+            {
+                var list = Arm(def)?.abilities;
+                if (list != null)
+                    foreach (AbilityDef a in list)
+                        yield return a;
+            }
+        }
+
         // Gives the pilot what the fitted arms do: their melee attacks and stat changes, and the
         // arm gun as their weapon (their own weapon is stowed in their inventory meanwhile).
         public static void Apply(Apparel_PowerSuit suit, Pawn pilot)
@@ -56,6 +103,9 @@ namespace RimoutPowerSuit
                 if (ext?.hediff != null)
                     pilot.health.AddHediff(ext.hediff);
             }
+            if (pilot.abilities != null)
+                foreach (AbilityDef a in Abilities(suit))
+                    pilot.abilities.GainAbility(a);
             EquipArmGun(suit, pilot);
         }
 
@@ -71,6 +121,12 @@ namespace RimoutPowerSuit
                 while ((h = pilot.health.hediffSet.GetFirstHediffOfDef(ext.hediff)) != null)
                     pilot.health.RemoveHediff(h);
             }
+            if (pilot.abilities != null)
+                foreach (AbilityDef a in Abilities(suit))
+                    pilot.abilities.RemoveAbility(a);
+            Hediff unpowered = pilot.health.hediffSet.GetFirstHediffOfDef(RPS_DefOf.RPS_SuitUnpowered);
+            if (unpowered != null)
+                pilot.health.RemoveHediff(unpowered);
             DestroyArmGun(pilot);
             suit.RestoreStowedWeapon(pilot);
         }

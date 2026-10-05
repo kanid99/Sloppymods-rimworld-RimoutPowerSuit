@@ -11,4 +11,8 @@
   <Operation Class="PatchOperationRemove">
     <xpath>Defs/ThingDef[@Name="RPS_SuitArmBase"]/recipeMaker</xpath>
   </Operation>
+  <!-- The charging rack charges only the lightweight suits. -->
+  <Operation Class="PatchOperationRemove">
+    <xpath>Defs/ThingDef[defName="RPS_SuitChargingRack"]/designationCategory</xpath>
+  </Operation>
 </Patch>

@@ -3,22 +3,22 @@
   <name>SloppyMods Rimout Power Suit</name>
   <author>SloppyMod</author>
   <packageId>sloppymod.rimoutpowersuit</packageId>
-  <modVersion>0.9.10</modVersion>
+  <modVersion>0.9.11</modVersion>
   <!-- 1.6 only: the assembly is built against 1.6 signatures. -->
   <supportedVersions>
     <li>1.6</li>
   </supportedVersions>
-  <description>Build 0.9.10
+  <description>Build 0.9.11
 
 Walking tanks for your colonists. A power suit is a hulking armoured frame that stands on its own until a colonist climbs inside to work and fight in it, and climbs back out when the job is done.
 
-Two suits so far: the Bulwark, a heavy tank, and the Bughunter, built for clearing insect hives - hard to cut, bite or burn. Fit weapon arms to a standing suit - miniguns, rocket pods, lasers, flamers, hammers, a tower shield and more - each suit with arms of its own.
+Two suits so far: the Bulwark, a heavy tank, and the Bughunter, built for clearing insect hives - hard to cut, bite or burn. Fit weapon arms to a standing suit - miniguns, rocket pods, lasers, flamers, hammers, a tower shield and more - each suit with arms of its own. Suits run on power cells, recharged at a charging rack, and take a backpack of their own: the Bulwark's shield generator raises a shield when it stands its ground, the Bughunter's jump pack leaps it clear of a swarm, and the Bughunter nets insects in place.
 
 A pilot in a power suit can wield the heavy warcasket weapons from Vanilla Factions Expanded - Pirates. Unlike a warcasket, nobody is welded in for life.
 
 Works on its own, or - if Exosuit Framework is installed - as an Exosuit Framework suit, with its modules, maintenance bays and repairs, while still standing wherever you leave it.
 
-Early build: the suits, their weapon arms, climbing in and out, and warcasket weapon support. Suit backpacks (shield generator, jump pack), power cells, suit pieces that break off one at a time and more suits are on the way.
+Early build: the suits, their weapon arms and backpacks, power cells, climbing in and out, and warcasket weapon support. Suit pieces that break off one at a time and more suits are on the way.
 
 Requires Vanilla Factions Expanded - Pirates.</description>
   <modDependencies>

@@ -2,18 +2,25 @@ using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
 using Verse;
+using UnityEngine;
 using Verse.AI;
 
 namespace RimoutPowerSuit
 {
-    // Right-click a standing suit: "Fit <arm> (left arm)" for the nearest arm module of each kind
-    // on the map that fits this suit, and "Take off <arm> (left arm)" for fitted arms.
+    // Right-click a standing suit: "Fit <arm> (left arm)" for the nearest arm module or backpack of
+    // each kind on the map that fits this suit, "Take off <arm> (left arm)" for fitted ones, and
+    // "Load nets" for a suit with a net launcher.
     public class FloatMenuOptionProvider_SuitArms : FloatMenuOptionProvider
     {
         protected override bool Drafted => true;
         protected override bool Undrafted => true;
         protected override bool Multiselect => false;
         protected override bool RequiresManipulation => true;
+
+        private static readonly ArmSlot[] Slots = { ArmSlot.Left, ArmSlot.Right, ArmSlot.Back };
+
+        private static string SlotLabel(ArmSlot slot) =>
+            (slot == ArmSlot.Left ? "RPS.LeftArm" : slot == ArmSlot.Right ? "RPS.RightArm" : "RPS.BackSlot").Translate();
 
         public override IEnumerable<FloatMenuOption> GetOptionsFor(Thing clickedThing, FloatMenuContext context)
         {
@@ -23,9 +30,9 @@ namespace RimoutPowerSuit
             if (!pawn.CanReach(suit, PathEndMode.Touch, Danger.Deadly))
                 yield break;
 
-            foreach (ArmSlot slot in new[] { ArmSlot.Left, ArmSlot.Right })
+            foreach (ArmSlot slot in Slots)
             {
-                string slotLabel = (slot == ArmSlot.Left ? "RPS.LeftArm" : "RPS.RightArm").Translate();
+                string slotLabel = SlotLabel(slot);
                 ThingDef fitted = suit.ArmIn(slot);
                 if (fitted != null)
                 {
@@ -38,6 +45,29 @@ namespace RimoutPowerSuit
                 }
             }
 
+            // the net launcher: 20 textiles per net
+            if (suit.MaxNets > 0 && suit.Nets < suit.MaxNets)
+            {
+                int want = (suit.MaxNets - suit.Nets) * JobDriver_ReloadSuitNets.PerNet;
+                Thing cloth = GenClosest.ClosestThingReachable(suit.Position, suit.Map, ThingRequest.ForGroup(ThingRequestGroup.HaulableEver),
+                    PathEndMode.ClosestTouch, TraverseParms.For(pawn), 9999f,
+                    t => t.def.IsStuff && t.def.stuffProps.categories != null && t.def.stuffProps.categories.Contains(StuffCategoryDefOf.Fabric)
+                         && t.stackCount >= JobDriver_ReloadSuitNets.PerNet && !t.IsForbidden(pawn) && pawn.CanReserve(t));
+                string label = "RPS.LoadNets".Translate(suit.Nets, suit.MaxNets);
+                if (cloth == null)
+                    yield return new FloatMenuOption(label + ": " + "RPS.NoTextiles".Translate(JobDriver_ReloadSuitNets.PerNet), null);
+                else
+                {
+                    int count = Mathf.Min(cloth.stackCount, want) / JobDriver_ReloadSuitNets.PerNet * JobDriver_ReloadSuitNets.PerNet;
+                    yield return FloatMenuUtility.DecoratePrioritizedTask(new FloatMenuOption(label, () =>
+                    {
+                        Job job = JobMaker.MakeJob(RPS_DefOf.RPS_ReloadSuitNets, suit, cloth);
+                        job.count = count;
+                        pawn.jobs.TryTakeOrderedJob(job, JobTag.Misc);
+                    }), pawn, suit);
+                }
+            }
+
             // the nearest usable arm module of each kind that fits this suit
             var arms = suit.Map.listerThings.ThingsInGroup(ThingRequestGroup.HaulableEver)
                 .Where(t => SuitArmUtility.Fits(t.def, suit.def) && !t.IsForbidden(pawn)
@@ -46,11 +76,11 @@ namespace RimoutPowerSuit
                 .Select(g => g.OrderBy(t => t.Position.DistanceToSquared(suit.Position)).First());
             foreach (Thing arm in arms)
             {
-                foreach (ArmSlot slot in new[] { ArmSlot.Left, ArmSlot.Right })
+                foreach (ArmSlot slot in Slots)
                 {
                     if (suit.ArmIn(slot) == arm.def)
                         continue;
-                    string slotLabel = (slot == ArmSlot.Left ? "RPS.LeftArm" : "RPS.RightArm").Translate();
+                    string slotLabel = SlotLabel(slot);
                     ArmSlot s = slot;
                     Thing a = arm;
                     yield return FloatMenuUtility.DecoratePrioritizedTask(new FloatMenuOption(

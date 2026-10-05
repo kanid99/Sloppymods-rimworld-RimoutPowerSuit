@@ -23,6 +23,8 @@ namespace RimoutPowerSuit
         public static JobDef RPS_ExitPowerSuit;
         public static JobDef RPS_FitSuitArm;
         public static JobDef RPS_RemoveSuitArm;
+        public static JobDef RPS_ReloadSuitNets;
+        public static HediffDef RPS_SuitUnpowered;
 
         static RPS_DefOf()
         {

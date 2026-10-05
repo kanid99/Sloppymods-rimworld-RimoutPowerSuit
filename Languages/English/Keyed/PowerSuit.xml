@@ -17,6 +17,20 @@
   <RPS.SwitchArm>Use {0}</RPS.SwitchArm>
   <RPS.SwitchArmDesc>Switch which of the suit's two gun arms is firing.</RPS.SwitchArmDesc>
   <RPS.ArmGunFitted>the suit's gun arm is the pilot's weapon</RPS.ArmGunFitted>
+  <RPS.BackSlot>backpack</RPS.BackSlot>
+  <RPS.BackpackInspect>Backpack: {0}</RPS.BackpackInspect>
+  <!-- Power, shield, nets -->
+  <RPS.PowerInspect>Power: {0} ({1} cells)</RPS.PowerInspect>
+  <RPS.PowerGizmo>Suit power ({0} cells)</RPS.PowerGizmo>
+  <RPS.PowerGizmoDesc>The suit's power cells drain while it is piloted, and faster with the shield up or after a jump. When they run dry the servos stop and the pilot can barely move. Leave the suit standing next to a powered suit charging rack to recharge it.</RPS.PowerGizmoDesc>
+  <RPS.NotEnoughPower>Needs {0} cells of power</RPS.NotEnoughPower>
+  <RPS.ShieldToggle>Siege shield</RPS.ShieldToggle>
+  <RPS.ShieldToggleDesc>When on, the shield generator raises a shield bubble whenever the suit stands still for a moment. It absorbs every kind of damage and draws on the cells while it is up. Turn it off to save power.</RPS.ShieldToggleDesc>
+  <RPS.NetsInspect>Nets: {0} / {1}</RPS.NetsInspect>
+  <RPS.NoNets>No nets loaded</RPS.NoNets>
+  <RPS.LoadNets>Load nets ({0} / {1})</RPS.LoadNets>
+  <RPS.NoTextiles>needs a stack of at least {0} textiles</RPS.NoTextiles>
+  <RPS.ChargerInspect>Charging {0} suits</RPS.ChargerInspect>
   <!-- Exosuit Framework mode -->
   <RPS.ClimbOutHere>Climb out here</RPS.ClimbOutHere>
   <RPS.ClimbOutHereDesc>Climb out and leave the suit standing here, ready for anyone to climb back in. No maintenance bay needed.</RPS.ClimbOutHereDesc>

@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!-- ===================================================== backpacks
+       Fitted to a standing suit's back like an arm (right-click it). Each fits one suit and
+       holds three power cells. The suit draws its body with the pack (Body_<texKey>). -->
+
+  <ThingDef ParentName="RPS_SuitArmBase">
+    <defName>RPS_Pack_Bulwark_Shield</defName>
+    <label>Bulwark shield generator pack</label>
+    <description>A tall backpack holding three power cells and a shield generator. When the Bulwark stands still for a moment, the generator raises a shield bubble around it that soaks up every kind of damage - bullets, blades, blows, fire, explosions - while the pilot keeps firing out of it. Taking a step drops it. The shield draws on the cells while it is up and for every hit it takes; with the cells empty it stays down.\n\nFits only a Bulwark: right-click a standing Bulwark with a colonist selected to fit it.</description>
+    <graphicData>
+      <texPath>Things/Item/PowerSuit/Packs/Bulwark_shieldpack</texPath>
+    </graphicData>
+    <statBases>
+      <Mass>25</Mass>
+      <WorkToMake>20000</WorkToMake>
+    </statBases>
+    <costList>
+      <Steel>80</Steel>
+      <Plasteel>40</Plasteel>
+      <ComponentIndustrial>4</ComponentIndustrial>
+      <ComponentSpacer>2</ComponentSpacer>
+    </costList>
+    <modExtensions>
+      <li Class="RimoutPowerSuit.ArmModuleExtension">
+        <suits>
+          <li>RPS_PowerSuitFrame</li>
+        </suits>
+        <back>true</back>
+        <texKey>shieldpack</texKey>
+        <cells>3</cells>
+        <shield>true</shield>
+      </li>
+    </modExtensions>
+  </ThingDef>
+
+  <ThingDef ParentName="RPS_SuitArmBase">
+    <defName>RPS_Pack_Bughunter_Jump</defName>
+    <label>Bughunter jump pack</label>
+    <description>A backpack holding three power cells and two thrusters: a swarmed Bughunter can leap clear of the hive. Each jump burns a big share of the cells.\n\nFits only a Bughunter: right-click a standing Bughunter with a colonist selected to fit it.</description>
+    <graphicData>
+      <texPath>Things/Item/PowerSuit/Packs/Bughunter_jumppack</texPath>
+    </graphicData>
+    <statBases>
+      <Mass>25</Mass>
+      <WorkToMake>20000</WorkToMake>
+    </statBases>
+    <costList>
+      <Steel>90</Steel>
+      <Plasteel>30</Plasteel>
+      <ComponentIndustrial>4</ComponentIndustrial>
+      <ComponentSpacer>2</ComponentSpacer>
+      <Chemfuel>40</Chemfuel>
+    </costList>
+    <modExtensions>
+      <li Class="RimoutPowerSuit.ArmModuleExtension">
+        <suits>
+          <li>RPS_PowerSuitBughunter</li>
+        </suits>
+        <back>true</back>
+        <texKey>jumppack</texKey>
+        <cells>3</cells>
+        <abilities>
+          <li>RPS_SuitJump</li>
+        </abilities>
+      </li>
+    </modExtensions>
+  </ThingDef>
+
+  <!-- ===================================================== abilities -->
+
+  <AbilityDef>
+    <defName>RPS_SuitJump</defName>
+    <label>suit jump</label>
+    <description>Fire the jump pack's thrusters and leap to a spot nearby. Burns three quarters of a power cell.</description>
+    <iconPath>UI/Abilities/RPS_Jump</iconPath>
+    <cooldownTicksRange>1800~1800</cooldownTicksRange>
+    <hostile>false</hostile>
+    <casterMustBeCapableOfViolence>false</casterMustBeCapableOfViolence>
+    <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
+    <disableGizmoWhileUndrafted>false</disableGizmoWhileUndrafted>
+    <aiCanUse>false</aiCanUse>
+    <verbProperties>
+      <verbClass>RimoutPowerSuit.Verb_SuitJump</verbClass>
+      <label>jump</label>
+      <violent>false</violent>
+      <warmupTime>0.4</warmupTime>
+      <range>14.9</range>
+      <requireLineOfSight>true</requireLineOfSight>
+      <targetParams>
+        <canTargetLocations>true</canTargetLocations>
+        <canTargetPawns>false</canTargetPawns>
+        <canTargetBuildings>false</canTargetBuildings>
+      </targetParams>
+    </verbProperties>
+    <comps>
+      <li Class="RimoutPowerSuit.CompProperties_SuitPower">
+        <cells>0.75</cells>
+        <!-- paid by Verb_SuitJump once the jump happens -->
+        <payOnApply>false</payOnApply>
+      </li>
+    </comps>
+  </AbilityDef>
+
+  <AbilityDef>
+    <defName>RPS_NetLauncher</defName>
+    <label>fire net</label>
+    <description>Fire a weighted net over an area. Insects under it are pinned for several seconds; anything else is slowed for a moment. Holds three nets; load more at the standing suit, twenty textiles a net.</description>
+    <iconPath>UI/Abilities/RPS_Net</iconPath>
+    <cooldownTicksRange>480~480</cooldownTicksRange>
+    <aiCanUse>false</aiCanUse>
+    <verbProperties>
+      <verbClass>Verb_CastAbility</verbClass>
+      <label>fire net</label>
+      <warmupTime>0.8</warmupTime>
+      <range>17.9</range>
+      <requireLineOfSight>true</requireLineOfSight>
+      <soundCast>Shot_IncendiaryLauncher</soundCast>
+      <targetParams>
+        <canTargetLocations>true</canTargetLocations>
+        <canTargetPawns>true</canTargetPawns>
+      </targetParams>
+    </verbProperties>
+    <comps>
+      <li Class="CompProperties_AbilityLaunchProjectile">
+        <projectileDef>RPS_Projectile_Net</projectileDef>
+      </li>
+      <li Class="RimoutPowerSuit.CompProperties_SuitNets" />
+    </comps>
+  </AbilityDef>
+
+  <ThingDef ParentName="BaseBullet">
+    <defName>RPS_Projectile_Net</defName>
+    <label>net</label>
+    <thingClass>RimoutPowerSuit.Projectile_Net</thingClass>
+    <graphicData>
+      <texPath>Things/Projectile/PowerSuit/Net</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(1.6,1.6)</drawSize>
+    </graphicData>
+    <projectile>
+      <damageDef>Blunt</damageDef>
+      <damageAmountBase>1</damageAmountBase>
+      <speed>30</speed>
+      <flyOverhead>true</flyOverhead>
+    </projectile>
+  </ThingDef>
+
+  <!-- ===================================================== effects -->
+
+  <HediffDef>
+    <defName>RPS_SuitUnpowered</defName>
+    <label>suit out of power</label>
+    <description>The power suit's cells are empty: its servos have stopped and the pilot can barely drag it along. Recharge it at a suit charging rack.</description>
+    <hediffClass>HediffWithComps</hediffClass>
+    <defaultLabelColor>(1, 0.6, 0.3)</defaultLabelColor>
+    <isBad>true</isBad>
+    <scenarioCanAdd>false</scenarioCanAdd>
+    <stages>
+      <li>
+        <statFactors>
+          <MoveSpeed>0.3</MoveSpeed>
+        </statFactors>
+      </li>
+    </stages>
+  </HediffDef>
+
+  <HediffDef>
+    <defName>RPS_NettedInsect</defName>
+    <label>netted</label>
+    <description>Pinned under a weighted net.</description>
+    <hediffClass>HediffWithComps</hediffClass>
+    <isBad>true</isBad>
+    <scenarioCanAdd>false</scenarioCanAdd>
+    <stages>
+      <li>
+        <capMods>
+          <li>
+            <capacity>Moving</capacity>
+            <setMax>0.05</setMax>
+          </li>
+        </capMods>
+      </li>
+    </stages>
+    <comps>
+      <li Class="HediffCompProperties_Disappears">
+        <disappearsAfterTicks>420~480</disappearsAfterTicks>
+        <showRemainingTime>true</showRemainingTime>
+      </li>
+    </comps>
+  </HediffDef>
+
+  <HediffDef>
+    <defName>RPS_Netted</defName>
+    <label>tangled in a net</label>
+    <description>Caught in a weighted net, struggling free.</description>
+    <hediffClass>HediffWithComps</hediffClass>
+    <isBad>true</isBad>
+    <scenarioCanAdd>false</scenarioCanAdd>
+    <stages>
+      <li>
+        <capMods>
+          <li>
+            <capacity>Moving</capacity>
+            <offset>-0.5</offset>
+          </li>
+        </capMods>
+      </li>
+    </stages>
+    <comps>
+      <li Class="HediffCompProperties_Disappears">
+        <disappearsAfterTicks>150~180</disappearsAfterTicks>
+        <showRemainingTime>true</showRemainingTime>
+      </li>
+    </comps>
+  </HediffDef>
+
+  <!-- ===================================================== charging rack -->
+
+  <ThingDef ParentName="BuildingBase">
+    <defName>RPS_SuitChargingRack</defName>
+    <label>suit charging rack</label>
+    <description>Recharges the power cells of power suits standing next to it. Climb out beside it and leave the suit to charge.</description>
+    <graphicData>
+      <texPath>Things/Building/PowerSuit/ChargingRack</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(1.3,1.3)</drawSize>
+    </graphicData>
+    <size>(1,1)</size>
+    <altitudeLayer>Building</altitudeLayer>
+    <passability>PassThroughOnly</passability>
+    <pathCost>42</pathCost>
+    <fillPercent>0.4</fillPercent>
+    <rotatable>false</rotatable>
+    <tickerType>Rare</tickerType>
+    <designationCategory>Misc</designationCategory>
+    <researchPrerequisites>
+      <li>RPS_PowerSuits</li>
+    </researchPrerequisites>
+    <statBases>
+      <MaxHitPoints>150</MaxHitPoints>
+      <WorkToBuild>2500</WorkToBuild>
+      <Flammability>0.5</Flammability>
+      <Mass>20</Mass>
+    </statBases>
+    <costList>
+      <Steel>80</Steel>
+      <ComponentIndustrial>3</ComponentIndustrial>
+    </costList>
+    <comps>
+      <li Class="CompProperties_Power">
+        <compClass>CompPowerTrader</compClass>
+        <basePowerConsumption>400</basePowerConsumption>
+      </li>
+      <li Class="CompProperties_Flickable" />
+      <li Class="RimoutPowerSuit.CompProperties_SuitCharger">
+        <cellsPerDay>4</cellsPerDay>
+        <radius>1.9</radius>
+      </li>
+    </comps>
+    <building>
+      <destroySound>BuildingDestroyed_Metal_Small</destroySound>
+    </building>
+    <constructionSkillPrerequisite>5</constructionSkillPrerequisite>
+  </ThingDef>
+
+</Defs>

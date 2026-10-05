@@ -19,12 +19,14 @@ Fit weapon arms to a standing suit: right-click it with a colonist selected. Bul
 minigun, autocannon, laser, rocket pod, grenade launcher, arc projector, flamer, hammer,
 chainsaw, tower shield. Bughunter arms: fuel-injected flamer, pneumatic power hammer.
 
+Suits run on power cells: they drain while piloted and recharge next to a suit charging rack.
+Backpacks hold three cells: the Bulwark's shield generator (a shield bubble while it stands
+still) and the Bughunter's jump pack. The Bughunter also fires nets that pin insects.
+
 ## Planned
 
-- Power cells: removable batteries that drain while the suit works, recharged on a powered
-  charging rack.
-- Backpacks made for each suit (the Bulwark's shield generator, the Bughunter's jump pack and
-  net launcher), and the flamer and rocket arms as targeted buttons.
+- The flamer and rocket arms as targeted buttons with an auto mode; the suit's back opening
+  while a pilot climbs in or out.
 - Suit pieces that are damaged and knocked off one at a time.
 - More suits: medic, builder, miner and more.
 - Wrecked suits that trap their pilot until another colonist cuts them out.

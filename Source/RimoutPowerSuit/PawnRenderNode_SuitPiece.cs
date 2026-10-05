@@ -5,11 +5,13 @@ using Verse;
 
 namespace RimoutPowerSuit
 {
-    // A suit piece's render node properties. An arm piece draws the arm fitted to its slot.
+    // A suit piece's render node properties. An arm piece draws the arm fitted to its slot; the
+    // body piece draws the fitted backpack (it is part of the body's textures).
     public class PawnRenderNodeProperties_SuitPiece : PawnRenderNodeProperties
     {
         public bool isArm;
         public ArmSlot slot;
+        public bool isBody;
     }
 
     // One piece of a worn suit (body, legs, an arm, the helmet), drawn as its own render node so
@@ -35,7 +37,14 @@ namespace RimoutPowerSuit
         // with a pair texture (two tower shields) use that instead.
         public static string TexPathFor(PawnRenderNodeProperties props, Apparel_PowerSuit suit)
         {
-            if (!(props is PawnRenderNodeProperties_SuitPiece piece) || !piece.isArm || suit == null)
+            if (!(props is PawnRenderNodeProperties_SuitPiece piece) || suit == null)
+                return props.texPath;
+            if (piece.isBody)
+            {
+                string packKey = SuitArmUtility.Arm(suit.ArmIn(ArmSlot.Back))?.texKey;
+                return packKey != null ? props.texPath + "_" + packKey : props.texPath;
+            }
+            if (!piece.isArm)
                 return props.texPath;
             ThingDef arm = suit.ArmIn(piece.slot);
             var ext = SuitArmUtility.Arm(arm);

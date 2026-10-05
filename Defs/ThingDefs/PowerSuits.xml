@@ -157,8 +157,9 @@
             <dataNorth><layer>60</layer></dataNorth>
           </drawData>
         </li>
-        <li>
+        <li Class="RimoutPowerSuit.PawnRenderNodeProperties_SuitPiece">
           <debugLabel>Bulwark Body</debugLabel>
+          <isBody>true</isBody>
           <nodeClass>RimoutPowerSuit.PawnRenderNode_SuitPiece</nodeClass>
           <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
           <parentTagDef>ApparelBody</parentTagDef>
@@ -223,6 +224,12 @@
         </li>
       </renderNodeProperties>
     </apparel>
+    <modExtensions>
+      <li Class="RimoutPowerSuit.PowerSuitExtension">
+        <cells>1</cells>
+        <drainPerDay>0.5</drainPerDay>
+      </li>
+    </modExtensions>
   </ThingDef>
 
   <!-- The Bughunter: built for the hive. Shrugs off claws, bites and stings (sharp) and its own
@@ -267,8 +274,9 @@
             <dataNorth><layer>60</layer></dataNorth>
           </drawData>
         </li>
-        <li>
+        <li Class="RimoutPowerSuit.PawnRenderNodeProperties_SuitPiece">
           <debugLabel>Bughunter Body</debugLabel>
+          <isBody>true</isBody>
           <nodeClass>RimoutPowerSuit.PawnRenderNode_SuitPiece</nodeClass>
           <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
           <parentTagDef>ApparelBody</parentTagDef>
@@ -333,6 +341,16 @@
         </li>
       </renderNodeProperties>
     </apparel>
+    <modExtensions>
+      <li Class="RimoutPowerSuit.PowerSuitExtension">
+        <cells>2</cells>
+        <drainPerDay>0.9</drainPerDay>
+        <nets>3</nets>
+        <abilities>
+          <li>RPS_NetLauncher</li>
+        </abilities>
+      </li>
+    </modExtensions>
   </ThingDef>
 
 </Defs>

@@ -25,4 +25,10 @@
     <reportString>taking an arm off TargetA.</reportString>
     <casualInterruptible>false</casualInterruptible>
   </JobDef>
+  <JobDef>
+    <defName>RPS_ReloadSuitNets</defName>
+    <driverClass>RimoutPowerSuit.JobDriver_ReloadSuitNets</driverClass>
+    <reportString>loading nets into TargetA.</reportString>
+    <casualInterruptible>false</casualInterruptible>
+  </JobDef>
 </Defs>
