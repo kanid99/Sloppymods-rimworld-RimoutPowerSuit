@@ -631,29 +631,43 @@ def bughunter_spec(sp):
     return s
 
 
-def miner_spec(sp):
-    """the Miner: a work suit on the Bulwark's frame - own chest, helmet, side painting and drill arm, the generic
-    light open-frame plates, the plain tall pack or (PACK=booster) the drill booster pack"""
+def work_spec(sp, tool, chest_side, pack_key=None):
+    """a work suit on the Bulwark's frame: own chest (front export in kit_src, side painting), helmet views and
+    tool arm (own/<tool>_front|east|back|fwd_south|fwd_north), the generic light open-frame plates, and the
+    plain tall pack or (PACK=<pack_key>) its own pack (own/chassis_north_pack, <chest_side>_pack)"""
     s = bulwark_spec(sp)
     s['helmet'] = dict(east=s['helmet']['east'], east_override=f'{sp}/own/helmet_east.png', north=f'{sp}/own/helmet_north.png')
-    s['weapon_l'], s['weapon_r'] = 'drill', 'drill'
-    s['weapons_south'] = dict(s['weapons_south'], drill=f'{sp}/own/drill_front.png')
-    s['weapons_east'] = dict(s['weapons_east'], drill=f'{sp}/own/drill_east.png')
-    s['weapons_north'] = dict(s['weapons_north'], drill=f'{sp}/own/drill_back.png')
-    s['weapons_back'] = dict(s['weapons_back'], drill=f'{sp}/own/drill_back.png')
-    s['weapons_fwd'] = dict(s['weapons_fwd'], drill=dict(south=f'{sp}/own/drill_fwd_south.png', north=f'{sp}/own/drill_fwd_north.png'))
-    s['weapon_h'] = dict(s['weapon_h'], drill=120)
+    s['weapon_l'], s['weapon_r'] = tool, tool
+    s['weapons_south'] = dict(s['weapons_south'], **{tool: f'{sp}/own/{tool}_front.png'})
+    s['weapons_east'] = dict(s['weapons_east'], **{tool: f'{sp}/own/{tool}_east.png'})
+    s['weapons_north'] = dict(s['weapons_north'], **{tool: f'{sp}/own/{tool}_back.png'})
+    s['weapons_back'] = dict(s['weapons_back'], **{tool: f'{sp}/own/{tool}_back.png'})
+    s['weapons_fwd'] = dict(s['weapons_fwd'], **{tool: dict(south=f'{sp}/own/{tool}_fwd_south.png', north=f'{sp}/own/{tool}_fwd_north.png')})
+    s['weapon_h'] = dict(s['weapon_h'], **{tool: 120})
     # the generic plate in the side view, whatever the arm carries
-    s['east_plates'] = {w: f'{sp}/own/plate_east_generic.png' for w in ('drill', 'none')}
-    s['full_east'] = dict(s['full_east'], body_image=f'{sp}/own/full_east_miner.png', body_ref=f'{sp}/views/full_east_noarm.png')
-    if os.environ.get('PACK') == 'booster':          # three cells and a capacitor coil feeding the drills
+    s['east_plates'] = {w: f'{sp}/own/plate_east_generic.png' for w in (tool, 'none')}
+    s['full_east'] = dict(s['full_east'], body_image=f'{sp}/own/{chest_side}.png', body_ref=f'{sp}/views/full_east_noarm.png')
+    if pack_key and os.environ.get('PACK') == pack_key:
         s['body'] = dict(s['body'], north=f'{sp}/own/chassis_north_pack.png', north_ref=f'{sp}/views/chassis_north_tall.png')
-        s['full_east'] = dict(s['full_east'], body_image=f'{sp}/own/full_east_miner_pack.png')
+        s['full_east'] = dict(s['full_east'], body_image=f'{sp}/own/{chest_side}_pack.png')
+    return s
+
+
+def miner_spec(sp):
+    """the Miner: drill arms; PACK=booster for the drill booster pack"""
+    s = work_spec(sp, 'drill', 'full_east_miner', 'booster')
     s['colors'] = [(0.78, 0.62, 0.30), (0.56, 0.58, 0.60)]
     return s
 
 
-SPECS = {'bulwark': bulwark_spec, 'bughunter': bughunter_spec, 'miner': miner_spec}
+def builder_spec(sp):
+    """the Builder: combo construction drill + nail gun arms"""
+    s = work_spec(sp, 'combo', 'full_east_builder')
+    s['colors'] = [(0.86, 0.66, 0.22), (0.56, 0.58, 0.60)]
+    return s
+
+
+SPECS = {'bulwark': bulwark_spec, 'bughunter': bughunter_spec, 'miner': miner_spec, 'builder': builder_spec}
 
 if __name__ == '__main__':
     sp, out = sys.argv[1], sys.argv[2]

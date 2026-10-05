@@ -85,6 +85,15 @@ Decisions agreed with the owner, to build from. Numbers are starting points for 
 - Art: own chest, helmet, side painting, drill (5 views edited from the hammer's) and booster pack
   (`kit/miner_src/own/`); everything else shared with the Bulwark.
 
+## Builder (work suit)
+
+- Light armour; servos build and smooth much faster and carry more.
+- **Construction drill arm**: a construction drill with a nail gun alongside. Faster building per arm (two stack);
+  the nail gun is the pilot's short-range rapid-fire weapon (twin with two arms).
+- No special pack yet (plain tall pack).
+- Art: own chest, helmet, side painting and combo tool (5 views edited from the Miner's drill), `kit/builder_src/own/`.
+  `work_spec()` in `suit_kit.py` builds any work suit from its chest, helmet and tool art.
+
 ## Power cells
 
 - Removable battery items carrying their own charge, charged on a powered charging rack.
