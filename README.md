@@ -14,6 +14,8 @@ Vanilla Expanded Framework and
 - **Bulwark** - the heavy tank: thick armour against everything, slow.
 - **Bughunter** - built for insect hives: very hard to cut, bite or burn, hits harder up close,
   even slower.
+- **Miner** - a light work suit that digs through rock much faster; drill arms and a drill
+  booster pack make it faster still.
 
 Fit weapon arms to a standing suit: right-click it with a colonist selected. Bulwark arms:
 minigun, autocannon, laser, rocket pod, grenade launcher, arc projector, flamer, hammer,
@@ -28,7 +30,7 @@ still) and the Bughunter's jump pack. The Bughunter also fires nets that pin ins
 - The flamer and rocket arms as targeted buttons with an auto mode; the suit's back opening
   while a pilot climbs in or out.
 - Suit pieces that are damaged and knocked off one at a time.
-- More suits: medic, builder, miner and more.
+- More suits: builder, medic, harvester and more.
 - Wrecked suits that trap their pilot until another colonist cuts them out.
 
 ## Building

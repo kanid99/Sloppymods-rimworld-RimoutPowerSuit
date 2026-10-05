@@ -3,16 +3,16 @@
   <name>SloppyMods Rimout Power Suit</name>
   <author>SloppyMod</author>
   <packageId>sloppymod.rimoutpowersuit</packageId>
-  <modVersion>0.9.12</modVersion>
+  <modVersion>0.9.13</modVersion>
   <!-- 1.6 only: the assembly is built against 1.6 signatures. -->
   <supportedVersions>
     <li>1.6</li>
   </supportedVersions>
-  <description>Build 0.9.12
+  <description>Build 0.9.13
 
 Walking tanks for your colonists. A power suit is a hulking armoured frame that stands on its own until a colonist climbs inside to work and fight in it, and climbs back out when the job is done.
 
-Two suits so far: the Bulwark, a heavy tank, and the Bughunter, built for clearing insect hives - hard to cut, bite or burn. Fit weapon arms to a standing suit - miniguns, rocket pods, lasers, flamers, hammers, a tower shield and more - each suit with arms of its own. Suits run on power cells, recharged at a charging rack, and take a backpack of their own: the Bulwark's shield generator raises a shield when it stands its ground, the Bughunter's jump pack leaps it clear of a swarm, and the Bughunter nets insects in place.
+Three suits so far: the Bulwark, a heavy tank; the Bughunter, built for clearing insect hives - hard to cut, bite or burn; and the Miner, a work suit that digs through rock, with drill arms and a drill booster pack. Fit weapon arms to a standing suit - miniguns, rocket pods, lasers, flamers, hammers, a tower shield and more - each suit with arms of its own. Suits run on power cells, recharged at a charging rack, and take a backpack of their own: the Bulwark's shield generator raises a shield when it stands its ground, the Bughunter's jump pack leaps it clear of a swarm, and the Bughunter nets insects in place.
 
 A pilot in a power suit can wield the heavy warcasket weapons from Vanilla Factions Expanded - Pirates. Unlike a warcasket, nobody is welded in for life.
 

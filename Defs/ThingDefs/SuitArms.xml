@@ -363,6 +363,29 @@
   </ThingDef>
 
   <ThingDef ParentName="RPS_SuitArmBase">
+    <defName>RPS_Arm_Miner_drill</defName>
+    <label>Miner drill arm</label>
+    <description>A heavy rotary drill on a Miner arm: the pilot digs through rock much faster, and two drill arms faster still. It bores into anything that gets too close, too.\n\nFits only a Miner: right-click a standing Miner with a colonist selected to fit it to the left or right arm.</description>
+    <graphicData>
+      <texPath>Things/Item/PowerSuit/Arms/Miner_drill</texPath>
+    </graphicData>
+    <costList>
+      <Steel>90</Steel>
+      <Plasteel>15</Plasteel>
+      <ComponentIndustrial>3</ComponentIndustrial>
+    </costList>
+    <modExtensions>
+      <li Class="RimoutPowerSuit.ArmModuleExtension">
+        <suits>
+          <li>RPS_PowerSuitMiner</li>
+        </suits>
+        <texKey>drill</texKey>
+        <hediff>RPS_ArmDrill</hediff>
+      </li>
+    </modExtensions>
+  </ThingDef>
+
+  <ThingDef ParentName="RPS_SuitArmBase">
     <defName>RPS_Arm_Bughunter_hammer</defName>
     <label>Bughunter power hammer arm</label>
     <description>A hammer driven by the shoulder plate's pneumatic pressure system: brutal, stunning blows up close.\n\nFits only a Bughunter: right-click a standing Bughunter with a colonist selected to fit it to the left or right arm.</description>
@@ -1019,6 +1042,44 @@
         </statOffsets>
       </li>
     </stages>
+  </HediffDef>
+
+  <HediffDef ParentName="RPS_SuitArmHediffBase">
+    <defName>RPS_ArmDrill</defName>
+    <label>drill arm</label>
+    <description>A heavy rotary drill on a suit arm: much faster digging, and a boring strike up close. Two drill arms dig faster still.</description>
+    <initialSeverity>1</initialSeverity>
+    <maxSeverity>2</maxSeverity>
+    <stages>
+      <li>
+        <label>one drill</label>
+        <statOffsets>
+          <MiningSpeed>0.4</MiningSpeed>
+        </statOffsets>
+      </li>
+      <li>
+        <minSeverity>1.5</minSeverity>
+        <label>two drills</label>
+        <statOffsets>
+          <MiningSpeed>0.8</MiningSpeed>
+        </statOffsets>
+      </li>
+    </stages>
+    <comps>
+      <li Class="HediffCompProperties_VerbGiver">
+        <tools>
+          <li>
+            <label>drill</label>
+            <capacities>
+              <li>Stab</li>
+            </capacities>
+            <power>20</power>
+            <cooldownTime>2.2</cooldownTime>
+            <armorPenetration>0.5</armorPenetration>
+          </li>
+        </tools>
+      </li>
+    </comps>
   </HediffDef>
 
 </Defs>

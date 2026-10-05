@@ -119,6 +119,9 @@ namespace RimoutPowerSuit
             if (pilot.pather != null && pilot.pather.MovingNow)
                 lastMovedTick = Find.TickManager.TicksGame;
             float drain = (SuitExt?.drainPerDay ?? 0.5f) * delta / GenDate.TicksPerDay;
+            var pack = SuitArmUtility.Arm(backpack);
+            if (pack?.workJob != null && pilot.CurJobDef == pack.workJob && SuitArmUtility.Boosting(this, pack))
+                drain += pack.workDrainPerDay * delta / GenDate.TicksPerDay;
             if (ShieldUp)
             {
                 drain += ShieldDrainPerDay * delta / GenDate.TicksPerDay;

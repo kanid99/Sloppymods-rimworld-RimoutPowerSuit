@@ -36,6 +36,11 @@ namespace RimoutPowerSuit
         public bool shield;
         // Abilities the pilot gets while it is fitted (e.g. the jump pack's jump).
         public List<AbilityDef> abilities;
+        // Its hediff works only with an arm of this texKey fitted (the Miner's booster powers its drills).
+        public string boostsArm;
+        // Extra cells per day drawn while the pilot does this job (the booster while mining).
+        public JobDef workJob;
+        public float workDrainPerDay;
         // The suits it fits. Every suit has its own arms (their shoulder plates are the suit's own).
         public List<ThingDef> suits;
         // The arm's textures: <suit piece texPath>_<texKey>, e.g. Things/Pawn/PowerSuit/Bulwark/ArmL_minigun.
@@ -100,7 +105,7 @@ namespace RimoutPowerSuit
             foreach (ThingDef def in suit.FittedArms())
             {
                 var ext = Arm(def);
-                if (ext?.hediff != null)
+                if (ext?.hediff != null && Boosting(suit, ext))
                     pilot.health.AddHediff(ext.hediff);
             }
             if (pilot.abilities != null)
@@ -129,6 +134,14 @@ namespace RimoutPowerSuit
                 pilot.health.RemoveHediff(unpowered);
             DestroyArmGun(pilot);
             suit.RestoreStowedWeapon(pilot);
+        }
+
+        // A module that boosts an arm does nothing without that arm fitted.
+        public static bool Boosting(Apparel_PowerSuit suit, ArmModuleExtension ext)
+        {
+            if (ext.boostsArm == null)
+                return true;
+            return Arm(suit.ArmIn(ArmSlot.Left))?.texKey == ext.boostsArm || Arm(suit.ArmIn(ArmSlot.Right))?.texKey == ext.boostsArm;
         }
 
         public static ThingDef ArmGunFor(Apparel_PowerSuit suit)

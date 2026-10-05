@@ -68,6 +68,52 @@
     </modExtensions>
   </ThingDef>
 
+  <ThingDef ParentName="RPS_SuitArmBase">
+    <defName>RPS_Pack_Miner_Booster</defName>
+    <label>Miner drill booster pack</label>
+    <description>A backpack holding three power cells and a big capacitor coil that feeds extra power to the Miner's drill arms: they dig much faster while the pack is fitted. It drains the cells quickly while the pilot is mining, and does nothing without a drill arm.\n\nFits only a Miner: right-click a standing Miner with a colonist selected to fit it.</description>
+    <graphicData>
+      <texPath>Things/Item/PowerSuit/Packs/Miner_boosterpack</texPath>
+    </graphicData>
+    <statBases>
+      <Mass>25</Mass>
+      <WorkToMake>18000</WorkToMake>
+    </statBases>
+    <costList>
+      <Steel>90</Steel>
+      <Plasteel>20</Plasteel>
+      <ComponentIndustrial>5</ComponentIndustrial>
+      <ComponentSpacer>1</ComponentSpacer>
+    </costList>
+    <modExtensions>
+      <li Class="RimoutPowerSuit.ArmModuleExtension">
+        <suits>
+          <li>RPS_PowerSuitMiner</li>
+        </suits>
+        <back>true</back>
+        <texKey>boosterpack</texKey>
+        <cells>3</cells>
+        <hediff>RPS_DrillBooster</hediff>
+        <boostsArm>drill</boostsArm>
+        <workJob>Mine</workJob>
+        <workDrainPerDay>3</workDrainPerDay>
+      </li>
+    </modExtensions>
+  </ThingDef>
+
+  <HediffDef ParentName="RPS_SuitArmHediffBase">
+    <defName>RPS_DrillBooster</defName>
+    <label>drill booster</label>
+    <description>The drill booster pack feeds extra power to the suit's drills: much faster digging.</description>
+    <stages>
+      <li>
+        <statOffsets>
+          <MiningSpeed>0.6</MiningSpeed>
+        </statOffsets>
+      </li>
+    </stages>
+  </HediffDef>
+
   <!-- ===================================================== abilities -->
 
   <AbilityDef>

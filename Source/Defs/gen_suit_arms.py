@@ -2,7 +2,7 @@
 Run from the repository root: python3 Source/Defs/gen_suit_arms.py. Edit the tables here, not the XML."""
 from xml.sax.saxutils import escape
 
-SUIT = {'Bulwark': 'RPS_PowerSuitFrame', 'Bughunter': 'RPS_PowerSuitBughunter'}
+SUIT = {'Bulwark': 'RPS_PowerSuitFrame', 'Bughunter': 'RPS_PowerSuitBughunter', 'Miner': 'RPS_PowerSuitMiner'}
 
 # projectile: (label, texture, damageDef, damage, armour penetration, speed, explosion radius or None)
 PROJ = {
@@ -61,6 +61,7 @@ ARMS = [
     ('Bulwark', 'towershield', 'Bulwark tower shield arm', 'A huge shield held up in front of the suit, from shoulder to feet. Much harder to hurt, a little slower.', None, 'TowerShield', dict(Steel=60, Plasteel=60, ComponentIndustrial=1),
      {'pairTexKey': 'towershield_pair', 'aboveHelmetSouth': 'true'}),
     ('Bughunter', 'flamer', 'Bughunter fuel-injected flamer arm', 'A flamethrower fed by the shoulder plate\'s fuel-injection system: longer range and hotter flames than a plain flamer. Becomes the pilot\'s weapon.', 'FuelFlamer', None, dict(Steel=80, Plasteel=25, ComponentIndustrial=4, Chemfuel=40), {}),
+    ('Miner', 'drill', 'Miner drill arm', 'A heavy rotary drill on a Miner arm: the pilot digs through rock much faster, and two drill arms faster still. It bores into anything that gets too close, too.', None, 'Drill', dict(Steel=90, Plasteel=15, ComponentIndustrial=3), {}),
     ('Bughunter', 'hammer', 'Bughunter power hammer arm', 'A hammer driven by the shoulder plate\'s pneumatic pressure system: brutal, stunning blows up close.', None, 'PowerHammer', dict(Steel=90, Plasteel=30, ComponentIndustrial=4), {}),
 ]
 
@@ -269,12 +270,50 @@ SHIELD = '''  <HediffDef ParentName="RPS_SuitArmHediffBase">
     </stages>
   </HediffDef>'''
 
+DRILL = '''  <HediffDef ParentName="RPS_SuitArmHediffBase">
+    <defName>RPS_ArmDrill</defName>
+    <label>drill arm</label>
+    <description>A heavy rotary drill on a suit arm: much faster digging, and a boring strike up close. Two drill arms dig faster still.</description>
+    <initialSeverity>1</initialSeverity>
+    <maxSeverity>2</maxSeverity>
+    <stages>
+      <li>
+        <label>one drill</label>
+        <statOffsets>
+          <MiningSpeed>0.4</MiningSpeed>
+        </statOffsets>
+      </li>
+      <li>
+        <minSeverity>1.5</minSeverity>
+        <label>two drills</label>
+        <statOffsets>
+          <MiningSpeed>0.8</MiningSpeed>
+        </statOffsets>
+      </li>
+    </stages>
+    <comps>
+      <li Class="HediffCompProperties_VerbGiver">
+        <tools>
+          <li>
+            <label>drill</label>
+            <capacities>
+              <li>Stab</li>
+            </capacities>
+            <power>20</power>
+            <cooldownTime>2.2</cooldownTime>
+            <armorPenetration>0.5</armorPenetration>
+          </li>
+        </tools>
+      </li>
+    </comps>
+  </HediffDef>'''
+
 if __name__ == '__main__':
     parts = [HEADER]
     parts += [arm_def(*a) for a in ARMS]
     for g in GUNS:
         parts += [gun_def(g), gun_def(g, twin=True)]
     parts += [proj_def(p) for p in PROJ]
-    parts += [melee_hediff(m) for m in MELEE] + [SHIELD]
+    parts += [melee_hediff(m) for m in MELEE] + [SHIELD, DRILL]
     open('Defs/ThingDefs/SuitArms.xml', 'w').write('\n\n'.join(parts) + '\n\n</Defs>\n')
     print('wrote Defs/ThingDefs/SuitArms.xml')
