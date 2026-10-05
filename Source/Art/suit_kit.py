@@ -631,7 +631,29 @@ def bughunter_spec(sp):
     return s
 
 
-SPECS = {'bulwark': bulwark_spec, 'bughunter': bughunter_spec}
+def miner_spec(sp):
+    """the Miner: a work suit on the Bulwark's frame - own chest, helmet, side painting and drill arm, the generic
+    light open-frame plates, the plain tall pack or (PACK=booster) the drill booster pack"""
+    s = bulwark_spec(sp)
+    s['helmet'] = dict(east=s['helmet']['east'], east_override=f'{sp}/own/helmet_east.png', north=f'{sp}/own/helmet_north.png')
+    s['weapon_l'], s['weapon_r'] = 'drill', 'drill'
+    s['weapons_south'] = dict(s['weapons_south'], drill=f'{sp}/own/drill_front.png')
+    s['weapons_east'] = dict(s['weapons_east'], drill=f'{sp}/own/drill_east.png')
+    s['weapons_north'] = dict(s['weapons_north'], drill=f'{sp}/own/drill_back.png')
+    s['weapons_back'] = dict(s['weapons_back'], drill=f'{sp}/own/drill_back.png')
+    s['weapons_fwd'] = dict(s['weapons_fwd'], drill=dict(south=f'{sp}/own/drill_fwd_south.png', north=f'{sp}/own/drill_fwd_north.png'))
+    s['weapon_h'] = dict(s['weapon_h'], drill=120)
+    # the generic plate in the side view, whatever the arm carries
+    s['east_plates'] = {w: f'{sp}/own/plate_east_generic.png' for w in ('drill', 'none')}
+    s['full_east'] = dict(s['full_east'], body_image=f'{sp}/own/full_east_miner.png', body_ref=f'{sp}/views/full_east_noarm.png')
+    if os.environ.get('PACK') == 'booster':          # three cells and a capacitor coil feeding the drills
+        s['body'] = dict(s['body'], north=f'{sp}/own/chassis_north_pack.png', north_ref=f'{sp}/views/chassis_north_tall.png')
+        s['full_east'] = dict(s['full_east'], body_image=f'{sp}/own/full_east_miner_pack.png')
+    s['colors'] = [(0.78, 0.62, 0.30), (0.56, 0.58, 0.60)]
+    return s
+
+
+SPECS = {'bulwark': bulwark_spec, 'bughunter': bughunter_spec, 'miner': miner_spec}
 
 if __name__ == '__main__':
     sp, out = sys.argv[1], sys.argv[2]

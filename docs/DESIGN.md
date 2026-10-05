@@ -75,6 +75,16 @@ Decisions agreed with the owner, to build from. Numbers are starting points for 
   - **Bulwark:** an optional **shield-generator backpack**. It powers the standing-still shield
     system and needs three cells.
 
+## Miner (work suit)
+
+- Light armour; servos dig rock much faster (mining speed, a little more yield) and carry more.
+- Generic light open-frame plates (the Bughunter's plain plate), shared by every work suit.
+- **Drill arm**: faster mining per drill (two stack), and a boring melee strike.
+- **Drill booster pack** (Miner only, three cells): powers the drills for much faster digging, only
+  with a drill arm fitted; drains the cells fast while mining.
+- Art: own chest, helmet, side painting, drill (5 views edited from the hammer's) and booster pack
+  (`kit/miner_src/own/`); everything else shared with the Bulwark.
+
 ## Power cells
 
 - Removable battery items carrying their own charge, charged on a powered charging rack.

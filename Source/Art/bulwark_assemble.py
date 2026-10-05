@@ -47,7 +47,7 @@ def plate(side,wn=None):
     return _outlined(place(f'{SP}/arms/{f}.png',PW_CX,int(os.environ.get('PT','58')),PH,side,ref=REF),round_r=3)
 pb=np.array(plate('left')[0].split()[3])>0; xs=np.nonzero(pb.any(0))[0]; PCX=(xs.min()+xs.max())/2
 import os; OUT=int(os.environ.get('OUT','8'))
-H={w:120 for w in ('minigun','rockets','chainsaw','laser','flamer','hammer','autocannon','grenade','arc','towershield')}   # one length: both arms end at the same height
+H={w:120 for w in ('minigun','rockets','chainsaw','laser','flamer','hammer','autocannon','grenade','arc','towershield','drill')}   # one length: both arms end at the same height
 def arm(name,side):
     w=clip_behind(place(f'{SP}/weap/{name}.png',PCX-OUT,58+int(os.environ.get('TOP','80')),H[name],side),ringw)
     return [w,plate(side,name),joint(side)]
@@ -142,7 +142,7 @@ for i,(lab,a,b) in enumerate(loadouts):
                 ta=np.array(t); ma=np.array(m); ta[cut,3]=0; ma[cut,3]=0; t=Image.fromarray(ta); m=Image.fromarray(ma)
             return t,m
         KS=os.environ.get('KITSRC',SP+'/kit_src'); os.makedirs(KS,exist_ok=True)
-        WEAPONS=[w for w in ('minigun','rockets','chainsaw','laser','flamer','hammer','autocannon','grenade','arc','towershield') if w in H]
+        WEAPONS=[w for w in ('minigun','rockets','chainsaw','laser','flamer','hammer','autocannon','grenade','arc','towershield','drill') if w in H]
         layers=[('body',ch),('helmet',HL),('plateLfull',merge(arm(os.environ.get('WL','minigun'),'left')[1:])),('plateRfull',merge(arm(os.environ.get('WR','minigun'),'right')[1:]))]
         layers+=[('plateLbase',plate('left')),('plateRbase',plate('right'))]
         for wn in WEAPONS: layers+= [(f'armL_{wn}',merge(arm(wn,'left'),band)),(f'armR_{wn}',merge(arm(wn,'right'),band)),(f'armLfull_{wn}',merge(arm(wn,'left'))),(f'armRfull_{wn}',merge(arm(wn,'right')))]
