@@ -473,4 +473,123 @@
     </modExtensions>
   </ThingDef>
 
+  <!-- The Builder: a lightly armoured work suit for construction; its construction drill arms
+       build faster still and carry a nail gun. -->
+  <ThingDef ParentName="RPS_PowerSuitBase">
+    <defName>RPS_PowerSuitBuilder</defName>
+    <label>Builder power suit</label>
+    <description>A work suit for building: a riveted chest with a tool belt, a helmet with a warning beacon and light open-frame shoulder plates. Its servos let the pilot build, smooth and haul far faster than by hand; it is only lightly armoured. Fit construction drill arms to build faster still - each carries a nail gun.\n\nThe suit encloses its pilot completely: outer armour and headgear are left behind when they climb in. A pilot can climb back out at any time.</description>
+    <graphicData>
+      <texPath>Things/Item/PowerSuit/Builder</texPath>
+    </graphicData>
+    <statBases>
+      <MaxHitPoints>320</MaxHitPoints>
+      <Mass>70</Mass>
+      <Flammability>0.3</Flammability>
+      <ArmorRating_Sharp>0.6</ArmorRating_Sharp>
+      <ArmorRating_Blunt>0.35</ArmorRating_Blunt>
+      <ArmorRating_Heat>0.4</ArmorRating_Heat>
+      <Insulation_Cold>20</Insulation_Cold>
+      <Insulation_Heat>10</Insulation_Heat>
+    </statBases>
+    <equippedStatOffsets>
+      <MoveSpeed>-0.4</MoveSpeed>
+      <CarryingCapacity>90</CarryingCapacity>
+      <VEF_MassCarryCapacity>110</VEF_MassCarryCapacity>
+      <ConstructionSpeed>0.4</ConstructionSpeed>
+      <SmoothingSpeed>0.3</SmoothingSpeed>
+      <MeleeDamageFactor>0.2</MeleeDamageFactor>
+    </equippedStatOffsets>
+    <apparel>
+      <renderNodeProperties>
+        <li>
+          <debugLabel>Builder Legs</debugLabel>
+          <nodeClass>RimoutPowerSuit.PawnRenderNode_SuitPiece</nodeClass>
+          <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
+          <parentTagDef>ApparelBody</parentTagDef>
+          <texPath>Things/Pawn/PowerSuit/Builder/Legs</texPath>
+          <drawSize>(2.717,2.717)</drawSize>
+          <baseLayer>60</baseLayer>
+          <drawData>
+            <dataSouth><layer>60</layer></dataSouth>
+            <dataEast><layer>61</layer></dataEast>
+            <dataWest><layer>61</layer></dataWest>
+            <dataNorth><layer>60</layer></dataNorth>
+          </drawData>
+        </li>
+        <li Class="RimoutPowerSuit.PawnRenderNodeProperties_SuitPiece">
+          <debugLabel>Builder Body</debugLabel>
+          <isBody>true</isBody>
+          <nodeClass>RimoutPowerSuit.PawnRenderNode_SuitPiece</nodeClass>
+          <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
+          <parentTagDef>ApparelBody</parentTagDef>
+          <texPath>Things/Pawn/PowerSuit/Builder/Body</texPath>
+          <drawSize>(2.717,2.717)</drawSize>
+          <baseLayer>61</baseLayer>
+          <drawData>
+            <dataSouth><layer>61</layer></dataSouth>
+            <dataEast><layer>62</layer></dataEast>
+            <dataWest><layer>62</layer></dataWest>
+            <dataNorth><layer>62</layer></dataNorth>
+          </drawData>
+        </li>
+        <li Class="RimoutPowerSuit.PawnRenderNodeProperties_SuitPiece">
+          <debugLabel>Builder ArmL</debugLabel>
+          <isArm>true</isArm>
+          <slot>Left</slot>
+          <nodeClass>RimoutPowerSuit.PawnRenderNode_SuitPiece</nodeClass>
+          <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
+          <parentTagDef>ApparelBody</parentTagDef>
+          <texPath>Things/Pawn/PowerSuit/Builder/ArmL</texPath>
+          <drawSize>(2.717,2.717)</drawSize>
+          <baseLayer>62</baseLayer>
+          <drawData>
+            <dataSouth><layer>62</layer></dataSouth>
+            <dataEast><layer>64</layer></dataEast>
+            <dataWest><layer>64</layer></dataWest>
+            <dataNorth><layer>63</layer></dataNorth>
+          </drawData>
+        </li>
+        <li Class="RimoutPowerSuit.PawnRenderNodeProperties_SuitPiece">
+          <debugLabel>Builder ArmR</debugLabel>
+          <isArm>true</isArm>
+          <slot>Right</slot>
+          <nodeClass>RimoutPowerSuit.PawnRenderNode_SuitPiece</nodeClass>
+          <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
+          <parentTagDef>ApparelBody</parentTagDef>
+          <texPath>Things/Pawn/PowerSuit/Builder/ArmR</texPath>
+          <drawSize>(2.717,2.717)</drawSize>
+          <baseLayer>63</baseLayer>
+          <drawData>
+            <dataSouth><layer>63</layer></dataSouth>
+            <dataEast><layer>60</layer></dataEast>
+            <dataWest><layer>60</layer></dataWest>
+            <dataNorth><layer>64</layer></dataNorth>
+          </drawData>
+        </li>
+        <li>
+          <debugLabel>Builder Helmet</debugLabel>
+          <nodeClass>RimoutPowerSuit.PawnRenderNode_SuitPiece</nodeClass>
+          <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
+          <parentTagDef>ApparelBody</parentTagDef>
+          <texPath>Things/Pawn/PowerSuit/Builder/Helmet</texPath>
+          <drawSize>(2.717,2.717)</drawSize>
+          <baseLayer>64</baseLayer>
+          <drawData>
+            <dataSouth><layer>64</layer></dataSouth>
+            <dataEast><layer>63</layer></dataEast>
+            <dataWest><layer>63</layer></dataWest>
+            <dataNorth><layer>61</layer></dataNorth>
+          </drawData>
+        </li>
+      </renderNodeProperties>
+    </apparel>
+    <modExtensions>
+      <li Class="RimoutPowerSuit.PowerSuitExtension">
+        <cells>1</cells>
+        <drainPerDay>0.35</drainPerDay>
+      </li>
+    </modExtensions>
+  </ThingDef>
+
 </Defs>

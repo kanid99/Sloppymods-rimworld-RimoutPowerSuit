@@ -386,6 +386,31 @@
   </ThingDef>
 
   <ThingDef ParentName="RPS_SuitArmBase">
+    <defName>RPS_Arm_Builder_combo</defName>
+    <label>Builder construction drill arm</label>
+    <description>A construction drill with a nail gun mounted alongside, on a Builder arm. The drill speeds up building (two arms faster still); the nail gun becomes the pilot's weapon, a short-range rapid-fire gun.\n\nFits only a Builder: right-click a standing Builder with a colonist selected to fit it to the left or right arm.</description>
+    <graphicData>
+      <texPath>Things/Item/PowerSuit/Arms/Builder_combo</texPath>
+    </graphicData>
+    <costList>
+      <Steel>90</Steel>
+      <Plasteel>15</Plasteel>
+      <ComponentIndustrial>4</ComponentIndustrial>
+    </costList>
+    <modExtensions>
+      <li Class="RimoutPowerSuit.ArmModuleExtension">
+        <suits>
+          <li>RPS_PowerSuitBuilder</li>
+        </suits>
+        <texKey>combo</texKey>
+        <gun>RPS_ArmGun_NailGun</gun>
+        <twinGun>RPS_ArmGun_NailGun_Twin</twinGun>
+        <hediff>RPS_ArmConstructionDrill</hediff>
+      </li>
+    </modExtensions>
+  </ThingDef>
+
+  <ThingDef ParentName="RPS_SuitArmBase">
     <defName>RPS_Arm_Bughunter_hammer</defName>
     <label>Bughunter power hammer arm</label>
     <description>A hammer driven by the shoulder plate's pneumatic pressure system: brutal, stunning blows up close.\n\nFits only a Bughunter: right-click a standing Bughunter with a colonist selected to fit it to the left or right arm.</description>
@@ -820,6 +845,52 @@
     </verbs>
   </ThingDef>
 
+  <ThingDef ParentName="RPS_ArmGunBase">
+    <defName>RPS_ArmGun_NailGun</defName>
+    <label>arm nail gun</label>
+    <description>A suit arm's gun. It exists only while a pilot is in the suit.</description>
+    <uiIconPath>Things/Item/PowerSuit/Arms/Builder_combo</uiIconPath>
+    <statBases>
+      <RangedWeapon_Cooldown>1.4</RangedWeapon_Cooldown>
+    </statBases>
+    <verbs>
+      <li>
+        <verbClass>Verb_Shoot</verbClass>
+        <hasStandardCommand>true</hasStandardCommand>
+        <defaultProjectile>RPS_Projectile_Nail</defaultProjectile>
+        <warmupTime>0.9</warmupTime>
+        <range>15.9</range>
+        <burstShotCount>4</burstShotCount>
+        <ticksBetweenBurstShots>6</ticksBetweenBurstShots>
+        <soundCast>Shot_Autopistol</soundCast>
+        <muzzleFlashScale>9</muzzleFlashScale>
+      </li>
+    </verbs>
+  </ThingDef>
+
+  <ThingDef ParentName="RPS_ArmGunBase">
+    <defName>RPS_ArmGun_NailGun_Twin</defName>
+    <label>twin arm nail guns</label>
+    <description>A suit arm's gun. It exists only while a pilot is in the suit.</description>
+    <uiIconPath>Things/Item/PowerSuit/Arms/Builder_combo</uiIconPath>
+    <statBases>
+      <RangedWeapon_Cooldown>1.4</RangedWeapon_Cooldown>
+    </statBases>
+    <verbs>
+      <li>
+        <verbClass>Verb_Shoot</verbClass>
+        <hasStandardCommand>true</hasStandardCommand>
+        <defaultProjectile>RPS_Projectile_Nail</defaultProjectile>
+        <warmupTime>0.9</warmupTime>
+        <range>15.9</range>
+        <burstShotCount>8</burstShotCount>
+        <ticksBetweenBurstShots>6</ticksBetweenBurstShots>
+        <soundCast>Shot_Autopistol</soundCast>
+        <muzzleFlashScale>9</muzzleFlashScale>
+      </li>
+    </verbs>
+  </ThingDef>
+
   <ThingDef ParentName="BaseBullet">
     <defName>RPS_Projectile_Minigun</defName>
     <label>minigun slug</label>
@@ -954,6 +1025,22 @@
     </projectile>
   </ThingDef>
 
+  <ThingDef ParentName="BaseBullet">
+    <defName>RPS_Projectile_Nail</defName>
+    <label>nail</label>
+    <graphicData>
+      <texPath>Things/Projectile/PowerSuit/Slug</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <shaderType>TransparentPostLight</shaderType>
+    </graphicData>
+    <projectile>
+      <damageDef>Bullet</damageDef>
+      <damageAmountBase>8</damageAmountBase>
+      <armorPenetrationBase>0.15</armorPenetrationBase>
+      <speed>70</speed>
+    </projectile>
+  </ThingDef>
+
   <HediffDef ParentName="RPS_SuitArmHediffBase">
     <defName>RPS_ArmHammer</defName>
     <label>hammer arm</label>
@@ -1080,6 +1167,29 @@
         </tools>
       </li>
     </comps>
+  </HediffDef>
+
+  <HediffDef ParentName="RPS_SuitArmHediffBase">
+    <defName>RPS_ArmConstructionDrill</defName>
+    <label>construction drill arm</label>
+    <description>A construction drill on a suit arm: much faster building. Two arms build faster still.</description>
+    <initialSeverity>1</initialSeverity>
+    <maxSeverity>2</maxSeverity>
+    <stages>
+      <li>
+        <label>one drill</label>
+        <statOffsets>
+          <ConstructionSpeed>0.35</ConstructionSpeed>
+        </statOffsets>
+      </li>
+      <li>
+        <minSeverity>1.5</minSeverity>
+        <label>two drills</label>
+        <statOffsets>
+          <ConstructionSpeed>0.7</ConstructionSpeed>
+        </statOffsets>
+      </li>
+    </stages>
   </HediffDef>
 
 </Defs>

@@ -16,6 +16,8 @@ Vanilla Expanded Framework and
   even slower.
 - **Miner** - a light work suit that digs through rock much faster; drill arms and a drill
   booster pack make it faster still.
+- **Builder** - a light work suit that builds much faster; its construction drill arms build
+  faster still and carry a nail gun.
 
 Fit weapon arms to a standing suit: right-click it with a colonist selected. Bulwark arms:
 minigun, autocannon, laser, rocket pod, grenade launcher, arc projector, flamer, hammer,
@@ -30,7 +32,7 @@ still) and the Bughunter's jump pack. The Bughunter also fires nets that pin ins
 - The flamer and rocket arms as targeted buttons with an auto mode; the suit's back opening
   while a pilot climbs in or out.
 - Suit pieces that are damaged and knocked off one at a time.
-- More suits: builder, medic, harvester and more.
+- More suits: medic, harvester and more.
 - Wrecked suits that trap their pilot until another colonist cuts them out.
 
 ## Building

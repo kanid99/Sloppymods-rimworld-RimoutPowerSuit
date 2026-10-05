@@ -72,10 +72,11 @@ commit pushed to `main` is what the game loads next**.
 - Do not reuse VFE Pirates' `Apparel_Warcasket` / `WarcasketDef` types: their
   patches block unlocking, stripping and spawning them on the ground, which
   is the opposite of a suit you climb in and out of.
-- **Suits.** Lite mode has three suits: the **Bulwark** (`RPS_PowerSuitFrame` - the old defName,
+- **Suits.** Lite mode has four suits: the **Bulwark** (`RPS_PowerSuitFrame` - the old defName,
   kept so saves carry over), the heavy tank, and the **Bughunter** (`RPS_PowerSuitBughunter`),
   hardened against sharp and heat damage, and the **Miner** (`RPS_PowerSuitMiner`), a light
-  work suit with drill arms and the drill booster pack. All share the abstract `RPS_PowerSuitBase`.
+  work suit with drill arms and the drill booster pack, and the **Builder** (`RPS_PowerSuitBuilder`),
+  a light work suit with construction drill + nail gun arms. All share the abstract `RPS_PowerSuitBase`.
   The roadmap, the per-suit mechanics and the design notes are in `docs/DESIGN.md`
   on the `art/modular` branch.
 - **Art is original.** Never give an image generator another game's armour as a reference,

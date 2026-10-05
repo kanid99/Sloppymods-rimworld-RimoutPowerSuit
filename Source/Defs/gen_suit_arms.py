@@ -2,7 +2,7 @@
 Run from the repository root: python3 Source/Defs/gen_suit_arms.py. Edit the tables here, not the XML."""
 from xml.sax.saxutils import escape
 
-SUIT = {'Bulwark': 'RPS_PowerSuitFrame', 'Bughunter': 'RPS_PowerSuitBughunter', 'Miner': 'RPS_PowerSuitMiner'}
+SUIT = {'Bulwark': 'RPS_PowerSuitFrame', 'Bughunter': 'RPS_PowerSuitBughunter', 'Miner': 'RPS_PowerSuitMiner', 'Builder': 'RPS_PowerSuitBuilder'}
 
 # projectile: (label, texture, damageDef, damage, armour penetration, speed, explosion radius or None)
 PROJ = {
@@ -14,6 +14,7 @@ PROJ = {
     'Arc':        ('arc charge', 'Arc', 'EMP', 30, None, 35, 1.5),
     'Flame':      ('flame', 'Flame', 'Flame', 9, 0.10, 28, None),
     'FuelFlame':  ('injected flame', 'Flame', 'Flame', 13, 0.15, 32, None),
+    'Nail':       ('nail', 'Slug', 'Bullet', 8, 0.15, 70, None),
 }
 
 # gun: (label, projectile, warmup, range, burst, ticks between shots, cooldown, sound, tail, forced miss radius, targets ground)
@@ -26,6 +27,7 @@ GUNS = {
     'Arc':        ('arm arc projector', 'Arc', 1.8, 19.9, 1, 0, 2.6, 'Shot_IncendiaryLauncher', None, 1.5, True),
     'Flamer':     ('arm flamer', 'Flame', 1.2, 8.9, 6, 5, 2.2, 'Shot_IncendiaryLauncher', None, None, True),
     'FuelFlamer': ('fuel-injected arm flamer', 'FuelFlame', 1.2, 11.9, 8, 5, 2.0, 'Shot_IncendiaryLauncher', None, None, True),
+    'NailGun':    ('arm nail gun', 'Nail', 0.9, 15.9, 4, 6, 1.4, 'Shot_Autopistol', None, None, False),
 }
 
 TOOL = '''          <li>
@@ -62,6 +64,7 @@ ARMS = [
      {'pairTexKey': 'towershield_pair', 'aboveHelmetSouth': 'true'}),
     ('Bughunter', 'flamer', 'Bughunter fuel-injected flamer arm', 'A flamethrower fed by the shoulder plate\'s fuel-injection system: longer range and hotter flames than a plain flamer. Becomes the pilot\'s weapon.', 'FuelFlamer', None, dict(Steel=80, Plasteel=25, ComponentIndustrial=4, Chemfuel=40), {}),
     ('Miner', 'drill', 'Miner drill arm', 'A heavy rotary drill on a Miner arm: the pilot digs through rock much faster, and two drill arms faster still. It bores into anything that gets too close, too.', None, 'Drill', dict(Steel=90, Plasteel=15, ComponentIndustrial=3), {}),
+    ('Builder', 'combo', 'Builder construction drill arm', 'A construction drill with a nail gun mounted alongside, on a Builder arm. The drill speeds up building (two arms faster still); the nail gun becomes the pilot\'s weapon, a short-range rapid-fire gun.', 'NailGun', 'ConstructionDrill', dict(Steel=90, Plasteel=15, ComponentIndustrial=4), {}),
     ('Bughunter', 'hammer', 'Bughunter power hammer arm', 'A hammer driven by the shoulder plate\'s pneumatic pressure system: brutal, stunning blows up close.', None, 'PowerHammer', dict(Steel=90, Plasteel=30, ComponentIndustrial=4), {}),
 ]
 
@@ -270,6 +273,29 @@ SHIELD = '''  <HediffDef ParentName="RPS_SuitArmHediffBase">
     </stages>
   </HediffDef>'''
 
+CONSTRUCTION = '''  <HediffDef ParentName="RPS_SuitArmHediffBase">
+    <defName>RPS_ArmConstructionDrill</defName>
+    <label>construction drill arm</label>
+    <description>A construction drill on a suit arm: much faster building. Two arms build faster still.</description>
+    <initialSeverity>1</initialSeverity>
+    <maxSeverity>2</maxSeverity>
+    <stages>
+      <li>
+        <label>one drill</label>
+        <statOffsets>
+          <ConstructionSpeed>0.35</ConstructionSpeed>
+        </statOffsets>
+      </li>
+      <li>
+        <minSeverity>1.5</minSeverity>
+        <label>two drills</label>
+        <statOffsets>
+          <ConstructionSpeed>0.7</ConstructionSpeed>
+        </statOffsets>
+      </li>
+    </stages>
+  </HediffDef>'''
+
 DRILL = '''  <HediffDef ParentName="RPS_SuitArmHediffBase">
     <defName>RPS_ArmDrill</defName>
     <label>drill arm</label>
@@ -314,6 +340,6 @@ if __name__ == '__main__':
     for g in GUNS:
         parts += [gun_def(g), gun_def(g, twin=True)]
     parts += [proj_def(p) for p in PROJ]
-    parts += [melee_hediff(m) for m in MELEE] + [SHIELD, DRILL]
+    parts += [melee_hediff(m) for m in MELEE] + [SHIELD, DRILL, CONSTRUCTION]
     open('Defs/ThingDefs/SuitArms.xml', 'w').write('\n\n'.join(parts) + '\n\n</Defs>\n')
     print('wrote Defs/ThingDefs/SuitArms.xml')
