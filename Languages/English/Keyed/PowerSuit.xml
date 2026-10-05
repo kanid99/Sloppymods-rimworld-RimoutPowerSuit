@@ -7,6 +7,16 @@
   <RPS.CannotEnterNotHumanlike>{0} cannot pilot a power suit</RPS.CannotEnterNotHumanlike>
   <RPS.CannotEnterNotAdult>{0} is too small for a power suit</RPS.CannotEnterNotAdult>
   <RPS.CannotEnterAlreadyPiloting>{0} is already in a power suit</RPS.CannotEnterAlreadyPiloting>
+  <!-- Suit arms -->
+  <RPS.LeftArm>left arm</RPS.LeftArm>
+  <RPS.RightArm>right arm</RPS.RightArm>
+  <RPS.FitArm>Fit {0} ({1})</RPS.FitArm>
+  <RPS.RemoveArm>Take off {0} ({1})</RPS.RemoveArm>
+  <RPS.ArmBare>bare</RPS.ArmBare>
+  <RPS.ArmsInspect>Arms: {0} (left), {1} (right)</RPS.ArmsInspect>
+  <RPS.SwitchArm>Use {0}</RPS.SwitchArm>
+  <RPS.SwitchArmDesc>Switch which of the suit's two gun arms is firing.</RPS.SwitchArmDesc>
+  <RPS.ArmGunFitted>the suit's gun arm is the pilot's weapon</RPS.ArmGunFitted>
   <!-- Exosuit Framework mode -->
   <RPS.ClimbOutHere>Climb out here</RPS.ClimbOutHere>
   <RPS.ClimbOutHereDesc>Climb out and leave the suit standing here, ready for anyone to climb back in. No maintenance bay needed.</RPS.ClimbOutHereDesc>

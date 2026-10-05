@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- In Exosuit mode the suit is crafted as the framework core above; the lightweight suits
-     (Bulwark, Bughunter) stay defined (so old saves keep theirs) but can no longer be crafted. -->
+<!-- In Exosuit mode the suit is crafted as the framework core above. The lightweight suits
+     (Bulwark, Bughunter) and their arm modules stay defined, so old saves keep theirs, but can
+     no longer be crafted. Patches run before inheritance, so the recipes are removed from the
+     abstract parents the suits and arms inherit them from. -->
 <Patch>
   <Operation Class="PatchOperationRemove">
-    <xpath>Defs/ThingDef[defName="RPS_PowerSuitFrame" or defName="RPS_PowerSuitBughunter"]/recipeMaker</xpath>
+    <xpath>Defs/ThingDef[@Name="RPS_PowerSuitBase"]/recipeMaker</xpath>
+  </Operation>
+  <!-- Arm modules fit only the lightweight suits. -->
+  <Operation Class="PatchOperationRemove">
+    <xpath>Defs/ThingDef[@Name="RPS_SuitArmBase"]/recipeMaker</xpath>
   </Operation>
 </Patch>

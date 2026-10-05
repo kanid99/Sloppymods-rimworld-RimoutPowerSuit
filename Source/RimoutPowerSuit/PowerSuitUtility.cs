@@ -49,12 +49,15 @@ namespace RimoutPowerSuit
             if (suit.Spawned)
                 suit.DeSpawn();
             pawn.apparel.Wear(suit, dropReplacedApparel: true, locked: true);
+            SuitArmUtility.Apply(suit, pawn);
         }
 
-        // Takes the pilot out and stands the empty suit where they were. A weapon that only a
-        // suited pilot can hold - the warcasket guns - is dropped with it.
+        // Takes the pilot out and stands the empty suit where they were. The arms stop working
+        // (the arm gun goes, the pilot's own weapon comes back); a weapon that only a suited
+        // pilot can hold - the warcasket guns - is dropped with the suit.
         public static void TakeOut(Pawn pawn, Apparel_PowerSuit suit)
         {
+            SuitArmUtility.Remove(suit, pawn);
             AllowUnlock = true;
             try
             {

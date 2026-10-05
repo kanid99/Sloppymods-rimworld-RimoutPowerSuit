@@ -5,13 +5,15 @@
        render nodes of its pieces), its armour and its handling. -->
   <ThingDef Name="RPS_PowerSuitBase" ParentName="ArmorMachineableBase" Abstract="True">
     <thingClass>RimoutPowerSuit.Apparel_PowerSuit</thingClass>
+    <!-- Drawn every frame from its piece textures (Apparel_PowerSuit.DrawAt), so fitted arms show. -->
+    <drawerType>RealtimeOnly</drawerType>
     <techLevel>Spacer</techLevel>
     <!-- The standing suit, as it looks when nobody is inside. CutoutComplex reads the _m mask
          beside the texture: red marks the armour plates, which take the suit's colour. -->
     <graphicData>
       <graphicClass>Graphic_Single</graphicClass>
       <shaderType>CutoutComplex</shaderType>
-      <drawSize>(2.649,2.649)</drawSize>
+      <drawSize>(2.717,2.717)</drawSize>
     </graphicData>
     <thingCategories>
       <li>ApparelArmor</li>
@@ -146,7 +148,7 @@
           <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
           <parentTagDef>ApparelBody</parentTagDef>
           <texPath>Things/Pawn/PowerSuit/Bulwark/Legs</texPath>
-          <drawSize>(2.649,2.649)</drawSize>
+          <drawSize>(2.717,2.717)</drawSize>
           <baseLayer>60</baseLayer>
           <drawData>
             <dataSouth><layer>60</layer></dataSouth>
@@ -161,7 +163,7 @@
           <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
           <parentTagDef>ApparelBody</parentTagDef>
           <texPath>Things/Pawn/PowerSuit/Bulwark/Body</texPath>
-          <drawSize>(2.649,2.649)</drawSize>
+          <drawSize>(2.717,2.717)</drawSize>
           <baseLayer>61</baseLayer>
           <drawData>
             <dataSouth><layer>61</layer></dataSouth>
@@ -170,13 +172,15 @@
             <dataNorth><layer>62</layer></dataNorth>
           </drawData>
         </li>
-        <li>
+        <li Class="RimoutPowerSuit.PawnRenderNodeProperties_SuitPiece">
           <debugLabel>Bulwark ArmL</debugLabel>
+          <isArm>true</isArm>
+          <slot>Left</slot>
           <nodeClass>RimoutPowerSuit.PawnRenderNode_SuitPiece</nodeClass>
           <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
           <parentTagDef>ApparelBody</parentTagDef>
           <texPath>Things/Pawn/PowerSuit/Bulwark/ArmL</texPath>
-          <drawSize>(2.649,2.649)</drawSize>
+          <drawSize>(2.717,2.717)</drawSize>
           <baseLayer>62</baseLayer>
           <drawData>
             <dataSouth><layer>62</layer></dataSouth>
@@ -185,13 +189,15 @@
             <dataNorth><layer>63</layer></dataNorth>
           </drawData>
         </li>
-        <li>
+        <li Class="RimoutPowerSuit.PawnRenderNodeProperties_SuitPiece">
           <debugLabel>Bulwark ArmR</debugLabel>
+          <isArm>true</isArm>
+          <slot>Right</slot>
           <nodeClass>RimoutPowerSuit.PawnRenderNode_SuitPiece</nodeClass>
           <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
           <parentTagDef>ApparelBody</parentTagDef>
           <texPath>Things/Pawn/PowerSuit/Bulwark/ArmR</texPath>
-          <drawSize>(2.649,2.649)</drawSize>
+          <drawSize>(2.717,2.717)</drawSize>
           <baseLayer>63</baseLayer>
           <drawData>
             <dataSouth><layer>63</layer></dataSouth>
@@ -206,7 +212,7 @@
           <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
           <parentTagDef>ApparelBody</parentTagDef>
           <texPath>Things/Pawn/PowerSuit/Bulwark/Helmet</texPath>
-          <drawSize>(2.649,2.649)</drawSize>
+          <drawSize>(2.717,2.717)</drawSize>
           <baseLayer>64</baseLayer>
           <drawData>
             <dataSouth><layer>64</layer></dataSouth>
@@ -252,7 +258,7 @@
           <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
           <parentTagDef>ApparelBody</parentTagDef>
           <texPath>Things/Pawn/PowerSuit/Bughunter/Legs</texPath>
-          <drawSize>(2.649,2.649)</drawSize>
+          <drawSize>(2.717,2.717)</drawSize>
           <baseLayer>60</baseLayer>
           <drawData>
             <dataSouth><layer>60</layer></dataSouth>
@@ -267,7 +273,7 @@
           <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
           <parentTagDef>ApparelBody</parentTagDef>
           <texPath>Things/Pawn/PowerSuit/Bughunter/Body</texPath>
-          <drawSize>(2.649,2.649)</drawSize>
+          <drawSize>(2.717,2.717)</drawSize>
           <baseLayer>61</baseLayer>
           <drawData>
             <dataSouth><layer>61</layer></dataSouth>
@@ -276,13 +282,15 @@
             <dataNorth><layer>62</layer></dataNorth>
           </drawData>
         </li>
-        <li>
+        <li Class="RimoutPowerSuit.PawnRenderNodeProperties_SuitPiece">
           <debugLabel>Bughunter ArmL</debugLabel>
+          <isArm>true</isArm>
+          <slot>Left</slot>
           <nodeClass>RimoutPowerSuit.PawnRenderNode_SuitPiece</nodeClass>
           <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
           <parentTagDef>ApparelBody</parentTagDef>
           <texPath>Things/Pawn/PowerSuit/Bughunter/ArmL</texPath>
-          <drawSize>(2.649,2.649)</drawSize>
+          <drawSize>(2.717,2.717)</drawSize>
           <baseLayer>62</baseLayer>
           <drawData>
             <dataSouth><layer>62</layer></dataSouth>
@@ -291,13 +299,15 @@
             <dataNorth><layer>63</layer></dataNorth>
           </drawData>
         </li>
-        <li>
+        <li Class="RimoutPowerSuit.PawnRenderNodeProperties_SuitPiece">
           <debugLabel>Bughunter ArmR</debugLabel>
+          <isArm>true</isArm>
+          <slot>Right</slot>
           <nodeClass>RimoutPowerSuit.PawnRenderNode_SuitPiece</nodeClass>
           <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
           <parentTagDef>ApparelBody</parentTagDef>
           <texPath>Things/Pawn/PowerSuit/Bughunter/ArmR</texPath>
-          <drawSize>(2.649,2.649)</drawSize>
+          <drawSize>(2.717,2.717)</drawSize>
           <baseLayer>63</baseLayer>
           <drawData>
             <dataSouth><layer>63</layer></dataSouth>
@@ -312,7 +322,7 @@
           <workerClass>RimoutPowerSuit.PawnRenderNodeWorker_SuitPiece</workerClass>
           <parentTagDef>ApparelBody</parentTagDef>
           <texPath>Things/Pawn/PowerSuit/Bughunter/Helmet</texPath>
-          <drawSize>(2.649,2.649)</drawSize>
+          <drawSize>(2.717,2.717)</drawSize>
           <baseLayer>64</baseLayer>
           <drawData>
             <dataSouth><layer>64</layer></dataSouth>

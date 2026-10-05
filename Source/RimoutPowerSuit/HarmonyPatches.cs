@@ -70,4 +70,37 @@ namespace RimoutPowerSuit
             return true;
         }
     }
+
+    // An arm gun is part of the suit: it is never dropped (not when downed, stripped or killed);
+    // it is removed in code when the pilot climbs out.
+    [HarmonyPatch(typeof(Pawn_EquipmentTracker), nameof(Pawn_EquipmentTracker.TryDropEquipment))]
+    public static class Pawn_EquipmentTracker_TryDropEquipment_Patch
+    {
+        public static bool Prefix(ThingWithComps eq, ref ThingWithComps resultingEq, ref bool __result)
+        {
+            if (!SuitArmUtility.IsArmGun(eq))
+                return true;
+            resultingEq = null;
+            __result = false;
+            return false;
+        }
+    }
+
+    // A pilot whose suit arm is their weapon can't pick up or equip another weapon.
+    [HarmonyPatch(typeof(EquipmentUtility), nameof(EquipmentUtility.CanEquip),
+        new[] { typeof(Thing), typeof(Pawn), typeof(string), typeof(bool) },
+        new[] { ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Out, ArgumentType.Normal })]
+    public static class EquipmentUtility_CanEquip_Patch
+    {
+        public static void Postfix(Thing thing, Pawn pawn, ref string cantReason, ref bool __result)
+        {
+            if (!__result || thing == null || !thing.def.IsWeapon || SuitArmUtility.IsArmGun(thing))
+                return;
+            if (SuitArmUtility.IsArmGun(pawn?.equipment?.Primary))
+            {
+                cantReason = "RPS.ArmGunFitted".Translate();
+                __result = false;
+            }
+        }
+    }
 }

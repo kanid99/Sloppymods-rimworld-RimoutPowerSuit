@@ -15,13 +15,16 @@ Vanilla Expanded Framework and
 - **Bughunter** - built for insect hives: very hard to cut, bite or burn, hits harder up close,
   even slower.
 
+Fit weapon arms to a standing suit: right-click it with a colonist selected. Bulwark arms:
+minigun, autocannon, laser, rocket pod, grenade launcher, arc projector, flamer, hammer,
+chainsaw, tower shield. Bughunter arms: fuel-injected flamer, pneumatic power hammer.
+
 ## Planned
 
 - Power cells: removable batteries that drain while the suit works, recharged on a powered
   charging rack.
-- Weapon arms fitted to the suit (minigun, rocket pod, flamer, power hammer...), shoulder plates
-  and backpacks made for each suit (the Bulwark's shield generator, the Bughunter's jump pack
-  and net launcher).
+- Backpacks made for each suit (the Bulwark's shield generator, the Bughunter's jump pack and
+  net launcher), and the flamer and rocket arms as targeted buttons.
 - Suit pieces that are damaged and knocked off one at a time.
 - More suits: medic, builder, miner and more.
 - Wrecked suits that trap their pilot until another colonist cuts them out.

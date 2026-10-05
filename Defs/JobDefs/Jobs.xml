@@ -13,4 +13,16 @@
     <reportString>climbing out of a power suit.</reportString>
     <casualInterruptible>false</casualInterruptible>
   </JobDef>
+  <JobDef>
+    <defName>RPS_FitSuitArm</defName>
+    <driverClass>RimoutPowerSuit.JobDriver_FitSuitArm</driverClass>
+    <reportString>fitting TargetB to TargetA.</reportString>
+    <casualInterruptible>false</casualInterruptible>
+  </JobDef>
+  <JobDef>
+    <defName>RPS_RemoveSuitArm</defName>
+    <driverClass>RimoutPowerSuit.JobDriver_RemoveSuitArm</driverClass>
+    <reportString>taking an arm off TargetA.</reportString>
+    <casualInterruptible>false</casualInterruptible>
+  </JobDef>
 </Defs>
