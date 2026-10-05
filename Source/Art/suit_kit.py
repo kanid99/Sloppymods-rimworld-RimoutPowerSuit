@@ -615,14 +615,16 @@ def bughunter_spec(sp):
     s['helmet'] = dict(east=s['helmet']['east'], east_override=f'{sp}/own/bh_helmet_east.png', north=f'{sp}/own/bh_helmet_north.png')
     s['weapon_l'], s['weapon_r'] = 'flamer', 'hammer'
     s['colors'] = [(0.66, 0.56, 0.40), (0.56, 0.58, 0.60)]
+    # its own side-view chest (the rounded chevron chest, not the Bulwark's slab plates): repainted from the
+    # Bulwark's side painting, so the frame still lines up; own/full_east_bh_base.png is it without the launcher
     if os.environ.get('JUMP', '1') == '1':          # the jump-pack backpack (three cells, thrusters) with the net launcher on top
         s['body'] = dict(s['body'], north=f'{sp}/own/chassis_north_jumpnet.png', north_ref=f'{sp}/views/chassis_north_tall.png',
                          north_over_from=f'{sp}/own/chassis_north_jump.png')
-        s['full_east'] = dict(s['full_east'], body_image=f'{sp}/own/full_east_noarm_jumpnet.png', over_from=f'{sp}/own/full_east_noarm_jump.png', body_ref=f'{sp}/views/full_east_noarm.png')
+        s['full_east'] = dict(s['full_east'], body_image=f'{sp}/own/full_east_bh_jumpnet.png', over_from=f'{sp}/own/full_east_bh_base.png', body_ref=f'{sp}/views/full_east_noarm.png')
     else:                                            # the plain pack, with the net launcher (a chassis ability) on top
         s['body'] = dict(s['body'], north=f'{sp}/own/chassis_north_net.png', north_ref=f'{sp}/views/chassis_north_tall.png',
                          north_over_from=f'{sp}/views/chassis_north_tall.png')
-        s['full_east'] = dict(s['full_east'], body_image=f'{sp}/own/full_east_noarm_net.png', over_from=f'{sp}/views/full_east_noarm.png', body_ref=f'{sp}/views/full_east_noarm.png')
+        s['full_east'] = dict(s['full_east'], body_image=f'{sp}/own/full_east_bh_net.png', over_from=f'{sp}/own/full_east_bh_base.png', body_ref=f'{sp}/views/full_east_noarm.png')
     # its light plates in the side view (pauldron + elbow paintings), not the Bulwark's painted heavy arm
     s['east_plates'] = {'flamer': f'{sp}/own/plate_east_fuel.png', 'hammer': f'{sp}/own/plate_east_pneumatic.png',
                         'none': f'{sp}/own/plate_east_fuel.png'}   # the near arm is the left (fuel) one
