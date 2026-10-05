@@ -94,6 +94,17 @@ Decisions agreed with the owner, to build from. Numbers are starting points for 
 - Art: own chest, helmet, side painting and combo tool (5 views edited from the Miner's drill), `kit/builder_src/own/`.
   `work_spec()` in `suit_kit.py` builds any work suit from its chest, helmet and tool art.
 
+## Medic (work suit) - designed, art pending
+
+- Light armour; servos speed up tending.
+- **Suture arm**: a "Stitch wounds" button - closes every bleeding wound on an adjacent pawn (or the pilot)
+  at once, but as a rough low-quality tend: the bleeding stops, the infection risk stays. Costs a little power.
+- **Medic pack** (Medic only, three cells): on-the-go scans and diagnostics raise tend quality, tend speed and
+  surgery success while fitted. Holds up to 10 doses of medicine, loaded at the standing suit from any medicine;
+  with medicine in it, each stitch uses a dose and tends at that medicine's quality (much less infection).
+- Art needed (~10 credits): suture tool (5 views, from the drill's), side chest, helmet side and back, pack back
+  (and side). Front chest and helmet exist (approved painted set).
+
 ## Power cells
 
 - Removable battery items carrying their own charge, charged on a powered charging rack.
