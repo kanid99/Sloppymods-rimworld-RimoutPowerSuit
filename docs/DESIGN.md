@@ -209,16 +209,9 @@ canisters hanging low, two crown lamps. `Source/Art/vfe_bughunter_helmet.py`.
 
 The approved painted modular set (`Source/Art/nano/modular/`) is the base again. Rules: `docs/STYLE_GUIDE.md`.
 
-### Per-piece damage (owner's idea, to design)
+### Per-piece damage - superseded by "The frame and the suit damage model" below
 
-Each armour piece (helmet, chest, each shoulder/arm, legs) has its own condition and can be damaged and
-destroyed independently of the frame. A destroyed piece falls off and its slot is exposed; when the
-pieces covering a body part are gone, hits there reach the pilot inside the frame. Pieces are repaired
-or replaced individually. The owner wants visible legs back so damage to them can be shown: short stubby leg pieces under the hip armour (`legs_bulwark_south.png`), not full legs.
-Fits both modes: Exosuit mode already treats modules as separate items; lite mode would need the pieces
-as separate apparel with their own hit points.
-
-### Entry: the back opens
+### Entry: the back opens (superseded by "The frame" below)
 
 _Update:_ the pack opens **gullwing style**. It is hinged at its top edge and swings up over the head, so every
 backpack variant reuses the same open cavity. The **net launcher** sits on the Bughunter's pack, at the top right
@@ -228,3 +221,76 @@ The suit is entered from behind: the whole back panel (power-cell caps and relea
 one side and swings open like a door, showing an upright padded cavity for a standing pilot (who faces away from the viewer: no seat) with arm holes in the side walls, leg holes in the floor and the neck hole at the top; the harness straps are on the inside of the door and close around the pilot's back
 (`chassis_bulwark_north_open.png`). Used for the empty/parked suit and as a frame of the climb-in animation
 (turn the release wheel, back swings open, pilot climbs in, back closes).
+
+## The frame (v5, agreed with the owner)
+
+Every suit is built on one **power armour frame**: a bulky, solid, human-shaped exoskeleton (bone-coloured
+shells over dark metal, exposed drive bellows and red cable bundles at the waist), about 1.6x the pawn's
+height on the existing 320 px / drawSize 2.717 canvas. Original design, inspired by open-back power-armour
+frames. Concept art and game-ready layers: `Source/Art/frame/` (scripts) and `Source/Art/frame/kit/`
+(layers, hatch stages, GUIDE.png, README.txt with the draw order, fit checks).
+
+- **Proportions win (option A):** every plate, arm weapon and tool is redrawn to fit the frame (longer arms
+  and legs, collar at the pilot's chin). The current suit art does not fit it (`kit/fit_<Suit>.png`).
+- **The pilot** is the game's own pawn, drawn 26 px higher than normal so the head clears the collar.
+- **The back hatch** is one solid armoured shell (30 px deep), hinged along the top of its humps (hinge
+  barrels on the frame), closing onto a rim of the same shape round the opening. Inside: quilted padding.
+  The pack rides on the hatch and swings up with it.
+- **The neck hole** is a collar ring in the frame itself. Without a helmet the head shows through it.
+- **Auxiliary tank** across the lower back: holds the spare cell used if the pack is damaged or destroyed.
+- **Climb-in:** the hatch swings up (6 stages, 0 = shut .. 5 = 135 degrees open); the pilot walks up from
+  behind, under the raised hatch, steps up into the frame; the head goes into the collar (north: covered by
+  the raised hatch, revealed as it closes; south: rises up through the collar); the hatch closes. The legs
+  do not open. Hinge barrels are hidden by the hatch while it moves.
+
+### Pilot's clothes
+
+Clothes stay visible while the pilot climbs in. When the hatch closes, everything the pilot wears (hats
+included) is taken off and kept in the suit (a container on the suit, saved with it - not the pilot's
+inventory). They go back on when the pilot climbs out; anything that cannot be worn again is dropped.
+Open points: Ideology/Royalty apparel requirements while suited (exempt the suit, or accept the mood
+penalty); quest-locked apparel (refuse entry, or keep it on).
+
+### Helmet
+
+Optional. A frame runs without one: the pilot's head shows out of the collar, head hits reach the pilot,
+and the helmet's bonuses are missing. With a helmet: a real headgear item put on when the hatch closes,
+using the game's render skip flags (Head, Hair, Beard, Eyes, Tattoos) to hide the head; head armour, and
+the suit's sensor bonuses. Broken helmet = no helmet. Suggested bonuses (tunable):
+Bulwark aim + melee hit chance; Bughunter aiming delay + accuracy; Miner mining yield; Builder construction
+success and speed; Medic tend quality and surgery success.
+
+### Parts and slots
+
+Seven slots: helmet, chest, left arm, right arm, left leg, right leg, pack. Every fitted part can modify the
+suit (stat offsets/factors, armour, hit points, power drain, abilities, an arm module) while fitted and not
+broken. Suit-specific parts fit only their suit; generic parts fit all. The chest and leg plates that are
+part of each suit today become separate parts; each suit comes with its standard set.
+
+### The suit damage model
+
+The pilot stays the real pawn wearing the suit (apparel), so skills, jobs, abilities and mods keep working.
+Three layers, outside in:
+1. **Plates** (the fitted parts) - own armour and hit points.
+2. **Frame systems**, hit once the plate over them is gone or broken:
+   leg actuators L/R (move speed, carrying; one gone = limping, both = cannot walk), arm actuators L/R
+   (work speed, melee; gone = limp arm, its module offline), drive system - the exposed waist (everything
+   slower; gone = frame locks up, pilot trapped), power system - pack mount and auxiliary tank (charge leaks,
+   capacity drops; gone = unpowered; a hit tank can rupture), hatch (jammed = pilot cannot get out).
+3. **The pilot**, hit when the system there is gone, through gaps, or by very big hits (a share of
+   explosions and heavy hits passes through every layer; threshold to tune, e.g. 40% of a part's max HP).
+Hits are mapped from the pilot's body part the game picks to the suit part covering it. Severe damage can
+kill the pilot. Suggested: legs tracked left and right.
+Seen in game: missing plates show the frame; damaged systems spark, smoke, hiss; a status panel with a bar
+per plate and system. Repair per part: plates with steel/plasteel, systems at the charging rack with steel
+and components (an advanced component for a destroyed system).
+
+### Wreck and dead pilot
+
+The suit at zero (body/drive destroyed): the pilot's clothes are put back on and the suit becomes a
+**wreck** holding the pilot, like a cryptosleep casket (a Building_Casket-style container). Suggested: needs
+paused inside; another colonist pries it open; a conscious pilot can force their way out slowly. The wreck
+can be repaired back into a frame or deconstructed. If the pilot dies inside, the suit loses its identity
+and is just a container holding the body until emptied.
+Not chosen: making the suit its own pawn that inherits the pilot's skills (vehicle-mod style) - far more
+work and fragile; the apparel model gives the same play.
