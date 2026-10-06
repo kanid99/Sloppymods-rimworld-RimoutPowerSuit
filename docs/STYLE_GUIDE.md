@@ -175,7 +175,8 @@ Heavy (Bulwark) is done south and north (`armor/armor_heavy_*`); the other four 
 
 `armor_ws2.py` (renderer `armor_vfe.py`): our own Heavy pieces in the warcasket design language - top-heavy
 silhouette, small helmet sunk into a high collar, big rounded dome pauldrons with a rim lip, barrel chest over
-banded abdomen, flared hip skirt, chunky forearm cuffs, big round knee guards, short flared greaves; big smooth
+banded abdomen, flared hip skirt, thick strong forearms (a broad cuff bulging toward the elbow, an elbow plate over it, a heavy wrist lip), big
+round knee guards, short flared greaves; raised pectorals suggested on the chest by form, not lines; big smooth
 rounded plates; light grey (takes the tint). The recorded no-gos stay out (T visor, twin back exhausts, round
 grille snout with hoses). Owner's rule: resemble the design elements, never copy a warcasket.
 

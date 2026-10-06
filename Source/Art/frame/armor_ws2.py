@@ -50,16 +50,20 @@ def torso(s):
     for sd in (-1, 1):
         s.plate(R(M([(180, 200), (220, 204), (232, 236), (198, 242), (182, 226)], sd), 7), 3.4)
     s.plate(R([(110, 116), (210, 116), (228, 134), (226, 168), (206, 188), (114, 188), (94, 168), (92, 134)], 18), 5)   # barrel chest
-    s.detail(seam((160, 120), (160, 184)) + seam((112, 148), (148, 152)) + seam((208, 148), (172, 152))
-             + f'<rect x="176" y="160" width="16" height="4" rx="1" fill="#1d1b1e"/><rect x="178" y="161.2" width="12" height="1.6" fill="#8ef08a" filter="url(#GLOW)"/>'
+    for sd in (-1, 1):                                                                             # raised pectorals
+        s.plate(R(M([(163, 121), (206, 118), (224, 127), (222, 140), (204, 154), (182, 164), (164, 167)], sd), 10), 1.8)
+    s.detail(seam((160, 166), (160, 184))                                                          # the sternum channel below them
+             + f'<rect x="184" y="172" width="14" height="3.6" rx="1" fill="#1d1b1e"/><rect x="186" y="173" width="10" height="1.6" fill="#8ef08a" filter="url(#GLOW)"/>'
              + bolt(104, 140) + bolt(216, 140))
 
 def arm_low(s, sd):
     s.plate(R(M([(234, 150), (254, 148), (256, 184), (236, 186)], sd), 4), 2.4)                    # upper arm
-    s.plate(R(M([(218, 196), (266, 192), (276, 214), (270, 236), (226, 240), (214, 216)], sd), 11), 4.4)   # forearm cuff
-    s.plate(R(M([(222, 234), (270, 232), (272, 246), (226, 248)], sd), 4), 2.4)                     # wrist lip
-    a, b = M([(232, 208)], sd)[0], M([(256, 206)], sd)[0]
-    s.detail(slot(min(a[0], b[0]), 205, max(a[0], b[0]), 210) + bolt(*M([(262, 222)], sd)[0]))
+    # a thick, strong forearm: a broad cuff bulging toward the elbow and tapering to the wrist
+    s.plate(R(M([(212, 190), (270, 184), (285, 206), (281, 228), (267, 243), (228, 247), (209, 227), (205, 206)], sd), 12), 4.8)
+    s.plate(R(M([(224, 238), (274, 235), (277, 251), (226, 254)], sd), 5), 2.8)                     # heavy wrist lip
+    s.plate(R(M([(222, 178), (262, 175), (270, 190), (228, 196)], sd), 8), 3)                       # elbow plate over its top
+    a, b = M([(228, 214)], sd)[0], M([(262, 211)], sd)[0]
+    s.detail(slot(min(a[0], b[0]), 211, max(a[0], b[0]), 216) + bolt(*M([(274, 222)], sd)[0]) + bolt(*M([(214, 220)], sd)[0]))
 
 def pauldron(s, sd):
     s.plate(R(M([(200, 140), (264, 144), (284, 134), (288, 148), (266, 162), (202, 156)], sd), 5), 2.6)   # rim lip
@@ -111,7 +115,7 @@ def piece(fn, prefix):
 
 CELLS = [('Helmet + collar', (100, 44, 120, 90), 'south', lambda: piece(lambda s: (helmet(s), collar(s)), 'h')),
          ('Chest, abdomen, hip skirt', (84, 104, 152, 146), 'south', lambda: piece(torso, 'c')),
-         ('Pauldrons and forearm cuffs', (26, 80, 268, 176), 'south', lambda: piece(lambda s: [f(s, d) for d in (-1, 1) for f in (arm_low, pauldron)], 'a')),
+         ('Pauldrons and forearm cuffs', (22, 80, 276, 180), 'south', lambda: piece(lambda s: [f(s, d) for d in (-1, 1) for f in (arm_low, pauldron)], 'a')),
          ('Legs', (96, 222, 128, 94), 'south', lambda: piece(lambda s: (leg(s, -1), leg(s, 1)), 'l')),
          ('Pack (reactor)', (96, 80, 128, 134), 'north', lambda: piece(pack, 'p'))]
 
