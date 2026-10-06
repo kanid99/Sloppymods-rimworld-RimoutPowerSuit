@@ -72,11 +72,33 @@ def arm_low(s, sd):
     s.detail(slot(min(a[0], b[0]), 205, max(a[0], b[0]), 210) + bolt(*M([(256, 224)], sd)[0]))
 
 def pauldron(s, sd):
-    """angular, armoured: tilted down and outward, flat faceted planes, tight corners, a sharp outer point"""
-    s.plate(R(M([(204, 138), (274, 142), (294, 132), (292, 148), (274, 160), (208, 154)], sd), 2), 2.4)      # angled lower lame
-    s.plate(R(M([(198, 102), (236, 88), (274, 98), (294, 130), (272, 146), (208, 142), (194, 124)], sd), 3), 4.4)   # main plate
-    s.plate(R(M([(214, 100), (238, 92), (270, 104), (268, 110), (238, 99), (216, 106)], sd), 2), 1.6)     # raised ridge along the top
-    s.detail(seam(*M([(214, 120), (276, 128)], sd)) + bolt(*M([(216, 134)], sd)[0]) + bolt(*M([(276, 136)], sd)[0]))
+    """angular, armoured, smaller (80% about the shoulder), with greebles: a vent grille, an access hatch with
+    four bolts, a marker lamp at the outer point, a pipe along the lower lame, a piston to the collar"""
+    SC = lambda p: [(236 + (x - 236) * 0.8, 120 + (y - 120) * 0.8) for x, y in p]
+    # a short hydraulic piston from the pauldron's inner edge down to the collar (drawn first: it sits under it)
+    pa, pb = M(SC([(204, 128)]), sd)[0], M([(196, 112)], sd)[0]
+    s.detail(f'<line x1="{pa[0]}" y1="{pa[1]}" x2="{pb[0]}" y2="{pb[1]}" stroke="{OLC}" stroke-width="5"/>'
+             f'<line x1="{pa[0]}" y1="{pa[1]}" x2="{pb[0]}" y2="{pb[1]}" stroke="#9a9aa2" stroke-width="3.2"/>'
+             f'<line x1="{pa[0]}" y1="{pa[1]}" x2="{(pa[0] + pb[0]) / 2}" y2="{(pa[1] + pb[1]) / 2}" stroke="{OLC}" stroke-width="5.6"/>'
+             f'<line x1="{pa[0]}" y1="{pa[1]}" x2="{(pa[0] + pb[0]) / 2}" y2="{(pa[1] + pb[1]) / 2}" stroke="#c8c8ce" stroke-width="3.8"/>')
+    s.plate(R(M(SC([(204, 138), (274, 142), (294, 132), (292, 148), (274, 160), (208, 154)]), sd), 2), 2.2)      # angled lower lame
+    s.plate(R(M(SC([(198, 102), (236, 88), (274, 98), (294, 130), (272, 146), (208, 142), (194, 124)]), sd), 3), 3.8)   # main plate
+    s.plate(R(M(SC([(214, 100), (238, 92), (270, 104), (268, 110), (238, 99), (216, 106)]), sd), 2), 1.4)     # raised top ridge
+    s.plate(R(M(SC([(244, 120), (266, 122), (265, 136), (243, 134)]), sd), 2), 1.4)                           # access hatch
+    hb = M(SC([(247, 123), (263, 125), (262, 133), (246, 131)]), sd)
+    det = ''.join(bolt(x, y, 0.8) for x, y in hb)
+    vx = [M(SC([(214 + k * 6, 118)]), sd)[0][0] for k in range(4)]                                             # vent grille
+    vy0, vy1 = SC([(0, 116)])[0][1], SC([(0, 130)])[0][1]
+    det += ''.join(slot(min(x, x + sd * 3.2), vy0, max(x, x + sd * 3.2), vy1) for x in vx)
+    lx, ly = M(SC([(284, 134)]), sd)[0]                                                                         # marker lamp
+    det += (f'<circle cx="{lx}" cy="{ly}" r="2.6" fill="{OLC}"/><circle cx="{lx}" cy="{ly}" r="1.9" fill="#f2a83a" filter="url(#GLOW)"/>'
+            f'<circle cx="{lx}" cy="{ly}" r="1.2" fill="#ffe2a8"/>')
+    p0 = M(SC([(212, 150), (240, 152), (268, 154), (284, 146)]), sd)                                          # a pipe along the lower lame
+    det += (f'<polyline points="{V.P(p0)}" fill="none" stroke="{OLC}" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>'
+            f'<polyline points="{V.P(p0)}" fill="none" stroke="#7c7c84" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+            f'<polyline points="{V.P([(x, y - 0.6) for x, y in p0])}" fill="none" stroke="#d6d6dc" stroke-width="0.7" stroke-linecap="round" stroke-opacity="0.8"/>')
+    det += seam(*M(SC([(214, 122), (274, 130)]), sd))
+    s.detail(det)
 
 def leg(s, sd):
     s.plate(R(M([(176, 292), (210, 292), (218, 308), (170, 310)], sd), 5), 3)                       # flared greave
