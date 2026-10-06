@@ -241,3 +241,10 @@ pauldrons, pack/shoulder, body) with `pill_trace.py`, reduced to tintable grey (
 decal kept), and fitted to our frame canvas: helmet top at the raised pilot's head (y 52), base at the frame's feet
 (y 318). Output `pill/pill_suit_{east,south,north}.svg` (+ `pill_cmp.png` over the frame, tinted, game size).
 The pill covers the frame's torso and legs; the frame's arms still show at the sides in south/north.
+Pieces on the frame (`pill_fit2.py` -> `pill/pill_pieces_<suit>_<view>.svg`, preview `pill/pill_versions.png`):
+each view is cut into helmet, pauldrons, chest, belt and groin/seat plate (east: pack, side shoulder, helmet,
+chest, belt), each piece scaled into its spot on the frame; the pill's rounded bottom is dropped so the frame's
+legs show. Three suits: classic (owner's first pill sheet), mining and futuristic (owner's second sheet; their
+images, not committed). Colour rules: plates to tintable grey (mining's hazard stripes come back yellow/black under
+a yellow tint), kept accents per suit (classic: the star; mining: headlamps; futuristic: red visor, orange/cyan
+lights). Gaps between pieces (arms, legs, sides; the east view) are still to be filled.
