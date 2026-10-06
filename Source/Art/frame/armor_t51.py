@@ -85,9 +85,9 @@ def torso(s):
 
 def arm_low(s, sd):
     s.plate(R(M([(234, 150), (254, 148), (256, 184), (236, 186)], sd), 4), 2.4)                    # upper arm
-    s.plate(R(M([(218, 196), (266, 192), (276, 214), (270, 236), (226, 240), (214, 216)], sd), 11), 4.4)   # forearm cuff (normal size)
-    s.plate(R(M([(222, 234), (270, 232), (272, 246), (226, 248)], sd), 4), 2.4)                     # wrist lip
-    s.detail(''.join(rib(*M([(220, 206 + k * 9), (270, 204 + k * 9)], sd)) for k in range(2)) + bolt(*M([(264, 226)], sd)[0]))
+    s.plate(R(M([(224, 198), (264, 196), (266, 234), (226, 236)], sd), 4), 3.6)                     # forearm cuff: smaller, squarer
+    s.plate(R(M([(226, 232), (266, 231), (267, 243), (227, 244)], sd), 3), 2.2)                     # wrist lip
+    s.detail(''.join(rib(*M([(228, 207 + k * 9), (262, 206 + k * 9)], sd)) for k in range(2)) + bolt(*M([(258, 226)], sd)[0]))
 
 def pauldron(s, sd):
     s.plate(R(M([(200, 140), (264, 144), (284, 134), (288, 148), (266, 162), (202, 156)], sd), 5), 2.6)   # rim lip
