@@ -85,12 +85,9 @@ def torso(s):
 
 def arm_low(s, sd):
     s.plate(R(M([(234, 150), (254, 148), (256, 184), (236, 186)], sd), 4), 2.4)                    # upper arm
-    # a thick, strong forearm: a broad cuff bulging toward the elbow and tapering to the wrist
-    s.plate(R(M([(212, 190), (270, 184), (285, 206), (281, 228), (267, 243), (228, 247), (209, 227), (205, 206)], sd), 12), 4.8)
-    s.plate(R(M([(224, 238), (274, 235), (277, 251), (226, 254)], sd), 5), 2.8)                     # heavy wrist lip
-    s.plate(R(M([(222, 178), (262, 175), (270, 190), (228, 196)], sd), 8), 3)                       # elbow plate over its top
-    a, b = M([(228, 214)], sd)[0], M([(262, 211)], sd)[0]
-    s.detail(''.join(rib(*M([(216, 204 + k * 9), (276, 202 + k * 9)], sd)) for k in range(3)) + bolt(*M([(274, 230)], sd)[0]) + bolt(*M([(214, 228)], sd)[0]))
+    s.plate(R(M([(218, 196), (266, 192), (276, 214), (270, 236), (226, 240), (214, 216)], sd), 11), 4.4)   # forearm cuff (normal size)
+    s.plate(R(M([(222, 234), (270, 232), (272, 246), (226, 248)], sd), 4), 2.4)                     # wrist lip
+    s.detail(''.join(rib(*M([(220, 206 + k * 9), (270, 204 + k * 9)], sd)) for k in range(2)) + bolt(*M([(264, 226)], sd)[0]))
 
 def pauldron(s, sd):
     s.plate(R(M([(200, 140), (264, 144), (284, 134), (288, 148), (266, 162), (202, 156)], sd), 5), 2.6)   # rim lip
@@ -144,7 +141,7 @@ def piece(fn, prefix):
 
 CELLS = [('Helmet + collar', (100, 44, 120, 90), 'south', lambda: piece(lambda s: (helmet(s), collar(s), face(s)), 'h')),
          ('Chest, abdomen, hip skirt', (84, 104, 152, 146), 'south', lambda: piece(torso, 'c')),
-         ('Pauldrons and forearm cuffs', (22, 80, 276, 180), 'south', lambda: piece(lambda s: [f(s, d) for d in (-1, 1) for f in (arm_low, pauldron)], 'a')),
+         ('Pauldrons and forearm cuffs', (26, 80, 268, 176), 'south', lambda: piece(lambda s: [f(s, d) for d in (-1, 1) for f in (arm_low, pauldron)], 'a')),
          ('Legs', (96, 222, 128, 94), 'south', lambda: piece(lambda s: (leg(s, -1), leg(s, 1)), 'l')),
          ('Pack (reactor)', (96, 80, 128, 134), 'north', lambda: piece(pack, 'p'))]
 
