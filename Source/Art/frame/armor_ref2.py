@@ -15,6 +15,14 @@ def Fs(pts, n, s, kind='flat', tone='light'):
 def circle(cx, cy, r, k=24):
     return [(cx + r * math.cos(2 * math.pi * i / k), cy + r * math.sin(2 * math.pi * i / k)) for i in range(k)]
 
+def band(tl, tr, br, bl, sag=3.0, k=10):
+    """a band round a cylinder seen from just above: its top and bottom edges bow down"""
+    def curve(a, b):
+        mx, my = (a[0] + b[0]) / 2, (a[1] + b[1]) / 2 + sag * 2
+        return [((1 - t) ** 2 * a[0] + 2 * (1 - t) * t * mx + t * t * b[0],
+                 (1 - t) ** 2 * a[1] + 2 * (1 - t) * t * my + t * t * b[1]) for t in [i / k for i in range(k + 1)]]
+    return curve(tl, tr) + curve(br, bl)
+
 def rect_x(d, x0, x1):
     return (min(x0, x1), max(x0, x1))
 
@@ -90,20 +98,28 @@ def build(prefix):
 
     # ---- arms
     for s in (-1, 1):
-        d.part([Fs([(234, 150), (254, 148), (256, 182), (236, 184)], (0, 0, 1), s, 'cyl_h')])
+        d.part([F(mirror(band((234, 150), (254, 148), (256, 182), (236, 184), 1.6), s), (0, 0, 1), 'cyl_h')])
         ex = 160 + s * 86
         d.part([F(circle(ex, 188, 7.5), (0, 0, 1), 'dome', 'dark')], grime=False)
         d.bolt(ex, 188, 1.5)
         d.piston(mirror([(258, 158)], s)[0], mirror([(266, 204)], s)[0])
-        d.part([Fs([(228, 212), (266, 210), (268, 230), (260, 240), (232, 242)], (0, 0.1, 1), s, 'cyl_h')])
-        d.part([Fs([(226, 194), (262, 192), (266, 206), (264, 212), (228, 214)], (0, -0.1, 1), s, 'cyl_h')])
-        d.part([Fs([(232, 238), (262, 236), (262, 245), (232, 247)], (0, 0, 1), s, 'cyl_h', 'dark')], grime=False)
-        for k in range(3):
-            d.groove(mirror([(234 + k * 9, 238), (234 + k * 9, 246)], s), 0.7)
+        lower = band((228, 212), (266, 210), (262, 238), (232, 240), 3)
+        upper = band((226, 193), (262, 191), (265, 212), (228, 214), 3)
+        ring = band((232, 237), (262, 235), (262, 244), (232, 246), 2.2)
+        d.part([F(mirror(lower, s), (0, 0.1, 1), 'cyl_h')])
+        d.part([F(mirror(upper, s), (0, -0.1, 1), 'cyl_h')])
+        d.part([F(mirror(ring, s), (0, 0, 1), 'cyl_h', 'dark')], grime=False)
+        for k in range(1, 4):
+            x = 232 + k * 7.5
+            d.groove(mirror([(x, 237.5 + 2.2 * 2 * 4 * ((x - 232) / 30) * (1 - (x - 232) / 30) * 0.5 + 0.2), (x, 244.5)], s), 0.7)
+        mid = band((228, 202), (264, 200), (264, 200), (228, 202), 3)[:11]
+        d.groove(mirror(mid, s))
+        lowg = band((230, 224), (266, 222), (266, 222), (230, 224), 3)[:11]
         d.hazard(mirror([(254, 197), (263, 196), (264, 202), (255, 203)], s))
-        d.groove(mirror([(230, 224), (266, 222)], s)); d.bolt(*mirror([(236, 232)], s)[0])
+        d.groove(mirror(lowg, s)); d.bolt(*mirror([(236, 232)], s)[0])
 
     # ---- neck cables, helmet, collar, respirator
+    d.add('<g transform="translate(160 0) scale(0.85 1) translate(-160 0)">')            # the helmet, 15% narrower
     for s in (-1, 1):
         d.tube(mirror([(178, 102), (186, 94), (190, 86)], s), 2.6)
     for s in (-1, 1):
@@ -120,16 +136,19 @@ def build(prefix):
     d.add(f'<polyline points="{P([(131, 89), (149, 91), (160, 97.5), (171, 91), (189, 89)])}" fill="none" stroke="#ff3a22" stroke-width="3.4" filter="url(#{d.glow})"/>'
           f'<polyline points="{P([(132, 89), (149, 91.2), (160, 97.4), (171, 91.2), (188, 89)])}" fill="none" stroke="#ffd0bf" stroke-width="1.1"/>'
           f'<polyline points="{P([(136, 87.6), (146, 88.4)])}" stroke="#ffffff" stroke-width="0.9" stroke-opacity="0.7"/>')
+    d.add('</g>')
     d.part([F([(118, 96), (202, 96), (210, 104), (110, 104)], (0, -0.8, 0.6)),
             F([(110, 104), (210, 104), (200, 122), (120, 122)], (0, 0.15, 0.99))])
     for x in (118, 140, 180, 202):
         d.bolt(x, 113, 1.1)
+    d.add('<g transform="translate(160 0) scale(0.85 1) translate(-160 0)">')            # the respirator, narrowed with the helmet
     d.part([F([(144, 100), (176, 100), (180, 112), (172, 120), (148, 120), (140, 112)], (0, 0.05, 1)),
             F([(148, 120), (172, 120), (168, 125), (152, 125)], (0, 0.8, 0.6))])
     d.vent(146, 104, 174, 117, 5)
+    d.add('</g>')
 
     # ---- pauldrons (90% about the shoulder)
-    SC = lambda p: [(236 + (x - 236) * 0.9, 120 + (y - 120) * 0.9) for x, y in p]
+    SC = lambda p: [(236 + (x - 236) * 0.9 - 9, 120 + (y - 120) * 0.9) for x, y in p]   # 90%, brought 9 px in toward the head
     for s in (-1, 1):
         G = lambda p, n, kind='flat', tone='light': Fs(SC(p), n, s, kind, tone)
         d.part([G([(202, 138), (272, 142), (290, 134), (288, 146), (272, 156), (206, 152)], (0.2, 0.35, 0.92)),

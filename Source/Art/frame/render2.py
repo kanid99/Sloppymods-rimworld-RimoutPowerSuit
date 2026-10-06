@@ -63,7 +63,8 @@ class Doc:
         if kind == 'flat':
             stops = [(0, I + 0.07), (1, I - 0.09)]; x2, y2 = 1, 1
         else:
-            stops = [(0, I - 0.3), (0.28, I + 0.16), (0.62, I), (1, I - 0.34)]
+            # a cylinder: dark sides, a bright band a third across, the turn away, reflected light at the far edge
+            stops = [(0, I - 0.44), (0.16, I + 0.02), (0.3, I + 0.26), (0.42, I + 0.06), (0.72, I - 0.16), (0.9, I - 0.3), (1, I - 0.22)]
             x2, y2 = (1, 0) if kind == 'cyl_h' else (0, 1)
         tr = f' gradientTransform="rotate({angle} 0.5 0.5)"' if angle else ''
         self.defs.append(f'<linearGradient id="{gid}" x1="0" y1="0" x2="{x2}" y2="{y2}"{tr}>' +
@@ -84,8 +85,9 @@ class Doc:
                 self.add(f'<polygon points="{P(pts)}" fill="url(#{self.carbon})"/>')
         for pts, n, kind, tone in facets:                       # faint seams, then light on the lit edges
             self.add(f'<polygon points="{P(pts)}" fill="none" stroke="{OLC}" stroke-width="0.55" stroke-opacity="0.32" stroke-linejoin="round"/>')
+            cyl = kind.startswith('cyl')
             s = 1 if orient(pts) > 0 else -1
-            for i in range(len(pts)):
+            for i in range(len(pts) if not cyl else 0):
                 a, b = pts[i - 1], pts[i]
                 dx, dy = b[0] - a[0], b[1] - a[1]; Ln = math.hypot(dx, dy) or 1
                 nx, ny = -dy / Ln * s, dx / Ln * s
@@ -94,7 +96,19 @@ class Doc:
                     ix, iy = -nx * 0.7, -ny * 0.7
                     op = 0.35 + 0.45 * (t - 0.35) / 0.65
                     self.add(f'<line x1="{a[0] + ix:.2f}" y1="{a[1] + iy:.2f}" x2="{b[0] + ix:.2f}" y2="{b[1] + iy:.2f}" stroke="#ffffff" stroke-width="0.8" stroke-opacity="{op:.2f}" stroke-linecap="round"/>')
-            if glints and tone != 'dark' and lit(n) > 0.82:
+            if cyl:                                              # a soft specular streak along the cylinder
+                xs = [x for x, _ in pts]; ys = [y for _, y in pts]
+                w = max(xs) - min(xs); h = max(ys) - min(ys)
+                sop = 0.5 if tone != 'dark' else 0.22
+                cid = self.id()
+                self.defs.append(f'<clipPath id="{cid}"><polygon points="{P(pts)}"/></clipPath>')
+                if kind == 'cyl_h':
+                    x = min(xs) + w * 0.3
+                    self.add(f'<g clip-path="url(#{cid})"><line x1="{x:.1f}" y1="{min(ys) - 2}" x2="{x:.1f}" y2="{max(ys) + 2}" stroke="#fff" stroke-width="{max(1.2, w * 0.07):.1f}" stroke-opacity="{sop}" filter="url(#{self.soft})"/></g>')
+                else:
+                    y = min(ys) + h * 0.3
+                    self.add(f'<g clip-path="url(#{cid})"><line x1="{min(xs) - 2}" y1="{y:.1f}" x2="{max(xs) + 2}" y2="{y:.1f}" stroke="#fff" stroke-width="{max(1.2, h * 0.07):.1f}" stroke-opacity="{sop}" filter="url(#{self.soft})"/></g>')
+            if glints and not cyl and tone != 'dark' and lit(n) > 0.82:
                 xs = [x for x, _ in pts]; ys = [y for _, y in pts]
                 cx, cy = min(xs) + (max(xs) - min(xs)) * 0.32, min(ys) + (max(ys) - min(ys)) * 0.28
                 rx, ry = (max(xs) - min(xs)) * 0.2, (max(ys) - min(ys)) * 0.1

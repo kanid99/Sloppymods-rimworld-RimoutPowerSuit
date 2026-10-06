@@ -212,3 +212,7 @@ pauldrons with vents, a bolted hatch, a marker lamp and stencils; faceted breast
 amber/blue/teal lights; stacked chevron abdomen over a dark waist with side cables; angular hip tassets; dark
 thighs under light front plates; faceted knee guards with round side joints and blue lights; three-faced greaves;
 boot caps; cylinder forearms with a hazard stripe and segmented wrist rings; a thruster behind one shoulder.
+Reference suit tweaks (owner): forearm cuffs, upper arms and wrist rings are cylinders - shaded as such (dark sides,
+a bright band a third across, reflected light at the far edge, a soft specular streak; no lit-edge lines or glints)
+with band edges bowing down like rings round a cylinder; the helmet and respirator are 15% narrower; the pauldrons
+sit 9 px further in toward the head.
