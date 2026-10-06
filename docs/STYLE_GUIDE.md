@@ -195,3 +195,20 @@ retro rounded forms, raised horizontal strakes (light top edge, soft dark line u
 knees and greaves, rivet rows (brow, collar, pauldron rims, thighs, pack), a ribbed accordion abdomen, a straight
 square-ended centre ridge (a narrow tapered keel with rivets read as a necktie - avoid), a heavy brow ridge, and a ribbed respirator with filter canisters that juts in front of the collar.
 Influences only: the T-51b helmet face (twin round eye lenses) is not used; our recessed slit visor stays.
+
+## Renderer v2 and the owner's reference suit
+
+The owner supplied a reference render (heavy power armour on a platform; their image, not committed). It is
+translated into our style, south view, fitted to the frame: `armor_ref2.py` with renderer `render2.py`
+(`armor/armor_ref2_suit_south.*`; `armor_ref1.py` is the simpler first pass).
+Renderer v2: parts are built from facets, each lit by its own normal (light from the upper left, toward the
+viewer) - top planes, front faces, turned-away sides, ridge facets - with flat / cylinder / dome gradients,
+glints on the brightest faces, light along lit edges, faint seams between facets, one light silhouette outline
+and a soft cast shadow per part, and grime toward the bottom. Tones: light (takes the tint), dark (undersuit, with
+a carbon weave), metal (bare steel). Details: recessed panels, vents with fins, grooves, bolts, pistons, cables,
+segmented joint rings, lights with glow, stencils, hazard stripes, a glass visor with a reflection streak.
+From the reference: ribbed dome helmet with a winged red visor, slatted respirator and cheek pods; layered angular
+pauldrons with vents, a bolted hatch, a marker lamp and stencils; faceted breastplate with a centre ridge and
+amber/blue/teal lights; stacked chevron abdomen over a dark waist with side cables; angular hip tassets; dark
+thighs under light front plates; faceted knee guards with round side joints and blue lights; three-faced greaves;
+boot caps; cylinder forearms with a hazard stripe and segmented wrist rings; a thruster behind one shoulder.

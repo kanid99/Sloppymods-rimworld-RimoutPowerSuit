@@ -12,6 +12,7 @@ from frame4 import X
 OLC = '#1c1a19'
 LIGHT = (-0.55, -0.84)                       # towards the upper left (screen y down)
 TOP = ('#ececee', '#cdcdd1', '#a2a2a9')      # top face: lit centre -> mid -> rim
+TOP_DARK = ('#6c6e75', '#4d4f55', '#34353a') # dark plates: the undersuit and joints
 ACC = '#e8603a'                              # one accent: the visor glow
 # RimWorld-weight lines (owner): a light silhouette outline, no dark lines between plates - shading suggests form
 SIL_W, EDGE_W, EDGE_OP = 3.4, 0.6, 0.35
@@ -42,12 +43,12 @@ def inset(p, c):
         out.append((b[0] + bx * c / cosh, b[1] + by * c / cosh))
     return out
 
-def face_colour(a, b, inward_sign):
+def face_colour(a, b, inward_sign, tone='light'):
     """the chamfer face along edge a-b: lit when its outward normal points to the light"""
     dx, dy = b[0] - a[0], b[1] - a[1]; L = math.hypot(dx, dy) or 1
     nx, ny = dy / L * inward_sign, -dx / L * inward_sign     # outward normal
     t = nx * LIGHT[0] + ny * LIGHT[1]                         # -1 .. 1
-    lo, hi = (112, 112, 120), (246, 246, 248)
+    lo, hi = ((112, 112, 120), (246, 246, 248)) if tone == 'light' else ((34, 34, 38), (120, 122, 130))
     f = min(1.0, max(0.0, (t + 1) / 2)) ** 1.4
     return '#%02x%02x%02x' % tuple(int(lo[k] + (hi[k] - lo[k]) * f) for k in range(3))
 
@@ -58,8 +59,8 @@ class Suit:
         self.p, self.n, self.defs, self.items = prefix, 0, [], []
     def id(self):
         self.n += 1; return f'{self.p}{self.n}'
-    def plate(self, pts, chamfer=3.2, shadow=True):
-        self.items.append(('plate', pts, chamfer, shadow))
+    def plate(self, pts, chamfer=3.2, shadow=True, tone='light'):
+        self.items.append(('plate', pts, chamfer, shadow, tone))
     def detail(self, svg):
         self.items.append(('detail', svg))
     def render(self):
@@ -72,27 +73,28 @@ class Suit:
         self.defs.append(f'<filter id="{soft}" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.6"/></filter>')
         out = []
         plates = [it for it in self.items if it[0] == 'plate']
-        for _, p, _, _ in plates:                                   # heavy silhouette outline
+        for _, p, *_ in plates:                                   # heavy silhouette outline
             out.append(f'<polygon points="{P(p)}" fill="{OLC}" stroke="{OLC}" stroke-width="{SIL_W}" stroke-linejoin="round"/>')
         for it in self.items:
             if it[0] == 'detail':
                 out.append(it[1].replace('GLOW', glow).replace('SOFT', soft)); continue
-            _, p, c, shadow = it
+            _, p, c, shadow, tone = it
+            top = TOP if tone == 'light' else TOP_DARK
             if shadow:
                 out.append(f'<polygon points="{P([(x + 2.4, y + 3.2) for x, y in p])}" fill="#000" fill-opacity="0.45" filter="url(#{blur})"/>')
             ins = inset(p, c)
             sgn = -1 if orient(p) > 0 else 1
             for i in range(len(p)):                                 # chamfer side faces
                 q = [p[i - 1], p[i], ins[i], ins[i - 1]]
-                col = face_colour(p[i - 1], p[i], sgn)
+                col = face_colour(p[i - 1], p[i], sgn, tone)
                 out.append(f'<polygon points="{P(q)}" fill="{col}" stroke="{col}" stroke-width="0.5" stroke-linejoin="round"/>')
             xs = [x for x, _ in ins]; ys = [y for _, y in ins]
             gid = self.id()                                         # soft form shading on the top face
             cx = min(xs) + (max(xs) - min(xs)) * 0.38; cy = min(ys) + (max(ys) - min(ys)) * 0.3
             r = max(max(xs) - min(xs), max(ys) - min(ys)) * 0.85
             self.defs.append(f'<radialGradient id="{gid}" gradientUnits="userSpaceOnUse" cx="{cx:.1f}" cy="{cy:.1f}" r="{r:.1f}">'
-                             f'<stop offset="0" stop-color="{TOP[0]}"/><stop offset="0.6" stop-color="{TOP[1]}"/>'
-                             f'<stop offset="1" stop-color="{TOP[2]}"/></radialGradient>')
+                             f'<stop offset="0" stop-color="{top[0]}"/><stop offset="0.6" stop-color="{top[1]}"/>'
+                             f'<stop offset="1" stop-color="{top[2]}"/></radialGradient>')
             out.append(f'<polygon points="{P(ins)}" fill="url(#{gid})"/>')
             # no line between plates: shadow and chamfer faces carry the form; only a faint edge
             out.append(f'<polygon points="{P(p)}" fill="none" stroke="{OLC}" stroke-width="{EDGE_W}" stroke-opacity="{EDGE_OP}" stroke-linejoin="round"/>')
