@@ -153,3 +153,12 @@ chain hoist with hooks on the frame's shoulders, two clamp arms on its sides, bo
 open back. East is a side elevation: the near post hides the far one, the beam is end-on on top, the far
 clamp arm and the far chain sit a little higher than the near ones. Drawn at the suit's scale (117.8 px per tile); the gantry
 rises above the footprint (needs a taller drawSize).
+
+## Armour piece styles (vector sheet, first pass)
+
+`Source/Art/frame/armor_sheet.py` -> `Source/Art/frame/armor/armor_pieces.svg` (+ PNG): five styles drawn to fit the
+frame - Heavy (Bulwark: layered slabs, visor slit), Light (Bughunter: slim plates with open cut-outs, bug-eye
+lenses), Industrial (Miner: rounded plates, hazard bands, headlamp, radiator pack), Builder (hard hat, tool
+loops, cable spool), Medic (glass dome, crosses, diagnostic screens, medicine case) - one piece per slot
+(helmet, chest, arms, legs, pack) and each assembled on the frame. Sheet colours only tell the styles apart;
+in game the plates take the suit's tint.
