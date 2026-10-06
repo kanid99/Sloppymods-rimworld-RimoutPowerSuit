@@ -78,8 +78,8 @@ def torso(s):
                  # a gentle line defining the lower curve and the inner edge, with a faint light line under it
                  + f'<polyline points="{V.P(edge)}" fill="none" stroke="#3c3a40" stroke-width="0.9" stroke-opacity="0.5" stroke-linecap="round" stroke-linejoin="round"/>'
                  + f'<polyline points="{V.P([(x, y + 1) for x, y in edge])}" fill="none" stroke="#f6f6f8" stroke-width="0.7" stroke-opacity="0.5" stroke-linecap="round" stroke-linejoin="round"/>')
-    s.plate(R([(155, 116), (165, 116), (168, 172), (160, 182), (152, 172)], 4), 2)                 # centre keel
-    s.detail(rivets((160, 124), (160, 168), 5, 0.9)
+    s.plate(R([(153, 118), (167, 118), (167, 180), (153, 180)], 3), 2)                             # centre ridge: straight, square-ended (not a tie)
+    s.detail(rib((154, 132), (166, 132)) + rib((154, 156), (166, 156))
              + f'<rect x="184" y="172" width="14" height="3.6" rx="1" fill="#1d1b1e"/><rect x="186" y="173" width="10" height="1.6" fill="#8ef08a" filter="url(#GLOW)"/>'
              + bolt(104, 140) + bolt(216, 140))
 

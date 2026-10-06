@@ -189,6 +189,6 @@ shadows, lit/shaded chamfer faces, form gradients); seams faint.
 
 `armor_t51.py` -> `armor/armor_heavy_t51_*`: the warcasket-like Heavy set blended with T-51b-inspired elements -
 retro rounded forms, raised horizontal strakes (light top edge, soft dark line under) on the pauldrons, forearms,
-knees and greaves, rivet rows (brow, collar, pauldron rims, thighs, pack), a ribbed accordion abdomen, a centre
-keel with rivets, a heavy brow ridge, and a ribbed respirator with filter canisters that juts in front of the collar.
+knees and greaves, rivet rows (brow, collar, pauldron rims, thighs, pack), a ribbed accordion abdomen, a straight
+square-ended centre ridge (a narrow tapered keel with rivets read as a necktie - avoid), a heavy brow ridge, and a ribbed respirator with filter canisters that juts in front of the collar.
 Influences only: the T-51b helmet face (twin round eye lenses) is not used; our recessed slit visor stays.
