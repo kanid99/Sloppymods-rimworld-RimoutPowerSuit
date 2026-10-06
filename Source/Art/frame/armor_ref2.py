@@ -64,21 +64,40 @@ def build(prefix):
         kx = 160 + s * 32
         d.light(kx - 3.5, 280, 7, 3, '#4aa8ff', '#e2f2ff')
 
-    # ---- waist: dark undersuit, cables, chevron abdomen, groin plate, hip tassets
-    d.part([F([(118, 160), (202, 160), (206, 200), (188, 214), (132, 214), (114, 200)], (0, 0, 1), 'cyl_h', 'dark')], grime=False)
-    for s in (-1, 1):
-        for k in range(2):
-            d.tube(mirror([(114 + k * 6, 162), (110 + k * 6, 180), (116 + k * 6, 196), (126 + k * 5, 208)], s), 2.8)
-    d.part([F([(152, 210), (168, 210), (170, 214), (150, 214)], (0, -0.8, 0.6)),
-            F([(150, 214), (170, 214), (168, 228), (160, 234), (152, 228)], (0, 0.05, 1))])
-    for k in (3, 2, 1, 0):
-        y0 = 164 + k * 11
-        d.part([F([(130 + k * 3, y0), (190 - k * 3, y0), (192 - k * 3, y0 + 3), (128 + k * 3, y0 + 3)], (0, -0.85, 0.5)),
-                F([(128 + k * 3, y0 + 3), (192 - k * 3, y0 + 3), (186 - k * 3, y0 + 10), (160, y0 + 14), (134 + k * 3, y0 + 10)], (0, 0.1, 1))])
-    for s in (-1, 1):
-        d.part([Fs([(186, 200), (212, 204), (220, 224), (200, 232), (190, 220)], (0.35, 0.1, 0.93), s),
-                Fs([(212, 204), (218, 206), (226, 226), (220, 224)], (0.85, 0.1, 0.5), s)])
-        d.bolt(*mirror([(200, 214)], s)[0])
+    # ---- waist (from the sample): a broad, heavy segmented abdomen, a thick belt with a buckle box,
+    # a shield-shaped groin plate and big curved hip plates
+    d.part([F([(116, 160), (204, 160), (208, 206), (190, 216), (130, 216), (112, 206)], (0, 0, 1), 'cyl_h', 'dark')], grime=False)
+    for s_ in (-1, 1):
+        d.tube(mirror([(118, 164), (112, 184), (116, 204)], s_), 2.8)
+    for k in (2, 1, 0):                                        # three thick bands, each a front face and two angled sides
+        y0 = 166 + k * 13; w = 44 - k * 3
+        d.part([F([(160 - w + 10, y0), (160 + w - 10, y0), (160 + w - 9, y0 + 3), (160 - w + 9, y0 + 3)], (0, -0.85, 0.5)),
+                F([(160 - w + 9, y0 + 3), (160 + w - 9, y0 + 3), (160 + w - 11, y0 + 13), (160 - w + 11, y0 + 13)], (0, 0.08, 1)),
+                F([(160 + w - 10, y0), (160 + w, y0 + 4), (160 + w - 3, y0 + 12), (160 + w - 11, y0 + 13), (160 + w - 9, y0 + 3)], (0.75, 0, 0.66)),
+                F([(160 - w + 10, y0), (160 - w, y0 + 4), (160 - w + 3, y0 + 12), (160 - w + 11, y0 + 13), (160 - w + 9, y0 + 3)], (-0.75, 0, 0.66))])
+        d.part([F([(155, y0 + 2), (165, y0 + 2), (164, y0 + 12), (156, y0 + 12)], (0, -0.1, 1))], shadow=False, grime=False)
+    # belt
+    d.part([F([(114, 205), (206, 205), (208, 210), (112, 210)], (0, -0.8, 0.6), 'flat', 'metal'),
+            F([(112, 210), (208, 210), (204, 217), (116, 217)], (0, 0.15, 1), 'cyl_h', 'metal')], grime=False)
+    d.part([F([(150, 203), (170, 203), (172, 219), (148, 219)], (0, 0, 1))])                       # buckle box
+    d.recess([(153, 207), (167, 207), (167, 215), (153, 215)], 'dark')
+    d.light(156.5, 210, 7, 2.6, '#f2a83a', '#fff0c8')
+    for s_ in (-1, 1):                                                                         # belt pouches
+        d.part([Fs([(176, 207), (190, 207), (190, 220), (176, 220)], (0, 0.1, 1), s_)])
+        d.groove(mirror([(176, 211), (190, 211)], s_), 0.7)
+    # big shield-shaped groin plate
+    d.part([F([(142, 218), (178, 218), (176, 222), (144, 222)], (0, -0.8, 0.6)),
+            F([(144, 222), (160, 222), (160, 252), (150, 244), (142, 232)], (-0.25, 0.1, 0.96)),
+            F([(160, 222), (176, 222), (178, 232), (170, 244), (160, 252)], (0.25, 0.1, 0.96))])
+    d.bolt(160, 229, 1.3)
+    # big curved hip plates
+    for s_ in (-1, 1):
+        d.part([Fs([(182, 210), (210, 212), (222, 224), (224, 244), (206, 252), (186, 244), (180, 226)], (0.35, 0.05, 0.94), s_),
+                Fs([(210, 212), (216, 213), (230, 226), (232, 244), (224, 244), (222, 224)], (0.85, 0.05, 0.52), s_),
+                Fs([(186, 244), (206, 252), (224, 244), (222, 250), (206, 258), (188, 250)], (0.15, 0.8, 0.58), s_)])
+        d.groove(mirror([(186, 230), (206, 236), (222, 232)], s_))
+        d.bolt(*mirror([(198, 222)], s_)[0])
+        d.bolt(*mirror([(214, 240)], s_)[0])
 
     # ---- breastplate
     facets = [F([(118, 110), (202, 110), (212, 122), (160, 128), (108, 122)], (0, -0.55, 0.83)),
@@ -98,77 +117,114 @@ def build(prefix):
 
     # ---- arms
     for s in (-1, 1):
-        d.part([F(mirror(band((234, 150), (254, 148), (256, 182), (236, 184), 1.6), s), (0, 0, 1), 'cyl_h')])
+        acx = 160 + s * 86
+        d.add(f'<g transform="translate({acx} 0) scale(1.38 1) translate({-acx} 0)">')   # bulkier arms (sample ratio)
+        d.part([F(mirror(band((230, 148), (262, 146), (262, 186), (231, 188), 1.8), s), (0, 0, 1), 'cyl_h')])
         ex = 160 + s * 86
-        d.part([F(circle(ex, 188, 7.5), (0, 0, 1), 'dome', 'dark')], grime=False)
+        d.part([F(circle(ex, 189, 10.5), (0, 0, 1), 'dome', 'dark')], grime=False)
         d.bolt(ex, 188, 1.5)
         d.piston(mirror([(258, 158)], s)[0], mirror([(266, 204)], s)[0])
-        lower = band((228, 212), (266, 210), (262, 238), (232, 240), 3)
-        upper = band((226, 193), (262, 191), (265, 212), (228, 214), 3)
-        ring = band((232, 237), (262, 235), (262, 244), (232, 246), 2.2)
+        lower = band((231, 212), (263, 211), (262, 238), (232, 240), 2.6)
+        upper = band((230, 193), (262, 192), (263, 212), (231, 214), 2.6)
+        ring = band((232, 237), (262, 236), (262, 244), (232, 246), 2.2)
         d.part([F(mirror(lower, s), (0, 0.1, 1), 'cyl_h')])
         d.part([F(mirror(upper, s), (0, -0.1, 1), 'cyl_h')])
         d.part([F(mirror(ring, s), (0, 0, 1), 'cyl_h', 'dark')], grime=False)
         for k in range(1, 4):
             x = 232 + k * 7.5
             d.groove(mirror([(x, 237.5 + 2.2 * 2 * 4 * ((x - 232) / 30) * (1 - (x - 232) / 30) * 0.5 + 0.2), (x, 244.5)], s), 0.7)
-        mid = band((228, 202), (264, 200), (264, 200), (228, 202), 3)[:11]
+        mid = band((230, 202), (262, 201), (262, 201), (230, 202), 2.6)[:11]
         d.groove(mirror(mid, s))
-        lowg = band((230, 224), (266, 222), (266, 222), (230, 224), 3)[:11]
-        d.hazard(mirror([(254, 197), (263, 196), (264, 202), (255, 203)], s))
+        lowg = band((231, 224), (263, 223), (263, 223), (231, 224), 2.6)[:11]
+        d.hazard(mirror([(252, 197), (261, 196), (262, 202), (253, 203)], s))
         d.groove(mirror(lowg, s)); d.bolt(*mirror([(236, 232)], s)[0])
+        # an armoured gauntlet over the frame's fist: knuckle plate, back of hand, thumb, finger segments
+        d.part([Fs([(234, 246), (260, 246), (262, 256), (232, 256)], (0, -0.4, 0.92), s, 'flat', 'metal'),
+                Fs([(232, 256), (262, 256), (260, 266), (234, 266)], (0, 0.3, 0.95), s, 'flat', 'dark')], grime=False)
+        for k in range(4):
+            x = 235 + k * 6.5
+            d.part([Fs([(x, 264), (x + 5.4, 264), (x + 5, 272), (x + 0.4, 272)], (0, 0.4, 0.9), s, 'flat', 'metal')], shadow=False, grime=False)
+        d.part([Fs([(230, 250), (234, 250), (232, 262), (227, 260)], (-0.7, 0.2, 0.7), s, 'flat', 'metal')], shadow=False, grime=False)
+        d.groove(mirror([(236, 251), (258, 251)], s), 0.7)
+        d.add('</g>')
 
-    # ---- neck cables, helmet, collar, respirator
-    d.add('<g transform="translate(160 0) scale(0.85 1) translate(-160 0)">')            # the helmet, 15% narrower
-    for s in (-1, 1):
-        d.tube(mirror([(178, 102), (186, 94), (190, 86)], s), 2.6)
-    for s in (-1, 1):
-        d.part([Fs([(186, 84), (200, 82), (204, 104), (190, 108), (184, 98)], (0.55, 0, 0.83), s)])
+    # collar with a curved neck cutout: a dark recess where the helmet sits, two collar pieces either side
+    neck = [(132, 110), (188, 110), (186, 122), (176, 131), (144, 131), (134, 122)]
+    d.recess(neck, 'dark')
+    for s_ in (-1, 1):
+        inner = [(190, 126), (185, 121), (184, 116), (186, 112)]
+        d.part([Fs([(186, 112), (202, 112), (210, 118), (190, 118)], (0, -0.8, 0.6), s_),
+                Fs([(190, 118), (210, 118), (200, 126)] + inner[:1], (0, 0.15, 0.99), s_)])
+        d.bolt(*mirror([(200, 121)], s_)[0], 1.1)
+        d.groove(mirror([(188, 112), (184, 118), (186, 124), (192, 128)], s_), 0.8)
+    # ---- helmet (from the owner's second reference): crested dome, wide tinted visor, gas-mask snout, hoses
     from armor_ws2 import rounded
-    d.part([F(rounded([(134, 58), (186, 58), (198, 74), (198, 100), (122, 100), (122, 74)], 16), (0, -0.1, 1), 'dome')])
-    d.part([F([(146, 56), (174, 56), (178, 70), (142, 70)], (0, -0.5, 0.86)),
-            F([(126, 72), (194, 72), (198, 76), (122, 76)], (0, -0.8, 0.6)),
-            F([(122, 76), (198, 76), (194, 84), (126, 84)], (0, 0.1, 1))], shadow=True)
-    for k in range(3):
-        d.groove([(148, 60 + k * 3.5), (172, 60 + k * 3.5)], 0.7)
-    visor = [(126, 85), (148, 87), (160, 93), (172, 87), (194, 85), (192, 93), (172, 97), (160, 102), (148, 97), (128, 93)]
+    d.add('<g transform="translate(160 0) scale(0.85 1) translate(-160 0)">')
+    for s_ in (-1, 1):                                                                             # ear housings
+        d.part([Fs([(186, 80), (200, 78), (204, 98), (190, 102), (184, 94)], (0.6, 0, 0.8), s_)])
+        d.bolt(*mirror([(195, 90)], s_)[0], 1.4)
+    d.part([F(rounded([(134, 56), (186, 56), (198, 72), (198, 98), (122, 98), (122, 72)], 17), (0, -0.1, 1), 'dome')])
+    d.part([F([(155, 50), (165, 50), (167, 72), (153, 72)], (0, -0.4, 0.92)),                      # raised crest ridge
+            F([(165, 50), (169, 54), (170, 72), (167, 72)], (0.8, 0, 0.6))], shadow=True)
+    d.part([F([(124, 70), (196, 70), (200, 75), (120, 75)], (0, -0.8, 0.6)),                        # brow
+            F([(120, 75), (200, 75), (196, 80), (124, 80)], (0, 0.2, 0.98))])
+    visor = [(126, 81), (194, 81), (190, 95), (130, 95)]
     d.recess(visor, 'dark')
-    d.add(f'<polyline points="{P([(131, 89), (149, 91), (160, 97.5), (171, 91), (189, 89)])}" fill="none" stroke="#ff3a22" stroke-width="3.4" filter="url(#{d.glow})"/>'
-          f'<polyline points="{P([(132, 89), (149, 91.2), (160, 97.4), (171, 91.2), (188, 89)])}" fill="none" stroke="#ffd0bf" stroke-width="1.1"/>'
-          f'<polyline points="{P([(136, 87.6), (146, 88.4)])}" stroke="#ffffff" stroke-width="0.9" stroke-opacity="0.7"/>')
+    gid = d.id()
+    d.defs.append(f'<linearGradient id="{gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6d77a"/>'
+                  f'<stop offset="0.5" stop-color="#c8923a"/><stop offset="1" stop-color="#6e4a1c"/></linearGradient>')
+    d.add(f'<polygon points="{P([(128, 82.5), (192, 82.5), (188.8, 93.5), (131.2, 93.5)])}" fill="url(#{gid})" fill-opacity="0.92"/>'
+          f'<polygon points="{P([(128, 82.5), (192, 82.5), (188.8, 93.5), (131.2, 93.5)])}" fill="#ffc860" fill-opacity="0.35" filter="url(#{d.glow})"/>'
+          f'<polygon points="{P([(134, 83.5), (150, 83.5), (143, 92.5), (136, 92.5)])}" fill="#fff" fill-opacity="0.38"/>'
+          f'<line x1="154" y1="83.5" x2="150" y2="92.5" stroke="#fff" stroke-opacity="0.25" stroke-width="1.6"/>')
+    # gas-mask snout with a round filter, corrugated hoses down to the collar
+    for s_ in (-1, 1):
+        pts = mirror([(172, 108), (186, 112), (194, 104), (200, 110)], s_)
+        d.tube(pts, 4.4, '#55575e', '#a8aab2')
+        for k in range(1, 6):
+            t = k / 6
+            x = pts[0][0] + (pts[-1][0] - pts[0][0]) * t; y = pts[0][1] + (pts[-1][1] - pts[0][1]) * t + (-4 * t * (1 - t) * 1.2)
+            d.add(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="2.3" fill="none" stroke="#1c1a19" stroke-width="0.7" stroke-opacity="0.7"/>')
+    d.part([F([(146, 96), (174, 96), (180, 106), (174, 116), (146, 116), (140, 106)], (0, 0.05, 1)),
+            F([(146, 116), (174, 116), (168, 122), (152, 122)], (0, 0.8, 0.6))])
+    d.part([F(circle(160, 108, 7.5), (0, 0, 1), 'dome', 'metal')], grime=False)
+    d.add(f'<circle cx="160" cy="108" r="4.6" fill="#1d1b1e"/>')
+    for k in range(6):
+        ang = k * math.pi / 3
+        d.add(f'<line x1="160" y1="108" x2="{160 + 4.4 * math.cos(ang):.2f}" y2="{108 + 4.4 * math.sin(ang):.2f}" stroke="#8a8c94" stroke-width="0.8"/>')
     d.add('</g>')
-    d.part([F([(118, 96), (202, 96), (210, 104), (110, 104)], (0, -0.8, 0.6)),
-            F([(110, 104), (210, 104), (200, 122), (120, 122)], (0, 0.15, 0.99))])
-    for x in (118, 140, 180, 202):
-        d.bolt(x, 113, 1.1)
-    d.add('<g transform="translate(160 0) scale(0.85 1) translate(-160 0)">')            # the respirator, narrowed with the helmet
-    d.part([F([(144, 100), (176, 100), (180, 112), (172, 120), (148, 120), (140, 112)], (0, 0.05, 1)),
-            F([(148, 120), (172, 120), (168, 125), (152, 125)], (0, 0.8, 0.6))])
-    d.vent(146, 104, 174, 117, 5)
-    d.add('</g>')
+    # a round pressure gauge on the chest
+    d.part([F(circle(136, 136, 6.5), (0, 0, 1), 'dome', 'metal')], grime=False)
+    d.add('<circle cx="136" cy="136" r="4.4" fill="#ece6d4" stroke="#1c1a19" stroke-width="0.6"/>'
+          '<line x1="136" y1="136" x2="139" y2="133" stroke="#b02a1a" stroke-width="0.9"/><circle cx="136" cy="136" r="0.8" fill="#1c1a19"/>')
 
-    # ---- pauldrons (90% about the shoulder)
-    SC = lambda p: [(236 + (x - 236) * 0.9 - 9, 120 + (y - 120) * 0.9) for x, y in p]   # 90%, brought 9 px in toward the head
+    # ---- pauldrons (90% about the shoulder): a concave curved cutout on the inner edge shows more chest plate
+    SC = lambda p: [(246 + (x - 246) * 0.6, 122 + (y - 122) * 0.6) for x, y in p]   # smaller, per the sample's ratio
+    def arc(a, c, b, k=8):
+        return [((1 - t) ** 2 * a[0] + 2 * (1 - t) * t * c[0] + t * t * b[0],
+                 (1 - t) ** 2 * a[1] + 2 * (1 - t) * t * c[1] + t * t * b[1]) for t in [i / k for i in range(1, k)]]
     for s in (-1, 1):
         G = lambda p, n, kind='flat', tone='light': Fs(SC(p), n, s, kind, tone)
-        d.part([G([(202, 138), (272, 142), (290, 134), (288, 146), (272, 156), (206, 152)], (0.2, 0.35, 0.92)),
-                G([(206, 152), (272, 156), (288, 146), (284, 152), (270, 160), (208, 156)], (0.1, 0.85, 0.5))])
-        d.part([G([(196, 104), (236, 92), (272, 100), (288, 126), (270, 142), (206, 138), (192, 122)], (0.2, 0.05, 0.98)),
-                G([(200, 98), (236, 84), (274, 94), (272, 100), (236, 92), (196, 104)], (0.15, -0.85, 0.5)),
+        lame = [(216, 138), (272, 142), (290, 134), (288, 146), (272, 156), (220, 152)] + arc((220, 152), (229, 146), (216, 138))
+        d.part([G(lame, (0.2, 0.35, 0.92)),
+                G([(220, 152), (272, 156), (288, 146), (284, 152), (270, 160), (223, 156)], (0.1, 0.85, 0.5))])
+        main = [(212, 100), (236, 92), (272, 100), (288, 126), (270, 142), (214, 140)] + arc((214, 140), (234, 120), (212, 100))
+        d.part([G(main, (0.2, 0.05, 0.98)),
+                G([(217, 94), (236, 84), (274, 94), (272, 100), (236, 92), (212, 100)], (0.15, -0.85, 0.5)),
                 G([(272, 100), (274, 94), (294, 126), (288, 126)], (0.85, -0.2, 0.5)),
                 G([(288, 126), (294, 126), (290, 136), (270, 142)], (0.7, 0.5, 0.5))])
-        d.part([G([(210, 100), (238, 91), (264, 98), (262, 105), (238, 99), (213, 106)], (0.1, -0.5, 0.86))], shadow=True)
-        v = mirror(SC([(244, 112), (268, 126)]), s)
+        d.part([G([(224, 98), (240, 91), (264, 98), (262, 105), (240, 99), (227, 104)], (0.1, -0.5, 0.86))], shadow=True)
+        v = mirror(SC([(250, 112), (270, 126)]), s)
         x0, x1 = sorted([v[0][0], v[1][0]])
         d.vent(x0, v[0][1], x1, v[1][1], 5)
-        h = mirror(SC([(208, 116), (232, 116), (232, 130), (208, 130)]), s)
+        h = mirror(SC([(229, 113), (245, 113), (245, 126), (229, 126)]), s)
         d.recess(h)
-        for p in mirror(SC([(211, 119), (229, 119), (229, 127), (211, 127)]), s):
+        for p in mirror(SC([(231.5, 115.5), (242.5, 115.5), (242.5, 123.5), (231.5, 123.5)]), s):
             d.bolt(*p, 0.8)
-        d.stencil(*mirror(SC([(222, 138)]), s)[0], '7A', 3.2)
+        d.stencil(*mirror(SC([(238, 137)]), s)[0], '7A', 3.2)
         lx, ly = mirror(SC([(284, 132)]), s)[0]
         d.light(lx - 2, ly - 1.6, 4, 3.2, '#f2a83a', '#fff0c8')
-        d.groove(mirror(SC([(206, 134), (270, 138)]), s))
+        d.groove(mirror(SC([(226, 134), (270, 138)]), s))
     return d.svg()
 
 if __name__ == '__main__':

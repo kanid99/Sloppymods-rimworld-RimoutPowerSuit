@@ -216,3 +216,10 @@ Reference suit tweaks (owner): forearm cuffs, upper arms and wrist rings are cyl
 a bright band a third across, reflected light at the far edge, a soft specular streak; no lit-edge lines or glints)
 with band edges bowing down like rings round a cylinder; the helmet and respirator are 15% narrower; the pauldrons
 sit 9 px further in toward the head.
+Second reference (owner's, not committed) and owner fixes: crested dome helmet with a brow, a wide amber visor,
+a gas-mask snout with a round filter and corrugated hoses to the collar; a neck cutout in the collar (dark recess) so
+more of the helmet shows; a round chest gauge (no "U.S." marking). Proportions per the sample: pauldrons at 60%
+(about the helmet's width), sitting on the arm, with a concave curved inner edge showing more chest; arms one even
+width from shoulder to wrist; armoured gauntlets. Waist per the sample: three broad faceted abdomen bands (almost
+chest width) with a centre ridge, a thick belt with a lit buckle box and pouches, a shield-shaped groin plate and
+big curved hip plates.
