@@ -170,3 +170,15 @@ under overlapping plates, inner bevels (lit top-left edge, shaded bottom-right),
 and grilles, bolts with highlights, pistons at elbows and knees, stencils and hazard decals, scratches and edge
 wear, soft glow on visors, lights and cell rings. Checked at game size (320 px canvas): it reads at 320 and 160.
 Heavy (Bulwark) is done south and north (`armor/armor_heavy_*`); the other four styles still follow.
+
+### Warcasket-like Heavy set (resemble, not copy)
+
+`armor_ws2.py` (renderer `armor_vfe.py`): our own Heavy pieces in the warcasket design language - top-heavy
+silhouette, small helmet sunk into a high collar, big rounded dome pauldrons with a rim lip, barrel chest over
+banded abdomen, flared hip skirt, chunky forearm cuffs, big round knee guards, short flared greaves; big smooth
+rounded plates; light grey (takes the tint). The recorded no-gos stay out (T visor, twin back exhausts, round
+grille snout with hoses). Owner's rule: resemble the design elements, never copy a warcasket.
+
+**Line weight (owner):** RimWorld uses lighter lines than our first passes - a light silhouette outline (3.4 at
+the 320 canvas, `SIL_W`), no dark line between plates, and shading without lines to suggest dimension (soft cast
+shadows, lit/shaded chamfer faces, form gradients); seams faint.
