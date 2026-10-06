@@ -51,7 +51,11 @@ def torso(s):
         s.plate(R(M([(180, 200), (220, 204), (232, 236), (198, 242), (182, 226)], sd), 7), 3.4)
     s.plate(R([(110, 116), (210, 116), (228, 134), (226, 168), (206, 188), (114, 188), (94, 168), (92, 134)], 18), 5)   # barrel chest
     for sd in (-1, 1):                                                                             # raised pectorals
-        s.plate(R(M([(163, 121), (206, 118), (224, 127), (222, 140), (204, 154), (182, 164), (164, 167)], sd), 10), 1.8)
+        pec = R(M([(163, 121), (206, 118), (224, 127), (222, 140), (204, 154), (182, 164), (164, 167)], sd), 10)
+        low = R(M([(222, 140), (204, 154), (182, 164), (164, 167)], sd), 10)
+        # shading only: a soft light on the upper surface, a soft shadow under the lower curve
+        s.detail(f'<polygon points="{V.P(pec)}" fill="#ffffff" fill-opacity="0.16" filter="url(#SOFT)"/>'
+                 f'<polyline points="{V.P([(x, y + 2.5) for x, y in low])}" fill="none" stroke="#3c3a40" stroke-width="3.2" stroke-opacity="0.32" stroke-linecap="round" filter="url(#SOFT)"/>')
     s.detail(seam((160, 166), (160, 184))                                                          # the sternum channel below them
              + f'<rect x="184" y="172" width="14" height="3.6" rx="1" fill="#1d1b1e"/><rect x="186" y="173" width="10" height="1.6" fill="#8ef08a" filter="url(#GLOW)"/>'
              + bolt(104, 140) + bolt(216, 140))

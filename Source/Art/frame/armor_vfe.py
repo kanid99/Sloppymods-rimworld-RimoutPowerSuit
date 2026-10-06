@@ -68,13 +68,15 @@ class Suit:
         glow = self.id()
         self.defs.append(f'<filter id="{glow}" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="1.5"/></filter>')
         self.glow = glow
+        soft = self.id()
+        self.defs.append(f'<filter id="{soft}" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.6"/></filter>')
         out = []
         plates = [it for it in self.items if it[0] == 'plate']
         for _, p, _, _ in plates:                                   # heavy silhouette outline
             out.append(f'<polygon points="{P(p)}" fill="{OLC}" stroke="{OLC}" stroke-width="{SIL_W}" stroke-linejoin="round"/>')
         for it in self.items:
             if it[0] == 'detail':
-                out.append(it[1].replace('GLOW', glow)); continue
+                out.append(it[1].replace('GLOW', glow).replace('SOFT', soft)); continue
             _, p, c, shadow = it
             if shadow:
                 out.append(f'<polygon points="{P([(x + 2.4, y + 3.2) for x, y in p])}" fill="#000" fill-opacity="0.45" filter="url(#{blur})"/>')
