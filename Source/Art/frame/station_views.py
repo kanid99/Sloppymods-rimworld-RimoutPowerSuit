@@ -112,13 +112,16 @@ def east_back(d):
     # hoist arm over the frame, chain down to its shoulder
     poly(d, [(84, 112), (190, 112), (190, 130), (84, 130)], YEL)
     flat(d, [(86, 114), (188, 114), (188, 118), (86, 118)], YEL_HI)
-    poly(d, [(84, 126), (120, 126), (116, 142), (88, 142)], STEEL)
-    ball(d, 102, 134, 5, STEEL_DK, STEEL)
-    chain(d, 102, 140, 286)
+    poly(d, [(80, 126), (120, 126), (116, 142), (84, 142)], STEEL)
+    ball(d, 92, 132, 4, STEEL_DK, STEEL)
+    ball(d, 104, 135, 5, STEEL_DK, STEEL)
+    chain(d, 92, 136, 274)                                          # the far chain, behind the frame (higher: further away)
+    hook(d, 92, 268, 1)
     tube(d, [(196, 262), (194, 330), (198, 420)], 5, (60, 60, 64, 255), (100, 100, 104, 255))
     clamp_arm(d, 298)                                               # the far arm, behind the frame (higher: further away)
 
 def east_front(d):
+    chain(d, 102, 140, 286)                                         # the near chain, in front of the frame
     hook(d, 102, 280, 1)
     clamp_arm(d, 312)                                               # the near arm, across the frame's side
     cabinet(d, 128, 540, 182, 622)                                  # front-right of the station = south-east corner

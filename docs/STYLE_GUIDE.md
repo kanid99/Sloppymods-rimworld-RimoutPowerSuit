@@ -151,5 +151,5 @@ outlines sit inside shapes). SVGs that would embed vanilla art (the pawn) stay o
 chain hoist with hooks on the frame's shoulders, two clamp arms on its sides, boot clamps, work lamps, a
 3-cell charging dock, monitor and tool cabinet. Posts at the station's front corners; the pilot enters from the
 open back. East is a side elevation: the near post hides the far one, the beam is end-on on top, the far
-clamp arm sits a little higher than the near one. Drawn at the suit's scale (117.8 px per tile); the gantry
+clamp arm and the far chain sit a little higher than the near ones. Drawn at the suit's scale (117.8 px per tile); the gantry
 rises above the footprint (needs a taller drawSize).
