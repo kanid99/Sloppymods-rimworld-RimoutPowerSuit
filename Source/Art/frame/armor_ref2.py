@@ -118,7 +118,7 @@ def build(prefix):
     # ---- arms
     for s in (-1, 1):
         acx = 160 + s * 86
-        d.add(f'<g transform="translate({acx} 0) scale(1.38 1) translate({-acx} 0)">')   # bulkier arms (sample ratio)
+        d.add(f'<g transform="translate({acx} 0) scale(1.24 1) translate({-acx} 0)">')   # bulkier arms (sample ratio)
         d.part([F(mirror(band((230, 148), (262, 146), (262, 186), (231, 188), 1.8), s), (0, 0, 1), 'cyl_h')])
         ex = 160 + s * 86
         d.part([F(circle(ex, 189, 10.5), (0, 0, 1), 'dome', 'dark')], grime=False)
@@ -199,7 +199,7 @@ def build(prefix):
           '<line x1="136" y1="136" x2="139" y2="133" stroke="#b02a1a" stroke-width="0.9"/><circle cx="136" cy="136" r="0.8" fill="#1c1a19"/>')
 
     # ---- pauldrons (90% about the shoulder): a concave curved cutout on the inner edge shows more chest plate
-    SC = lambda p: [(246 + (x - 246) * 0.6, 122 + (y - 122) * 0.6) for x, y in p]   # smaller, per the sample's ratio
+    SC = lambda p: [(246 + (x - 246) * 0.68, 122 + (y - 122) * 0.68) for x, y in p]   # smaller, per the sample's ratio
     def arc(a, c, b, k=8):
         return [((1 - t) ** 2 * a[0] + 2 * (1 - t) * t * c[0] + t * t * b[0],
                  (1 - t) ** 2 * a[1] + 2 * (1 - t) * t * c[1] + t * t * b[1]) for t in [i / k for i in range(1, k)]]
