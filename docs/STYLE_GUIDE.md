@@ -223,3 +223,13 @@ more of the helmet shows; a round chest gauge (no "U.S." marking). Proportions p
 width from shoulder to wrist; armoured gauntlets. Waist per the sample: three broad faceted abdomen bands (almost
 chest width) with a centre ridge, a thick belt with a lit buckle box and pouches, a shield-shaped groin plate and
 big curved hip plates.
+
+## Target style (owner's image), traced and reduced
+
+The owner's target image (an illustrated heavy suit; their image, not committed) was traced to SVG part by part -
+`trace_parts.py` cuts it into helmet, exhaust, pauldrons, arms, torso and legs and traces each with vtracer into its
+own `<g id>` - then reduced to RimWorld style by `reduce_parts.py`: grime smoothed, each part quantised to 8-12 flat
+tones, olive/rust plates turned into neutral grey of the same lightness (so the suit tint applies), the outline
+softened to dark grey-brown, accents kept (hazard yellow, gauge, visor, dark joints, the cream star decal), small
+specks dropped. Result: `target/target_rimworld.svg` (+ PNGs, and `target_cmp.png` showing the original, the grey
+base and two tints). It keeps the target's own proportions (long legs) - fitting it to the frame is a later step.
