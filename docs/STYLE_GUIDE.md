@@ -184,3 +184,11 @@ grille snout with hoses). Owner's rule: resemble the design elements, never copy
 **Line weight (owner):** RimWorld uses lighter lines than our first passes - a light silhouette outline (3.4 at
 the 320 canvas, `SIL_W`), no dark line between plates, and shading without lines to suggest dimension (soft cast
 shadows, lit/shaded chamfer faces, form gradients); seams faint.
+
+### Variant: warcasket-like + T-51b influences
+
+`armor_t51.py` -> `armor/armor_heavy_t51_*`: the warcasket-like Heavy set blended with T-51b-inspired elements -
+retro rounded forms, raised horizontal strakes (light top edge, soft dark line under) on the pauldrons, forearms,
+knees and greaves, rivet rows (brow, collar, pauldron rims, thighs, pack), a ribbed accordion abdomen, a centre
+keel with rivets, a heavy brow ridge, and a ribbed respirator with filter canisters that juts in front of the collar.
+Influences only: the T-51b helmet face (twin round eye lenses) is not used; our recessed slit visor stays.
