@@ -138,3 +138,18 @@ Shared with the Bulwark (symlinked): side and back body, legs, shoulder plates, 
   - The pack is the plain pack's column (`pack_box`) plus whatever the repaint added over
     `pack_base`.
   - Output: `Body_northopen`.
+
+## SVG masters (owner's rule)
+
+Art drawn in code is produced as SVG and converted to PNG; both are committed (`Source/Art/frame/svg/`,
+`Source/Art/frame/station/`). `frame_svg.py` records the same drawing calls as vector shapes (Pillow-matching:
+outlines sit inside shapes). SVGs that would embed vanilla art (the pawn) stay out of git.
+
+## Power armour station (test, 3x2)
+
+`Source/Art/frame/station.py` (south) and `station_views.py` (north, east): a yellow gantry over a steel deck,
+chain hoist with hooks on the frame's shoulders, two clamp arms on its sides, boot clamps, work lamps, a
+3-cell charging dock, monitor and tool cabinet. Posts at the station's front corners; the pilot enters from the
+open back. East is a side elevation: the near post hides the far one, the beam is end-on on top, the far
+clamp arm sits a little higher than the near one. Drawn at the suit's scale (117.8 px per tile); the gantry
+rises above the footprint (needs a taller drawSize).

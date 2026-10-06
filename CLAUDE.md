@@ -118,3 +118,8 @@ commit pushed to `main` is what the game loads next**.
   test in game.
 - For art changes, show the owner before/after comparisons - but they ship to
   the default branch like any other change; the build branch is the way back.
+- **Code-drawn art is made as SVG first, and the SVG is always committed** next to the
+  PNGs made from it (the SVG is the editable reference; the game still loads PNGs).
+  The drawing scripts write SVG through `Source/Art/frame/frame_svg.py`; PNGs are
+  rendered from the SVG with the preinstalled Chromium. Never commit an SVG that
+  embeds vanilla game art (e.g. the `_pilot` previews with the vanilla pawn).
