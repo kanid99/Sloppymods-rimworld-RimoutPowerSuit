@@ -162,3 +162,11 @@ lenses), Industrial (Miner: rounded plates, hazard bands, headlamp, radiator pac
 loops, cable spool), Medic (glass dome, crosses, diagnostic screens, medicine case) - one piece per slot
 (helmet, chest, arms, legs, pack) and each assembled on the frame. Sheet colours only tell the styles apart;
 in game the plates take the suit's tint.
+
+### Detailed pass (Heavy first)
+
+`armor_detail.py` writes SVG directly for richer pieces: gradient bodies (lit top, dark bottom), cast shadows
+under overlapping plates, inner bevels (lit top-left edge, shaded bottom-right), layered lames, recessed vents
+and grilles, bolts with highlights, pistons at elbows and knees, stencils and hazard decals, scratches and edge
+wear, soft glow on visors, lights and cell rings. Checked at game size (320 px canvas): it reads at 320 and 160.
+Heavy (Bulwark) is done south and north (`armor/armor_heavy_*`); the other four styles still follow.
