@@ -72,9 +72,11 @@ def arm_low(s, sd):
     s.detail(slot(min(a[0], b[0]), 205, max(a[0], b[0]), 210) + bolt(*M([(256, 224)], sd)[0]))
 
 def pauldron(s, sd):
-    s.plate(R(M([(200, 140), (264, 144), (284, 134), (288, 148), (266, 162), (202, 156)], sd), 5), 2.6)   # rim lip
-    s.plate(R(M([(194, 98), (248, 88), (276, 102), (284, 136), (264, 150), (204, 146), (192, 124)], sd), 20), 5)  # dome
-    s.detail(seam(*M([(214, 112), (262, 108)], sd)) + bolt(*M([(218, 132)], sd)[0]) + bolt(*M([(270, 128)], sd)[0]))
+    """angular, armoured: tilted down and outward, flat faceted planes, tight corners, a sharp outer point"""
+    s.plate(R(M([(204, 138), (274, 142), (294, 132), (292, 148), (274, 160), (208, 154)], sd), 2), 2.4)      # angled lower lame
+    s.plate(R(M([(198, 102), (236, 88), (274, 98), (294, 130), (272, 146), (208, 142), (194, 124)], sd), 3), 4.4)   # main plate
+    s.plate(R(M([(214, 100), (238, 92), (270, 104), (268, 110), (238, 99), (216, 106)], sd), 2), 1.6)     # raised ridge along the top
+    s.detail(seam(*M([(214, 120), (276, 128)], sd)) + bolt(*M([(216, 134)], sd)[0]) + bolt(*M([(276, 136)], sd)[0]))
 
 def leg(s, sd):
     s.plate(R(M([(176, 292), (210, 292), (218, 308), (170, 310)], sd), 5), 3)                       # flared greave
@@ -121,7 +123,7 @@ def piece(fn, prefix):
 
 CELLS = [('Helmet + collar', (100, 44, 120, 90), 'south', lambda: piece(lambda s: (helmet(s), collar(s)), 'h')),
          ('Chest, abdomen, hip skirt', (84, 104, 152, 146), 'south', lambda: piece(torso, 'c')),
-         ('Pauldrons and forearm cuffs', (26, 80, 268, 176), 'south', lambda: piece(lambda s: [f(s, d) for d in (-1, 1) for f in (arm_low, pauldron)], 'a')),
+         ('Pauldrons and forearm cuffs', (16, 80, 288, 180), 'south', lambda: piece(lambda s: [f(s, d) for d in (-1, 1) for f in (arm_low, pauldron)], 'a')),
          ('Legs', (96, 222, 128, 94), 'south', lambda: piece(lambda s: (leg(s, -1), leg(s, 1)), 'l')),
          ('Pack (reactor)', (96, 80, 128, 134), 'north', lambda: piece(pack, 'p'))]
 
