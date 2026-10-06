@@ -233,3 +233,11 @@ tones, olive/rust plates turned into neutral grey of the same lightness (so the 
 softened to dark grey-brown, accents kept (hazard yellow, gauge, visor, dark joints, the cream star decal), small
 specks dropped. Result: `target/target_rimworld.svg` (+ PNGs, and `target_cmp.png` showing the original, the grey
 base and two tints). It keeps the target's own proportions (long legs) - fitting it to the frame is a later step.
+
+## Pill-body format, expanded to the frame (owner's direction)
+
+The owner's sheet (east/south/north pill-body suits; their image, not committed) was traced by part (helmet,
+pauldrons, pack/shoulder, body) with `pill_trace.py`, reduced to tintable grey (outline dark grey-brown, the star
+decal kept), and fitted to our frame canvas: helmet top at the raised pilot's head (y 52), base at the frame's feet
+(y 318). Output `pill/pill_suit_{east,south,north}.svg` (+ `pill_cmp.png` over the frame, tinted, game size).
+The pill covers the frame's torso and legs; the frame's arms still show at the sides in south/north.
