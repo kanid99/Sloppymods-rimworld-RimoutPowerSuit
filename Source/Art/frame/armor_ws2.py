@@ -53,9 +53,13 @@ def torso(s):
     for sd in (-1, 1):                                                                             # raised pectorals
         pec = R(M([(163, 121), (206, 118), (224, 127), (222, 140), (204, 154), (182, 164), (164, 167)], sd), 10)
         low = R(M([(222, 140), (204, 154), (182, 164), (164, 167)], sd), 10)
+        edge = R(M([(222, 140), (204, 154), (182, 164), (164, 166), (163, 124)], sd), 9)[3:-3]
         # shading only: a soft light on the upper surface, a soft shadow under the lower curve
         s.detail(f'<polygon points="{V.P(pec)}" fill="#ffffff" fill-opacity="0.16" filter="url(#SOFT)"/>'
-                 f'<polyline points="{V.P([(x, y + 2.5) for x, y in low])}" fill="none" stroke="#3c3a40" stroke-width="3.2" stroke-opacity="0.32" stroke-linecap="round" filter="url(#SOFT)"/>')
+                 f'<polyline points="{V.P([(x, y + 2.5) for x, y in low])}" fill="none" stroke="#3c3a40" stroke-width="3.2" stroke-opacity="0.32" stroke-linecap="round" filter="url(#SOFT)"/>'
+                 # a gentle line defining the lower curve and the inner edge, with a faint light line under it
+                 + f'<polyline points="{V.P(edge)}" fill="none" stroke="#3c3a40" stroke-width="0.9" stroke-opacity="0.5" stroke-linecap="round" stroke-linejoin="round"/>'
+                 + f'<polyline points="{V.P([(x, y + 1) for x, y in edge])}" fill="none" stroke="#f6f6f8" stroke-width="0.7" stroke-opacity="0.5" stroke-linecap="round" stroke-linejoin="round"/>')
     s.detail(seam((160, 166), (160, 184))                                                          # the sternum channel below them
              + f'<rect x="184" y="172" width="14" height="3.6" rx="1" fill="#1d1b1e"/><rect x="186" y="173" width="10" height="1.6" fill="#8ef08a" filter="url(#GLOW)"/>'
              + bolt(104, 140) + bolt(216, 140))
